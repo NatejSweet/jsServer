@@ -1,0 +1,25 @@
+<body>
+    <script src="./createWorld.js"></script>
+    <link rel='stylesheet'href='creation.css'>
+    </body>
+    <header>
+      <input type="text" id="worldName" name="worldName"><br>
+      <nav>
+        <ul id="navbar">
+          <li><input type='text' name='navItem'></li>
+        </ul>
+      </nav>
+      <div id="mapsContainer">
+          <h4>input an image for the map</h4><br>
+          <input id="mainMap" type="file" accept=".img,.jpg,.jpeg" onchange="readURL(this,'mainMapImg');" label="main image"><br>
+          <img id="mainMapImg" src="#" alt="your image" /><br>
+          <h4>input a second image (optional)</h4><br>
+          <input id="secondaryMap" type="file" accept=".img,.jpg,.jpeg" onchange="readURL(this,'secondaryMapImg');" label="secondary image"><br>
+          <img id="secondaryMapImg" src="#" alt="your image" />
+        </div>
+      </header>
+    <main id="main">
+      <button id="navAddButton">Add Nav Item</button>
+      <button id=addButton>Add section</button>
+      <button id=submitButton>Submit</button>
+    </main>

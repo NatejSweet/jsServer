@@ -1,0 +1,31 @@
+<head>
+  <title>Dashboard</title>
+  <div class="logout-block">
+    <a href="/logout" id="logoutButton">Logout</a>
+  </div>
+  <link rel="stylesheet" type="text/css" href="./assets/css/dash.css">
+  <script type="text/javascript" src="./assets/./javascript/dash.js"></script>
+</head>
+<body>
+  <h1>Welcome </h1>
+  <div class="dropdown">
+    <select id="myWorldsMenu" class="dropbtn">
+      <option value="" disabled selected hidden>Select one of your Worlds</option>
+    </select>
+  </div>
+  <div class = "dropdown">
+    <select id="savedWorldsMenu" class="dropbtn">
+      <option value="" disabled selected hidden>Select a Saved World</option>
+    </select>
+    </div>
+  <div class = "search">
+      <input type="text" id="searchBar" placeholder="Search for a World">
+      <button type="button" id="searchButton">Search</button>
+        <select id="searchResultsMenu" class="dropbtn"></select>
+          <option value="" disabled selected hidden>Select a World</option>
+  </div>
+  <div class="create">
+    <a href="./creation/createWorld.html" id="createButton">Create a New World</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+
+nav {
+    background-color: #C0C0C0;
+    padding: 1rem;
+  }
+  
+nav ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+    display: inline;
+  }
+  
+nav ul li {
+    padding: 0;
+    margin-left: 1rem;
+    display: inline;
+  }
+  #mapsContainer {
+    float: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 20px; /* Adjust this margin as needed to create space between header and maps */
+    width: 60%; /* Set the width of the container to 60% */
+    height: 400px; /* Set the height of the container to a fixed value */
+  }
+  
+  #mainMap, #secondaryMap {
+    width: 100%; /* Set the width of the maps to 100% to fill the container */
+    height: 100%; /* Set the height of the maps to 100% to fill the container */
+    margin: 0; /* Remove any margins */
+  }
+  
+  #mainMapImg, #secondaryMapImg {
+    width: 100%; /* Set the width of the images to 100% to fill the container */
+    height: auto; /* Set the height to auto to maintain aspect ratio */
+  }
+
+  .navColumns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  
+  .navColumns .column {
+    flex: 1 0 auto;
+    margin: 10px;
+  }
+  .column-div {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+  }

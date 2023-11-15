@@ -1,0 +1,6 @@
+#createAccountForm {
+    display: none;
+  }
+#loginForm {
+    display: block;
+  }
