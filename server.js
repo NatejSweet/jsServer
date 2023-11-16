@@ -136,3 +136,21 @@ app.get('/search', async (req, res) => {
   if (conn) conn.end();
 });
   
+
+app.post('/createWorld', async (req, res) => {
+  const { worldName, mapImageSrc } = req.body;
+  try {
+    let conn = await pool.getConnection();
+    const world = await conn.query(
+      'INSERT INTO worlds (name,ownerId,mapImageSrc) VALUES (?,?,?)',[worldName,req.session.userId,mapImageSrc]);
+    if (world) {
+      res.redirect('fillNavs.html');
+    } else {
+      res.redirect('/');
+    }
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
