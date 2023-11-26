@@ -1,8 +1,10 @@
 <body>
-    <script src="./javascript/createWorld.js"></script>
+  <script type="module" src="./javascript/fillNavs.js"></script>
+    <script type='module' src="./javascript/fillMainPage.js"></script>
     <link rel='stylesheet'href='./css/creation.css'>
     </body>
-    <header>
+    <header id="header">
+      <div id="mainContentHeaderDiv">
       <input type="text" id="worldName" name="worldName"><br>
       <nav>
         <ul id="navbar">
@@ -17,12 +19,19 @@
           <input id="secondaryMap" type="file" accept=".img,.jpg,.jpeg" onchange="readURL(this,'secondaryMapImg');" label="secondary image"><br>
           <img id="secondaryMapImg" src="#" alt="your image" />
         </div>
+      </div>
+      <div id="fillNavsHeaderDiv">
+        </div>
       </header>
     <main id="main">
+      <div id="mainContentFormDiv">
       <form id="mainContentForm">
       <button id="navAddButton">Add Nav Item</button>
       <button id="navRemoveButton">Remove A Nav Item</button>
       <button id=addButton>Add section</button>
       <button id=submitButton>Submit</button>
     </form>
+    </div>
+    <div id="fillNavsFormDiv">
+      </div>
     </main>

@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs')
 dotenv.config({ path: './.env'})
 const app = express()
 const port  = 3000
+app.use(express.json());
 
 var pool = mariadb.createPool({
   host: process.env.DB_HOST,
@@ -35,22 +36,17 @@ app.get('/',(req,res) => {
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  console.log('about to try')
   try {
     let conn = await pool.getConnection();
-    console.log('attempting')
     const result = await conn.query(
       'SELECT id, username, password FROM users WHERE username = ?',[username]);
-      console.log(result[0])
     if (result.length > 0 && await bcrypt.compare(password, result[0].password)) {
-      console.log(result[0].id)
       // Authentication successful
       req.session.userId = result[0].id;
       res.redirect('dash.html');
     } else {
       // Authentication failed
       req.session.message = 'Invalid username or password';
-      console.log('fail')
       res.redirect('/');
     }
     if (conn) conn.end();
@@ -93,7 +89,6 @@ app.post('/createAccount', async (req, res) => {
           res.redirect('dash.html');
         }else{
           req.session.message = 'Invalid username or password';
-          console.log('fail')
           res.redirect('/');
         }
       } catch (err) {
@@ -111,11 +106,10 @@ app.post('/createAccount', async (req, res) => {
 })
 
 app.get('/myWorlds', async (req, res) => {
-  console.log(req.session.userId)
   try {
     let conn = await pool.getConnection();
     const worlds = await conn.query(
-      'SELECT name, id FROM worlds WHERE ownerId = ?',[req.session.userId]);
+      'SELECT worldName, id FROM worlds WHERE ownerId = ?',[req.session.userId]);
     if (worlds) {
       res.send(worlds);
     } else {
@@ -138,13 +132,64 @@ app.get('/search', async (req, res) => {
   
 
 app.post('/createWorld', async (req, res) => {
-  const { worldName, mapImageSrc } = req.body;
+  const world = req.body;
+  const name = world.name;
+  var navItems = world.navItems;
+  const images = world.images;
+  var content = world.content;
+  content = JSON.stringify(content);
+  content = Buffer.from(content).toString('base64');
+  navItems = JSON.stringify(navItems);
+  navItems = Buffer.from(navItems).toString('base64');
   try {
     let conn = await pool.getConnection();
-    const world = await conn.query(
-      'INSERT INTO worlds (name,ownerId,mapImageSrc) VALUES (?,?,?)',[worldName,req.session.userId,mapImageSrc]);
-    if (world) {
-      res.redirect('fillNavs.html');
+    // Insert img1src into images table and retrieve its id
+    const img1Result = await conn.query('INSERT INTO images (src) VALUES (?)', [images[0]]);
+    const img1Id = img1Result.insertId;
+    // Insert img2src into images table and retrieve its id
+    const img2Result = await conn.query('INSERT INTO images (src) VALUES (?)', [images[1]]);
+    const img2Id = img2Result.insertId;
+    // Insert world data into worlds table
+    const worldResult = await conn.query(
+      'INSERT INTO worlds (worldName, ownerId, img1Id, img2Id, mainPage, navNames) VALUES (?,?,?,?,?,?)',
+      [name, req.session.userId, img1Id, img2Id, content, navItems]
+    );
+    const worldId = worldResult.insertId; // Get the inserted worldId
+    req.session.worldId = worldId.toString(); // Store the worldId in the session
+
+    await new Promise((resolve, reject) => {
+      req.session.save(err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    // End the response without sending any data
+    res.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+});
+
+app.get('/fillNavs', async (req, res) => {
+  try {
+    let conn = await pool.getConnection();
+    const navs = await conn.query(
+      'SELECT navNames, worldName FROM worlds WHERE id = ? AND ownerId = ?',
+      [BigInt(req.session.worldId), req.session.userId]
+    );
+    console.log(navs);
+    if (navs.length > 0) {
+      console.log(navs[0].navNames)
+      const navNames = JSON.parse(Buffer.from(navs[0].navNames, 'utf-8'));
+      console.log(navNames);
+      const worldName = navs[0].worldName;
+      console.log(navNames, worldName);
+      res.send({ navNames, worldName });
     } else {
       res.redirect('/');
     }
@@ -153,4 +198,4 @@ app.post('/createWorld', async (req, res) => {
     console.log(err);
     res.status(500).send('ahhhhh');
   }
-})
+});

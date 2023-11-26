@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }).then(worlds => {
       worlds.forEach(world => {
         var option = document.createElement("option");
-        option.appendChild(document.createTextNode(world.name));
+        option.appendChild(document.createTextNode(world.worldName));
         dropdown.appendChild(option); // Append the <option> to the <select>
       });
     });

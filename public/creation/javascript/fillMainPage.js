@@ -1,13 +1,13 @@
-var mainContentStorage = [];
+import {createFillNavsPage} from './fillNavs.js'
 var mainImage = null;
 var secondaryImage = null;
 var mapImageStorage = [{"id":mainImage, "src":""}, {"id":secondaryImage, "src":""}];
 var navItemStorage = [];
-var worldName = null;
+
 document.addEventListener("DOMContentLoaded",function(event){
     addTitle(event)
-    let addTitleButton = document.getElementById('titleaddButton')
-    addButton.addEventListener('click',addTitle,false)
+    let addTitleButton = document.getElementById('addButton')
+    addTitleButton.addEventListener('click',addTitle,false)
     let addNavButton = document.getElementById('navAddButton')
     addNavButton.addEventListener('click',createNavItem,false)
     let removeNavButton = document.getElementById('navRemoveButton')
@@ -16,15 +16,17 @@ document.addEventListener("DOMContentLoaded",function(event){
 document.addEventListener("DOMContentLoaded",function (){
     document.getElementById('submitButton').addEventListener('click',submitMainPage)
 })
+
 function addTitle(event){
     event.preventDefault();
     let form = document.getElementById('mainContentForm')
     let titleDiv = document.createElement('div')
+    titleDiv.setAttribute('class','titleDiv')
     let titleLabel = document.createElement('label')
     titleLabel.textContent = 'Title: '
     let titleText = document.createElement('input')
     titleText.setAttribute("name", "title")
-    titleText.setAttribute("class", "title")
+    titleText.setAttribute("class", "titletext")
     titleLabel.appendChild(titleText)
     let addSubtextButton = document.createElement('button')
     addSubtextButton.setAttribute('id','subtextAddButton')
@@ -48,6 +50,7 @@ function addSubtext(event) {
     let addButton = event.target;
     let parentDiv = addButton.parentNode;
     let subtextDiv = document.createElement('div');
+    subtextDiv.setAttribute('class', 'subDiv');
     let subtextLabel = document.createElement('label');
     subtextLabel.textContent = 'Subtext: ';
     let subtextText = document.createElement('input');
@@ -73,6 +76,7 @@ function addText(event) {
     let addButton = event.target;
     let parentDiv = addButton.parentNode;
     let textDiv = document.createElement('div');
+    textDiv.setAttribute('class', 'textDiv');
     let textLabel = document.createElement('label');
     textLabel.textContent = 'Text: ';
     let textText = document.createElement('input');
@@ -118,40 +122,6 @@ function createJson(obj) {
     this.text = obj.text;
     this.subtext = obj.subtext;
 }
-function submitMainPage() {
-    // Gather the data
-    const worldName = storeWorldName();
-    const navItems = storeNavItems();
-    const mainImages = storeMainImages();
-    const mainContent = storeMainContent();
-  
-    // Create the world object
-    const world = {
-      name: worldName,
-      navItems: navItems,
-      images: mainImages,
-      content: mainContent
-    };
-  
-    // Send the POST request
-    fetch('/createWorld', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(world)
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      location.assign('./fillNavs.html');
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  }
-
 function readURL(input,imgId){
     if (input.files && input.files[0]){
         if (input.files[0].size > 4 * 1024 * 1024) {
@@ -175,21 +145,79 @@ function readURL(input,imgId){
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+function submitMainPage(event) {
+    event.preventDefault(); // Prevent page reload
+
+    // Gather the data
+    const worldName = storeWorldName();
+    const navItems = storeNavItems();
+    const mainImages = storeMainImages();
+    const mainContent = storeMainContent();
+
+    // Create the world object
+    const world = {
+        name: worldName,
+        content: mainContent,
+        images: mainImages,
+        navItems: navItems
+    };
+
+    // Send the data to the server
+    fetch('/createworld', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(world)
+    }).then(response => {
+        if (response.ok) {
+            return createFillNavsPage();
+        }
+    })
+}
+
+function storeMainContent() {
+    let form = document.getElementById('mainContentForm');
+    let titleDivs = form.getElementsByClassName('titleDiv');
+    let mainContent = [];
+
+    Array.from(titleDivs).forEach(titleDiv => {
+        let title = titleDiv.getElementsByClassName('titletext')[0].textContent;
+        let subDivs = titleDiv.getElementsByClassName('subDiv');
+        let subContent = [];
+
+        Array.from(subDivs).forEach(subDiv => {
+            let subText = subDiv.getElementsByClassName('subtext')[0].textContent;
+            let textDivs = subDiv.getElementsByClassName('textDiv');
+            let textContent = [];
+
+            Array.from(textDivs).forEach(textDiv => {
+                let text = textDiv.getElementsByClassName('text')[0].textContent;
+                textContent.push(text);
+            });
+
+            subContent.push([subText, textContent]);
+        });
+
+        mainContent.push([title, subContent]);
+    });
+
+    return mainContent;
+}
+
 function storeMainImages() {
-    let mainMapImg = document.getElementById('mainImage');
-    let secondaryMapImg = document.getElementById('secondaryImage');
+    let mainMapImg = document.getElementById('mainMapImg');
+    let secondaryMapImg = document.getElementById('secondaryMapImg');
     let mainMapImgSrc = mainMapImg.getAttribute('src');
     let secondaryMapImgSrc = secondaryMapImg.getAttribute('src');
-    let mapImageSrc = {
-        mainMapImgSrc: mainMapImgSrc,
-        secondaryMapImgSrc: secondaryMapImgSrc
-    };
+    let mapImageSrc = [mainMapImgSrc,secondaryMapImgSrc]
     return mapImageSrc;
 };
 
-function storeWorldName(){
-    worldName = document.getElementById('worldName').value
-    return worldName
+function storeWorldName() {
+    let worldName = document.getElementById('worldName').value;
+    return worldName;
 }
 
 function storeNavItems(){
@@ -201,22 +229,3 @@ function storeNavItems(){
     return navItemStorage;
 }
 
-// Define the data structure
-const dataStructure = [
-    ['Title 1', [
-        ['Subtext 1', ['Text 1', 'Text 2', 'Text 3']],
-        ['Subtext 2', ['Text 4', 'Text 5', 'Text 6']]
-    ]],
-    ['Title 2', [
-        ['Subtext 3', ['Text 7', 'Text 8', 'Text 9']],
-        ['Subtext 4', ['Text 10', 'Text 11', 'Text 12']]
-    ]]
-];
-
-// Retrieve the main text
-const mainText = dataStructure.reduce((acc, curr) => {
-    const subTexts = curr[1].map(subArr => subArr[1].join(' ')).join(' ');
-    return `${acc} ${curr[0]} ${subTexts}`;
-}, '');
-
-console.log(mainText); // Output: "Title 1 Text 1 Text 2 Text 3 Text 4 Text 5 Text 6 Title 2 Text 7 Text 8 Text 9 Text 10 Text 11 Text 12"
