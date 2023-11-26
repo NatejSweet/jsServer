@@ -6,3 +6,9 @@ and npm run dl to instal; mariadb if on ubuntu
 
 ## RUN WITH NODE
 node server.js
+
+## insatlling mariadb on ubuntu
+sudo apt install mairadb 
+sudo mysql.server start
+mariadb
+ur in the mariadb shell now
