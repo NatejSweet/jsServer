@@ -32,6 +32,7 @@ async function dropTables(){
         console.log(err);
         res.status(500).send('drop table failed');
     }
+    if (conn) conn.end();
 }
 async function createTables(){
     try {
@@ -44,6 +45,7 @@ async function createTables(){
         console.log(err);
         res.status(500).send('create table failed');
     }
+    if (conn) conn.end();
     try {
         let conn = await pool.getConnection();
         const result = await conn.query(
@@ -54,6 +56,7 @@ async function createTables(){
         console.log(err);
         res.status(500).send('create table failed');
     }
+    if (conn) conn.end();
 }
 dropTables();
 createTables();
