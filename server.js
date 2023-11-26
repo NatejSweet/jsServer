@@ -125,7 +125,7 @@ app.get('/myWorlds', async (req, res) => {
 app.get('/search', async (req, res) => {
   const query = req.query.query;
   let conn = await pool.getConnection();
-  const items = await conn.query('SELECT * FROM worlds WHERE name LIKE ?', ['%' + query + '%']);
+  const items = await conn.query('SELECT * FROM worlds WHERE worldName LIKE ?', ['%' + query + '%']);
   res.json(items);
   if (conn) conn.end();
 });
