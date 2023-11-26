@@ -12,3 +12,7 @@ ur in the mariadb shell now
 create a database for everything - CREATE DATABASE databaseName
 access sql database - USE mysql;
 create a user in this database - INSERT into users 
+
+CREATE USER 'user1'@localhost IDENTIFIED BY 'password1';
+
+GRANT ALL PRIVILEGES ON *.* TO 'user1'@localhost IDENTIFIED BY 'password1';
