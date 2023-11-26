@@ -12,7 +12,6 @@
   "scripts": {
     "start": "node server.js",
     "setup": "node setup.js",
-    "dl": "sudo apt install mariadb-client-core-10.6"
-    
+    "dl": "sudo apt install mariadb-client-core-10.6 && sudo apt install mariadb-server && sudo systemctl start mariadb.service"
   }
 }
