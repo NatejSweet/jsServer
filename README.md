@@ -9,3 +9,6 @@ sudo apt install mairadb
 sudo mysql.server start
 mariadb
 ur in the mariadb shell now
+create a database for everything - CREATE DATABASE databaseName
+access sql database - USE mysql;
+create a user in this database - INSERT into users 
