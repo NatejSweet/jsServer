@@ -16,7 +16,7 @@ var pool = mariadb.createPool({
 module.exports = Object.freeze({
     pool: pool
 });
-
+console.log(pool);
 // let conn = await pool.getConnection();
 // conn.query("DROP TABLES IF EXISTS users,worlds");
 //droptables,create empty tables
@@ -28,11 +28,11 @@ async function dropTables(){
         'DROP TABLES IF EXISTS users,worlds');
         console.log(result);
         // Authentication failed
+        if (conn) conn.end();
     } catch (err) {
         console.log(err);
         res.status(500).send('drop table failed');
     }
-    if (conn) conn.end();
 }
 async function createTables(){
     try {
@@ -41,22 +41,24 @@ async function createTables(){
         'CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY,username VARCHAR(50) NOT NULL,password VARCHAR(255) NOT NULL)');
         console.log(result);
         // Authentication failed
+        if (conn) conn.end();
     } catch (err) {
         console.log(err);
         res.status(500).send('create table failed');
     }
-    if (conn) conn.end();
+    
     try {
         let conn = await pool.getConnection();
         const result = await conn.query(
         'CREATE TABLE worlds (id INT AUTO_INCREMENT PRIMARY KEY,worldName VARCHAR(50) NOT NULL,ownerId INT NOT NULL,img1Id INT,img2Id INT,mainPage BLOB,pages BLOB,navNames BLOB,navItems BLOB)');
         console.log(result);
         // Authentication failed
+        if (conn) conn.end();
     } catch (err) {
         console.log(err);
         res.status(500).send('create table failed');
     }
-    if (conn) conn.end();
+    
 }
 dropTables();
 createTables();
