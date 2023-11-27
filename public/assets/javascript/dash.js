@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
       worlds.forEach(world => {
         var option = document.createElement("option");
         option.appendChild(document.createTextNode(world.worldName));
+        option.value =  "./viewing/viewing.html?id=" + world.id;
         dropdown.appendChild(option); // Append the <option> to the <select>
       });
     });
@@ -47,13 +48,15 @@ function search(event) {
             }
             worlds.forEach(world => {
                 var option = document.createElement("option");
-                var link = document.createElement("a");
-                link.href = "/worlds/" + world.id;
-                link.appendChild(document.createTextNode(world.name));
-                option.appendChild(link);
+                // option.appendChild(document.createTextNode(world.worldName));
+                // link.href =
                 dropdown.appendChild(option); // Append the <option> to the <select>
             });
             dropdown.classList.add('show');
         });
+}
+
+function loadWorld(option){
+  location.assign(option.value);
 }
 

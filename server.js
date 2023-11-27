@@ -138,9 +138,7 @@ app.post('/createWorld', async (req, res) => {
   const images = world.images;
   var content = world.content;
   content = JSON.stringify(content);
-  content = Buffer.from(content).toString('base64');
   navItems = JSON.stringify(navItems);
-  navItems = Buffer.from(navItems).toString('base64');
   try {
     let conn = await pool.getConnection();
     // Insert img1src into images table and retrieve its id
@@ -182,10 +180,9 @@ app.get('/fillNavs', async (req, res) => {
       'SELECT navNames, worldName FROM worlds WHERE id = ? AND ownerId = ?',
       [BigInt(req.session.worldId), req.session.userId]
     );
-    console.log(navs);
+    console.log(navs.navNames);
     if (navs.length > 0) {
-      console.log(navs[0].navNames)
-      const navNames = JSON.parse(Buffer.from(navs[0].navNames, 'utf-8'));
+      const navNames = navs[0].navNames;
       console.log(navNames);
       const worldName = navs[0].worldName;
       console.log(navNames, worldName);
@@ -199,3 +196,41 @@ app.get('/fillNavs', async (req, res) => {
     res.status(500).send('ahhhhh');
   }
 });
+app.post('/fillNavs', async (req, res) => {
+  const navContents = req.body;
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE worlds SET navItems = ? WHERE id = ? AND ownerId = ?',
+      [JSON.stringify(navContents), BigInt(req.session.worldId), req.session.userId]
+    );
+    console.log(result);
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+});
+app.get ('/viewMainPage', async (req, res) => {
+  try {
+    const worldId = req.query.id;
+    let conn = await pool.getConnection();
+    const mainPage = await conn.query(
+      'SELECT mainPage, worldName, navNames FROM worlds WHERE id = ? AND ownerId = ?',
+      [BigInt(worldId), req.session.userId]
+    );
+    if (mainPage.length > 0) {
+      const mainPageJSON = mainPage[0].mainPage;
+      const worldName = mainPage[0].worldName;
+      const navNames = mainPage[0].navNames;
+      res.send({ mainPageJSON, worldName, navNames });
+    } else {
+      res.redirect('/');
+    }
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
