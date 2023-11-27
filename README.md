@@ -4,7 +4,7 @@ npm run setup to setup database
 npm run start to start server
 
 ## insatlling mariadb and create database
-sudo apt install mairadb 
+sudo apt install mairadb-server
 sudo mariadb
 CREATE DATABASE databaseName
 
