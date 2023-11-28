@@ -137,6 +137,7 @@ app.post('/createWorld', async (req, res) => {
   var navItems = world.navItems;
   const images = world.images;
   var content = world.content;
+  console.log(images)
   content = JSON.stringify(content);
   navItems = JSON.stringify(navItems);
   try {
@@ -217,19 +218,42 @@ app.get ('/viewMainPage', async (req, res) => {
     const worldId = req.query.id;
     let conn = await pool.getConnection();
     const mainPage = await conn.query(
-      'SELECT mainPage, worldName, navNames FROM worlds WHERE id = ? AND ownerId = ?',
+      'SELECT mainPage, worldName, navNames,navItems ,img1Id, img2Id FROM worlds WHERE id = ? AND ownerId = ?',
       [BigInt(worldId), req.session.userId]
     );
     if (mainPage.length > 0) {
       const mainPageJSON = mainPage[0].mainPage;
       const worldName = mainPage[0].worldName;
       const navNames = mainPage[0].navNames;
-      res.send({ mainPageJSON, worldName, navNames });
+      const img1Id = mainPage[0].img1Id;
+      const img2Id = mainPage[0].img2Id;
+      const navItems = mainPage[0].navItems;
+      res.send({ mainPageJSON, worldName, navNames, img1Id,img2Id, navItems});
     } else {
       res.redirect('/');
     }
     if (conn) conn.end();
   } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
+app.get('/viewImage', async(req,res) => {
+  try{
+    const imageId = req.query.imgId;
+    let conn = await pool.getConnection();
+    const image = await conn.query(
+      'SELECT src FROM images WHERE id = ?',
+      [BigInt(imageId)]
+    );
+    if (image.length > 0) {
+      const src = image[0].src;
+      res.send({ src });
+    } else {
+      res.redirect('/');
+    }
+    if (conn) conn.end();
+  }catch (err) {
     console.log(err);
     res.status(500).send('ahhhhh');
   }
