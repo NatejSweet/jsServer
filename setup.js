@@ -25,7 +25,7 @@ async function dropTables(){
     try {
         let conn = await pool.getConnection();
         const result = await conn.query(
-        'DROP TABLES IF EXISTS users,worlds');
+        'DROP TABLES IF EXISTS users,worlds,images');
         console.log(result);
         if (conn) conn.end();
         // Authentication failed
@@ -56,6 +56,16 @@ async function createTables(){
     } catch (err) {
         console.log(err);
         res.status(500).send('create table failed');
+    }
+    try{
+        let conn = await pool.getConnection();
+        const result = await conn.query(
+            'CREATE TABLE images(id INT AUTO_INCREMENT PRIMARY KEY, src MEDIUMTEXT);');
+        console.log(result);
+        if (conn) conn.end();
+    }catch (err){
+        console.log(err);
+        // res.status(500).send('create table failed');    
     }
 }
 dropTables();
