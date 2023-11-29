@@ -1,5 +1,5 @@
 // const { text } = require("express");
-
+const pages = {};
 document.addEventListener('DOMContentLoaded', function() {
     viewMainPage();
 });
@@ -22,11 +22,16 @@ function viewMainPage() {
             fillMainContent(content.mainPageJSON);
             fillNavBar(content.navNames, content.navItems);
             fillMap(content.img1Id, content.img2Id);
+            setPages(content.pages);
         });
 }
-function fillMainContent(mainPage) {
+function fillMainContent(mainPage, pageName) {
     let mainContentDiv = document.getElementById("mainContentDiv");
-    console.log(mainPage)
+    mainContentDiv.innerHTML = '';
+    if (pageName) {
+       let pageName = document.createElement('h1');
+         pageName.appendChild(document.createTextNode(pageName));
+    }
     mainPage.forEach(title => {
         let titleDiv = document.createElement('div');
         titleDiv.setAttribute('class', 'titleDiv');
@@ -70,6 +75,7 @@ function fillNavBar(navNames, navItems){
         let select = document.createElement('select')
         select.setAttribute('id', name)
         select.setAttribute('class', 'dropbtn')
+        select.setAttribute('onchange', 'loadHub(this.value)')
         navItems[name].forEach(item => {
             let option = document.createElement('option')
             option.setAttribute('value', item)
@@ -84,7 +90,9 @@ function fillNavBar(navNames, navItems){
 function fillMap(img1Id, img2Id){
     let mapDiv = document.getElementById("mapDiv");
     let img1 = document.createElement('img')
+    img1.setAttribute('id', 'map1Img')
     let img2 = document.createElement('img')
+    img2.setAttribute('id', 'map2Img')
     console.log(img1Id,img2Id)
     fetch('/viewImage?imgId=' + encodeURIComponent(img1Id))
         .then(response => {
@@ -106,4 +114,31 @@ function fillMap(img1Id, img2Id){
     mapDiv.appendChild(img1);
     mapDiv.appendChild(img2);
 }
+function setPages(pages){
+    console.log(pages)
+    pages = pages
+}
     
+function loadHub(hubName){
+    console.log(hubName)
+    console.log(pages)
+    // fetch('/viewHub?id=' + encodeURIComponent(id) + '&hubName=' + encodeURIComponent(hubName))
+    let hub = pages[hubName];
+    console.log(hub)
+        // setPageName(hubName);
+        fillMainContent(hub.content, hubName);
+        updateMap(hub.imgId);
+}
+function updateMap(imgId){
+    let mapDiv = document.getElementById("mapDiv");
+    let img = document.getElementById('img2Id')
+    fetch('/viewImage?imgId=' + encodeURIComponent(imgId))
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+        })
+        .then(image => {
+            img.setAttribute('src', image.src);
+        });
+}
