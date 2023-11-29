@@ -137,7 +137,6 @@ app.post('/createWorld', async (req, res) => {
   var navItems = world.navItems;
   const images = world.images;
   var content = world.content;
-  console.log(images)
   content = JSON.stringify(content);
   navItems = JSON.stringify(navItems);
   try {
@@ -181,12 +180,9 @@ app.get('/fillNavs', async (req, res) => {
       'SELECT navNames, worldName FROM worlds WHERE id = ? AND ownerId = ?',
       [BigInt(req.session.worldId), req.session.userId]
     );
-    console.log(navs.navNames);
     if (navs.length > 0) {
       const navNames = navs[0].navNames;
-      console.log(navNames);
       const worldName = navs[0].worldName;
-      console.log(navNames, worldName);
       res.send({ navNames, worldName });
     } else {
       res.redirect('/');
@@ -212,13 +208,31 @@ app.post('/fillNavs', async (req, res) => {
     console.log(err);
     res.status(500).send('ahhhhh');
   }
+  console.log(navContents);
+  let pages = {};
+  Object.values(navContents).forEach(nav => {
+      nav.forEach(navItem => {
+        pages[navItem] = {content:[],imgId:null};
+    });
+  })
+  try{
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE worlds SET pages=? WHERE id = ? AND ownerId = ?',
+      [pages,BigInt(req.session.worldId), req.session.userId]
+    );
+    console.log(result)
+  } catch(err){
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
 });
 app.get ('/viewMainPage', async (req, res) => {
   try {
     const worldId = req.query.id;
     let conn = await pool.getConnection();
     const mainPage = await conn.query(
-      'SELECT mainPage, worldName, navNames,navItems ,img1Id, img2Id FROM worlds WHERE id = ? AND ownerId = ?',
+      'SELECT mainPage, worldName, navNames,navItems ,img1Id, img2Id, pages FROM worlds WHERE id = ? AND ownerId = ?',
       [BigInt(worldId), req.session.userId]
     );
     if (mainPage.length > 0) {
@@ -228,7 +242,8 @@ app.get ('/viewMainPage', async (req, res) => {
       const img1Id = mainPage[0].img1Id;
       const img2Id = mainPage[0].img2Id;
       const navItems = mainPage[0].navItems;
-      res.send({ mainPageJSON, worldName, navNames, img1Id,img2Id, navItems});
+      const pages = mainPage[0].pages;
+      res.send({ mainPageJSON, worldName, navNames, img1Id,img2Id, navItems,pages});
     } else {
       res.redirect('/');
     }
@@ -258,3 +273,9 @@ app.get('/viewImage', async(req,res) => {
     res.status(500).send('ahhhhh');
   }
 })
+
+function createBaselinePagesJSON(navContents) {
+  console.log(navContents)
+  
+  return pages
+}

@@ -6,10 +6,13 @@ Whole  world table is [worldName VARCHAR(50), ownerID INT, imgId1 INT, imgId2, m
 MainPage=[img ID1(likely main image), Img ID2, [content array]]
 
 Pages:
-[[PageTitle, img ID1(likely main image), Img ID2, [content array]],Repeat]
+{
+    hubName: [PageTitle, imgId,[content array]],
+    hubname...
+}
 
 content array:
-[TItle,[subtext,[text]],title[sub[text]]]
+[Title,[subtext,[text]],title[sub[text]]]
 
 NavNames:
 [nav1,nav2,nav30]
