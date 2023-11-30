@@ -279,3 +279,22 @@ function createBaselinePagesJSON(navContents) {
   
   return pages
 }
+
+app.post('/updatePage', async (req, res) => {
+  const page = req.body;
+  const pageJSON = JSON.stringify(page);
+  const worldId = req.query.id; // Extract worldId from the query string
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE worlds SET pages = ? WHERE id = ? AND ownerId = ?',
+      [pageJSON, BigInt(worldId), req.session.userId]
+    );
+    console.log(result);
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
