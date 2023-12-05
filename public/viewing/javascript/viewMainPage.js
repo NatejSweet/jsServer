@@ -26,9 +26,28 @@ function viewMainPage() {
             fillMap(content.img1Id, content.img2Id);
             setPages(content.pages);
         });
+    createEditButton();
 }
+
+function reloadMainPage() {
+    const urlParams = new URLSearchParams(window.location.search);  
+    const id = urlParams.get('id');
+    fetch('/viewMainPage?id=' + encodeURIComponent(id))
+        .then(response => {
+            if (response.ok) {
+                console.log(response)
+                return response.json();
+            }
+        }).then(content => {
+            console.log(content);
+            worldName.innerHTML = content.worldName;
+            fillMainContent(content.mainPageJSON);
+        })
+        console.log('creatiungEtidBUtton')
+    createEditButton();
+}
+            
 function fillMainContent(mainPage, pageName) {
-    console.log(pageName)
     let mainContentDiv = document.getElementById("mainContentDiv");
     mainContentDiv.innerHTML = '';
     if (pageName) {
@@ -131,7 +150,9 @@ function loadHub(hubName){
     let hub = pagesJSON[hubName];
     fillMainContent(hub.content, hubName);
     updateMap(hub.imgId);
-    addEditButton();
+    if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')){
+        createEditButton();
+    }
 }
 
 function updateMap(imgId){
@@ -150,224 +171,6 @@ function updateMap(imgId){
             img.setAttribute('src', content.src);
         });
 }
-function addEditButton(){
-    let editButton = document.createElement('button')
-    editButton.setAttribute('id', 'editButton')
-    editButton.setAttribute('onclick', 'editPage()')
-    editButton.appendChild(document.createTextNode('Edit Page'))
-    let header = document.querySelector('header')
-    header.appendChild(editButton)
-
-}
-
-function removeEditButton(){
-    let editButton = document.getElementById('editButton')
-    editButton.remove()
-}
-function addSaveButton(){
-    let saveButton = document.createElement('button')
-    saveButton.setAttribute('id', 'saveButton')
-    saveButton.setAttribute('onclick', 'savePage()')
-    saveButton.appendChild(document.createTextNode('Save Page'))
-    let header = document.querySelector('header')
-    header.appendChild(saveButton)
-}
-function savePage(){
-    let hubName = document.getElementById('pageTitle').textContent;
-    addEditButton();
-    removeSaveButton();
-    let content = storeMainContent();
-    pagesJSON[hubName].content = content;
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
-    fetch('/updatePage?id=' + encodeURIComponent(id),{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pagesJSON)
-    }).then(response => {
-        if (response.ok) {
-            return reloadContents();
-        }
-    })
-    //post function w/ event.preventDefault(), UPDATE worlds SET pages=? WHERE id = ? AND ownerId = ?
-}
-function reloadContents(){
-    loadHub(document.getElementById('pageTitle').textContent)
-}
-function removeSaveButton(){
-    let saveButton = document.getElementById('saveButton')
-    saveButton.remove()
-}
-function editPage() {
-    removeEditButton();
-    addSaveButton();
-    addAddSectionButton();
-    const titleDivs = document.querySelectorAll('.titleDiv');
-    const titles = document.querySelectorAll('.titleText');
-    const subtitles = document.querySelectorAll('.subTitleText');
-    const texts = document.querySelectorAll('.textText');
-
-    titleDivs.forEach(titleDiv => {
-        let title = titleDiv.getElementsByClassName('titletext')
-        let titleLabel = document.createElement('label')
-        titleLabel.textContent = 'Title: '
-        let titleText = document.createElement('input')
-        titleText.setAttribute("name", "title")
-        titleText.setAttribute("class", "titletext")
-        titleText.value = title[0].textContent
-        titleLabel.appendChild(titleText)
-        title[0].replaceWith(titleLabel)
-        let addSubtextButton = document.createElement('button')
-        addSubtextButton.setAttribute('id','subtextAddButton')
-        addSubtextButton.textContent = 'Add Subtext'
-        addSubtextButton.addEventListener('click',addSubtext,false)
-        titleDiv.appendChild(addSubtextButton)
-        let removeTitleButton = document.createElement('button');
-        removeTitleButton.textContent = 'Remove Title/Section';
-        removeTitleButton.addEventListener('click', removeItem);
-        titleDiv.appendChild(removeTitleButton);
-
-    })
-
-    titles.forEach(title => {
-        const input = document.createElement('input');
-        input.setAttribute('class', 'titletext')
-        input.value = title.textContent;
-        title.replaceWith(input);
-        
-    });
-
-    subtitles.forEach(subtitle => {
-        const input = document.createElement('input');
-        input.value = subtitle.textContent;
-        input.setAttribute('class', 'subtext')
-        subtitle.replaceWith(input);
-    });
-
-    texts.forEach(text => {
-        const input = document.createElement('input');
-        input.value = text.textContent;
-        input.setAttribute('class', 'text')
-        text.replaceWith(input);
-    });
-}
-function addAddSectionButton(){
-    let header = document.querySelector('header')
-    let addSectionButton = document.createElement('button')
-    addSectionButton.setAttribute('id', 'addSectionButton')
-    addSectionButton.setAttribute('onclick', 'addTitle()')
-    addSectionButton.appendChild(document.createTextNode('Add Section'))
-    header.appendChild(addSectionButton)
-}
-
-function addTitle(){
-    let contentDiv = document.getElementById('mainContentDiv')
-    let titleDiv = document.createElement('div')
-    titleDiv.setAttribute('class','titleDiv')
-    let titleLabel = document.createElement('label')
-    titleLabel.textContent = 'Title: '
-    let titleText = document.createElement('input')
-    titleText.setAttribute("name", "title")
-    titleText.setAttribute("class", "titletext")
-    titleLabel.appendChild(titleText)
-    let addSubtextButton = document.createElement('button')
-    addSubtextButton.setAttribute('id','subtextAddButton')
-    addSubtextButton.textContent = 'Add Subtext'
-    addSubtextButton.addEventListener('click',addSubtext,false)
-    titleDiv.appendChild(titleLabel)
-    titleDiv.appendChild(addSubtextButton)
-    contentDiv.appendChild(titleDiv)
-    let removeTitleButton = document.createElement('button');
-    removeTitleButton.textContent = 'Remove Title/Section';
-    removeTitleButton.addEventListener('click', removeItem);
-    titleDiv.appendChild(removeTitleButton);
-
-
-}
 
 
 
-function addSubtext(event) {
-    event.preventDefault();
-    let addButton = event.target;
-    let parentDiv = addButton.parentNode;
-    let subtextDiv = document.createElement('div');
-    subtextDiv.setAttribute('class', 'subDiv');
-    let subtextLabel = document.createElement('label');
-    subtextLabel.textContent = 'Subtext: ';
-    let subtextText = document.createElement('input');
-    subtextText.setAttribute("name", "subtext");
-    subtextText.setAttribute("class", "subtext");
-    subtextLabel.appendChild(subtextText);
-    subtextDiv.appendChild(subtextLabel);
-    parentDiv.appendChild(subtextDiv);
-    let addTextButton = document.createElement('button');
-    addTextButton.setAttribute('class', 'addTextButton');
-    addTextButton.textContent = 'Add Text';
-    addTextButton.addEventListener('click', addText, false);
-    subtextDiv.appendChild(addTextButton);
-    let removeSubtextButton = document.createElement('button');
-  removeSubtextButton.textContent = 'Remove Subtext/Section';
-  removeSubtextButton.addEventListener('click', removeItem);
-  subtextDiv.appendChild(removeSubtextButton);
-
-}
-
-function addText(event) {
-    event.preventDefault();
-    let addButton = event.target;
-    let parentDiv = addButton.parentNode;
-    let textDiv = document.createElement('div');
-    textDiv.setAttribute('class', 'textDiv');
-    let textLabel = document.createElement('label');
-    textLabel.textContent = 'Text: ';
-    let textText = document.createElement('input');
-    textText.setAttribute("name", "text");
-    textText.setAttribute("class", "text");
-    textLabel.appendChild(textText);
-    textDiv.appendChild(textLabel);
-    parentDiv.appendChild(textDiv);
-    let removeTextButton = document.createElement('button');
-  removeTextButton.textContent = 'Remove Text';
-  removeTextButton.addEventListener('click', removeItem);
-  textDiv.appendChild(removeTextButton);
-
-}
-
-function removeItem(event) {
-    event.preventDefault();
-    let removeButton = event.target;
-    let parentDiv = removeButton.parentNode;
-    parentDiv.remove();
-}
-
-function storeMainContent() {
-    let form = document.getElementById('mainContentDiv');
-    let titleDivs = form.getElementsByClassName('titleDiv');
-    let mainContent = [];
-
-    Array.from(titleDivs).forEach(titleDiv => {
-        let title = titleDiv.getElementsByClassName('titletext')[0].value;
-        let subDivs = titleDiv.getElementsByClassName('subDiv');
-        let subContent = [];
-
-        Array.from(subDivs).forEach(subDiv => {
-            let subText = subDiv.getElementsByClassName('subtext')[0].value;
-            let textDivs = subDiv.getElementsByClassName('textDiv');
-            let textContent = [];
-
-            Array.from(textDivs).forEach(textDiv => {
-                let text = textDiv.getElementsByClassName('text')[0].value;
-                textContent.push(text);
-            });
-
-            subContent.push([subText, textContent]);
-        });
-
-        mainContent.push([title, subContent]);
-    });
-
-    return mainContent;
-}

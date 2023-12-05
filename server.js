@@ -298,3 +298,22 @@ app.post('/updatePage', async (req, res) => {
     res.status(500).send('ahhhhh');
   }
 })
+app.post('/updateMainPage', async (req,res) => {
+  console.log('updatingMainPAge')
+  const mainPage = req.body;
+  const mainPageJSON = JSON.stringify(mainPage);
+  const worldId = req.query.id;
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE worlds SET mainPage = ? WHERE id = ? AND ownerId = ?',
+      [mainPageJSON, BigInt(worldId), req.session.userId]
+    );
+    console.log(result);
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
