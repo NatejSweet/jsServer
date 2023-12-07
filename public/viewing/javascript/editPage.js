@@ -1,41 +1,5 @@
 const e = require("express")
 
-function createEditButton(){
-    let editModeButton = document.createElement('button')
-    editModeButton.setAttribute('id', 'editModeButton')
-    editModeButton.setAttribute('onclick', 'enterEditMode()')
-    editModeButton.appendChild(document.createTextNode('Enter Edit Mode'))
-    let header = document.querySelector('header')
-    header.appendChild(editModeButton)
-}
-function enterEditMode(){
-    let editButtonsDiv = document.getElementById('editButtonsDiv')
-    if (document.getElementById('editModeButton')){
-        let editModeButton = document.getElementById('editModeButton')
-        editModeButton.remove()
-    }
-    let editPageButton = document.createElement('button')
-    editPageButton.setAttribute('id', 'editPageButton')
-    editPageButton.setAttribute('onclick', 'editPage()')
-    editPageButton.appendChild(document.createTextNode('Edit Page'))
-    editButtonsDiv.appendChild(editPageButton)
-    let editNavBarButton = document.createElement('button')
-    editNavBarButton.setAttribute('id', 'editNavBarButton')
-    editNavBarButton.setAttribute('onclick', 'editNavBar()')
-    editNavBarButton.appendChild(document.createTextNode('Edit NavBar'))
-    editButtonsDiv.appendChild(editNavBarButton)
-    let editNavItemsButton = document.createElement('button')
-    editNavItemsButton.setAttribute('id', 'editNavItemsButton')
-    editNavItemsButton.setAttribute('onclick', 'editNavItems()')
-    editNavItemsButton.appendChild(document.createTextNode('Edit NavItems'))
-    editButtonsDiv.appendChild(editNavItemsButton)
-    let exitEditModeButton = document.createElement('button')
-    exitEditModeButton.setAttribute('id', 'exitEditModeButton')
-    exitEditModeButton.setAttribute('onclick', 'exitEditMode()')
-    exitEditModeButton.appendChild(document.createTextNode('Exit Edit Mode'))
-    editButtonsDiv.appendChild(exitEditModeButton)
-
-}
 function addSaveButton(){
     let saveButton = document.createElement('button')
     saveButton.setAttribute('id', 'saveButton')
@@ -124,13 +88,14 @@ function editPage() {
         addSubtextButton.setAttribute('id','subtextAddButton')
         addSubtextButton.textContent = 'Add Subtext'
         addSubtextButton.addEventListener('click',addSubtext,false)
-        titleDiv.appendChild(addSubtextButton)
+        titleLabel.appendChild(addSubtextButton)
         let removeTitleButton = document.createElement('button');
         removeTitleButton.textContent = 'Remove Title/Section';
         removeTitleButton.addEventListener('click', removeItem);
-        titleDiv.appendChild(removeTitleButton);
-        let subtitleDivs = titleDiv.getElementsByClassName('subTitleDiv')
+        titleLabel.appendChild(removeTitleButton);
+        let subtitleDivs = Array.from(titleDiv.getElementsByClassName('subTitleDiv'))
         subtitleDivs.forEach(subtitleDiv =>{
+            console.log('subdiv')
             let subtitle = subtitleDiv.getElementsByClassName('subTitleText')
             let subtitleLabel = document.createElement('label')
             subtitleLabel.textContent = 'Subtitle: '
@@ -139,32 +104,59 @@ function editPage() {
             subtitleText.setAttribute('class', 'subtext')
             subtitleText.value = subtitle[0].textContent
             subtitleLabel.appendChild(subtitleText)
+            subtitle[0].replaceWith(subtitleLabel)
+            let addTextButton = document.createElement('button')
+            addTextButton.setAttribute('class', 'addTextButton')
+            addTextButton.textContent = 'Add Text'
+            addTextButton.addEventListener('click', addText, false);
+            subtitleLabel.appendChild(addTextButton)
+            let removeSubtitleButton = document.createElement('button');
+            removeSubtitleButton.textContent = 'Remove Subtitle/Section';
+            removeSubtitleButton.addEventListener('click', removeItem);
+            subtitleLabel.appendChild(removeSubtitleButton);
+            let textDivs = Array.from(subtitleDiv.getElementsByClassName('textDiv'))
+            textDivs.forEach(textDiv =>{
+                let text = textDiv.getElementsByClassName('textText')
+                let textLabel = document.createElement('label')
+                textLabel.textContent = 'Text: '
+                let textText = document.createElement('input')
+                textText.setAttribute("name", "text")
+                textText.setAttribute('class', 'text')
+                textText.value = text[0].textContent
+                textLabel.appendChild(textText)
+                text[0].replaceWith(textLabel)
+                let removeTextButton = document.createElement('button');
+                removeTextButton.textContent = 'Remove Text';
+                removeTextButton.addEventListener('click', removeItem);
+                textLabel.appendChild(removeTextButton);
+            })
+
 
         })
 
     })
 
-    titles.forEach(title => {
-        const input = document.createElement('input');
-        input.setAttribute('class', 'titletext')
-        input.value = title.textContent;
-        title.replaceWith(input);
+    // titles.forEach(title => {
+    //     const input = document.createElement('input');
+    //     input.setAttribute('class', 'titletext')
+    //     input.value = title.textContent;
+    //     title.replaceWith(input);
         
-    });
+    // });
 
-    subtitles.forEach(subtitle => {
-        const input = document.createElement('input');
-        input.value = subtitle.textContent;
-        input.setAttribute('class', 'subtext')
-        subtitle.replaceWith(input);
-    });
+    // subtitles.forEach(subtitle => {
+    //     const input = document.createElement('input');
+    //     input.value = subtitle.textContent;
+    //     input.setAttribute('class', 'subtext')
+    //     subtitle.replaceWith(input);
+    // });
 
-    texts.forEach(text => {
-        const input = document.createElement('input');
-        input.value = text.textContent;
-        input.setAttribute('class', 'text')
-        text.replaceWith(input);
-    });
+    // texts.forEach(text => {
+    //     const input = document.createElement('input');
+    //     input.value = text.textContent;
+    //     input.setAttribute('class', 'text')
+    //     text.replaceWith(input);
+    // });
 }
 function addAddSectionButton(){
     let header = document.querySelector('header')
@@ -191,7 +183,7 @@ function addTitle(){
     addSubtextButton.textContent = 'Add Subtext'
     addSubtextButton.addEventListener('click',addSubtext,false)
     titleDiv.appendChild(titleLabel)
-    titleDiv.appendChild(addSubtextButton)
+    titleLabel.appendChild(addSubtextButton)
     contentDiv.appendChild(titleDiv)
     let removeTitleButton = document.createElement('button');
     removeTitleButton.textContent = 'Remove Title/Section';
@@ -206,9 +198,10 @@ function addTitle(){
 function addSubtext(event) {
     event.preventDefault();
     let addButton = event.target;
-    let parentDiv = addButton.parentNode;
+    let titleLabel = addButton.parentNode;
+    let parentDiv = titleLabel.parentNode;
     let subtextDiv = document.createElement('div');
-    subtextDiv.setAttribute('class', 'subDiv');
+    subtextDiv.setAttribute('class', 'subTitleDiv');
     let subtextLabel = document.createElement('label');
     subtextLabel.textContent = 'Subtext: ';
     let subtextText = document.createElement('input');
@@ -225,14 +218,14 @@ function addSubtext(event) {
     let removeSubtextButton = document.createElement('button');
   removeSubtextButton.textContent = 'Remove Subtext/Section';
   removeSubtextButton.addEventListener('click', removeItem);
-  subtextDiv.appendChild(removeSubtextButton);
+  subtextLabel.appendChild(removeSubtextButton);
 
 }
 
 function addText(event) {
     event.preventDefault();
     let addButton = event.target;
-    let parentDiv = addButton.parentNode;
+    let parentDiv = addButton.parentNode.parentNode;
     let textDiv = document.createElement('div');
     textDiv.setAttribute('class', 'textDiv');
     let textLabel = document.createElement('label');
@@ -253,7 +246,7 @@ function addText(event) {
 function removeItem(event) {
     event.preventDefault();
     let removeButton = event.target;
-    let parentDiv = removeButton.parentNode;
+    let parentDiv = removeButton.parentNode.parentNode;
     parentDiv.remove();
 }
 
@@ -264,7 +257,7 @@ function storeMainContent() {
 
     Array.from(titleDivs).forEach(titleDiv => {
         let title = titleDiv.getElementsByClassName('titletext')[0].value;
-        let subDivs = titleDiv.getElementsByClassName('subDiv');
+        let subDivs = titleDiv.getElementsByClassName('subTitleDiv');
         let subContent = [];
 
         Array.from(subDivs).forEach(subDiv => {
@@ -296,18 +289,6 @@ function removeMainContentAddButtons(){
     while (addTextButtons.length > 0){
         addTextButtons[0].remove()
     }
-}
-function exitEditMode(){
-    console.log('exiting edit mode')
-    let editButtonsDiv = document.getElementById('editButtonsDiv');
-    while (editButtonsDiv.hasChildNodes()){
-        console.log(editButtonsDiv.firstChild)
-        editButtonsDiv.removeChild(editButtonsDiv.firstChild);
-    }
-    if (document.getElementById('addSectionButton')){
-        removeMainContentAddButtons();
-    }
-    reloadContents(editMode=false);
 }
 
 function disableNavBar(){

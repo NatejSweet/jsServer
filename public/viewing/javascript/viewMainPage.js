@@ -43,8 +43,23 @@ function reloadMainPage() {
             worldName.innerHTML = content.worldName;
             fillMainContent(content.mainPageJSON);
         })
-        console.log('creatiungEtidBUtton')
     createEditButton();
+}
+
+function reloadNavBar() { //probably want to create a specific request for this later
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    console.log('reloading nav bar')
+    fetch('/viewMainPage?id=' + encodeURIComponent(id))
+        .then(response => {
+            if (response.ok) {
+                console.log(response)
+                return response.json();
+            }
+        }).then(content => {
+            console.log(content);
+            fillNavBar(content.navNames, content.navItems);
+        })
 }
             
 function fillMainContent(mainPage, pageName) {
@@ -95,21 +110,26 @@ function fillNavBar(navNames, navItems){
     console.log(navItems)
     let list = document.createElement('ul')
     let nav = document.getElementById("navBar");
+    nav.innerHTML = '';
     navNames.forEach(name => {
         let li = document.createElement('li')
         let dropDownDiv = document.createElement('div')
         dropDownDiv.setAttribute('class', 'dropdown')
         let select = document.createElement('select')
-        select.setAttribute('id', name)
+        select.setAttribute('id', name)  
         select.setAttribute('class', 'dropbtn')
         select.setAttribute('onchange', 'loadHub(this.value)')
+        let label = document.createElement('label')
+        label.appendChild(document.createTextNode(name+': '))
+        label.setAttribute('id',name)
+        label.appendChild(select)
         navItems[name].forEach(item => {
             let option = document.createElement('option')
             option.setAttribute('value', item)
             option.appendChild(document.createTextNode(item))
             select.appendChild(option)
         })
-        li.appendChild(select)
+        li.appendChild(label)
         list.appendChild(li)
     });
     nav.appendChild(list)
