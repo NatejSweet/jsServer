@@ -4,3 +4,25 @@
 #loginForm {
     display: block;
   }
+
+  button {
+    /* styles for the button */
+    color: #aaaaff;
+    background-color: #000000;
+    padding: 10px;
+  }
+
+  button:hover {
+    /* styles for the button on hover */\
+    color: #aaaaff;
+  }
+
+  input {
+    /* styles for the input */
+    color: #aaaaff;
+  }
+
+  input:focus {
+    /* styles for the input when it has focus */
+    color: #aaaaff;
+  }

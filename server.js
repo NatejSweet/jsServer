@@ -317,3 +317,48 @@ app.post('/updateMainPage', async (req,res) => {
     res.status(500).send('ahhhhh');
   }
 })
+
+app.get('/navItems', async (req,res) => {
+  const worldId = req.query.id;
+  try {
+    let conn = await pool.getConnection();
+    const navItems = await conn.query(
+      'SELECT navItems,navNames,pages FROM worlds WHERE id = ? AND ownerId = ?',
+      [BigInt(worldId), req.session.userId]
+    );
+    if (navItems.length > 0) {
+      const navItemsJSON = navItems[0].navItems;
+      const navNames = navItems[0].navNames;
+      const pages = navItems[0].pages;
+      res.send({ navItemsJSON, navNames, pages});
+    } else {
+      res.redirect('/');
+    }
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
+app.post('/updateNavBarItems', async (req,res) => {
+  const navItems = JSON.stringify(req.body.navItems)
+  const pages = JSON.stringify(req.body.pages)
+  const navNames = JSON.stringify(req.body.navNames)
+  const worldId = req.query.id;
+  console.log(navItems)
+  console.log(pages)
+  console.log(navNames)
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE worlds SET navItems = ?, pages = ?, navNames = ? WHERE id = ? AND ownerId = ?',
+      [navItems, pages, navNames, BigInt(worldId), req.session.userId]
+    );
+    console.log(result+'1');
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
