@@ -9,7 +9,7 @@ sudo mariadb
 CREATE DATABASE databaseName
 
 CREATE USER 'user1'@localhost IDENTIFIED BY 'password1';
-GRANT ALL PRIVILEGES ON *.* TO 'user1'@localhost IDENTIFIED BY 'password1';
+GRANT ALL PRIVILEGES ON *.* TO 'user1'@'localhost' IDENTIFIED BY 'password1';
 
 then create a .env matching
 
