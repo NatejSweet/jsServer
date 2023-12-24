@@ -1,3 +1,5 @@
+const { response } = require("express");
+
 function editNavOptions(){
     disableNavBar();
     let editButtonsDiv = document.getElementById('editButtonsDiv');
@@ -10,6 +12,8 @@ function editNavOptions(){
         while (mainContentDiv.hasChildNodes()){
             mainContentDiv.removeChild(mainContentDiv.firstChild);
         }
+        let navOptionsDiv = document.createElement('div');
+        navOptionsDiv.setAttribute('id', 'navOptionsDiv');
     ul.childNodes.forEach(li => {
         console.log(li);
         let label = li.firstChild;
@@ -25,7 +29,7 @@ function editNavOptions(){
         addNavOptionButton.setAttribute('onclick', 'addNavOption(this)');
         addNavOptionButton.appendChild(document.createTextNode('Add Option'));
         navItemDiv.appendChild(addNavOptionButton);
-        mainContentDiv.appendChild(navItemDiv);
+        navOptionsDiv.appendChild(navItemDiv);
         
         options.forEach(option => {
             let navItemOption = document.createElement('input');
@@ -41,6 +45,7 @@ function editNavOptions(){
             
         });
     });
+    mainContentDiv.appendChild(navOptionsDiv);
     let saveButton = document.createElement('button');
     saveButton.setAttribute('onclick', 'saveNavOptions()');
     saveButton.appendChild(document.createTextNode('Save Nav Options'));
@@ -69,4 +74,38 @@ function removeNavOption(button){
     navItemDiv.removeChild(button.previousSibling);
     navItemDiv.removeChild(button);
 
+}
+
+function saveNavOptions(){
+    let navOptionsDiv = document.getElementById('navOptionsDiv');
+    let navBar = document.getElementById('navBar');
+    let ul = navBar.firstChild;
+    let navItems = navOptionsDiv.childNodes;
+    let navOptions = {};
+    navItems.forEach(navItem => {
+        let navItemOptions = navItem.childNodes;
+        let navItemOptionValues = [];
+        navItemOptions.forEach(navItemOption => {
+            if (navItemOption.tagName === 'INPUT'){
+                navItemOptionValues.push(navItemOption.value);
+            }
+        });
+        navOptions[navItem.id] = navItemOptionValues;
+    });
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    fetch('/editNavBarOptions?id=' + encodeURIComponent(id), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(navOptions),
+    }).then(response => {
+        if (response.ok){
+            console.log(response);
+            enableNavBar();
+            reloadNavBar();
+            return reloadContents(editMode=true);
+        }
+    })
 }

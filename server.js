@@ -345,16 +345,29 @@ app.post('/updateNavBarItems', async (req,res) => {
   const pages = JSON.stringify(req.body.pages)
   const navNames = JSON.stringify(req.body.navNames)
   const worldId = req.query.id;
-  console.log(navItems)
-  console.log(pages)
-  console.log(navNames)
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
       'UPDATE worlds SET navItems = ?, pages = ?, navNames = ? WHERE id = ? AND ownerId = ?',
       [navItems, pages, navNames, BigInt(worldId), req.session.userId]
     );
-    console.log(result+'1');
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
+app.post('/editNavBarOptions', async (req,res) => {
+  const navOptions = req.body;
+  const worldId = req.query.id;
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE worlds SET navItems = ? WHERE id = ? AND ownerId = ?',
+      [navOptions, BigInt(worldId), req.session.userId]
+    );
+    console.log(result);
     res.end();
     if (conn) conn.end();
   } catch (err) {
