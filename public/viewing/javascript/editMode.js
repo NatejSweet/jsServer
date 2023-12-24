@@ -32,6 +32,11 @@ function enterEditMode(){
     exitEditModeButton.setAttribute('onclick', 'exitEditMode()')
     exitEditModeButton.appendChild(document.createTextNode('Exit Edit Mode'))
     editButtonsDiv.appendChild(exitEditModeButton)
+    let editMapMarkersButton = document.createElement('button')
+    editMapMarkersButton.setAttribute('id', 'editMapMarkersButton')
+    editMapMarkersButton.setAttribute('onclick', 'editMapMarkers()')
+    editMapMarkersButton.appendChild(document.createTextNode('Edit Map Markers'))
+    editButtonsDiv.appendChild(editMapMarkersButton)
 }
 function exitEditMode(){
     console.log('exiting edit mode')
