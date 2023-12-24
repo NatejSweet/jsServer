@@ -134,10 +134,13 @@ function fillNavBar(navNames, navItems){
     });
     nav.appendChild(list)
 }
-function fillMap(img1Id, img2Id){
+function fillMap(img1Id, img2Id){                       //this needs to get areas and add them to the map
     let mapDiv = document.getElementById("mapDiv");
     let img1 = document.createElement('img')
     img1.setAttribute('id', 'map1Img')
+    img1.setAttribute('usemap', '#map1')
+    let map1 = document.createElement('map')
+    map1.setAttribute('name', 'map1')
     let img2 = document.createElement('img')
     img2.setAttribute('id', 'map2Img')
     console.log(img1Id,img2Id)
@@ -159,6 +162,7 @@ function fillMap(img1Id, img2Id){
             img2.setAttribute('src', content.src);
         });
     mapDiv.appendChild(img1);
+    mapDiv.appendChild(map1);
     mapDiv.appendChild(img2);
 }
 function setPages(pages){
