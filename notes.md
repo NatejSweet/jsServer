@@ -43,5 +43,10 @@ fill navs page
     update where id=worldId (navitems) VALUES ([,,,])
 
 
+TO-DO:
+create space in tables for mapmarkers
+create save function
+create data request when loading map
+
 
 

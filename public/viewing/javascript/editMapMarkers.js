@@ -50,18 +50,52 @@ function editMapMarkers(){
     //delete button will only dfelete marker, not hub
 }
 
-function addMarker(button){ //prevent the user from adding more than one marker at a time(clickeing add twice(same of diff hub))
-    console.log('addMarker');
+let activeButton = null; // global variable to keep track of the active button
+let handleClickWrapper = null; // global variable to keep track of the click handler
+function addMarker(button) {
     let navItemDiv = button.parentNode;
     let navItem = navItemDiv.firstChild.textContent;
-
-    // Collect location on the image clicked
     let mapDiv = document.getElementById('mapDiv');
     let img = mapDiv.firstChild;
-    console.log(img);
-    img.addEventListener('click', function(event) {
-        handleClick(event, navItemDiv,navItem);
-    }, {once:true});
+
+    if (activeButton) {
+        // If the clicked button is the active button, toggle it off
+        if (activeButton === button) {
+            img.removeEventListener('click', handleClickWrapper);
+            console.log(img.eventListeners)
+            toggleButtons(true); // Enable all buttons
+            activeButton = null;
+        } else {
+            // Swap the active button to the new button
+            activeButton = button;
+            img.removeEventListener('click', handleClickWrapper);
+            handleClickWrapper = function(event) {
+                handleClick(event, navItemDiv, navItem);
+            };
+            img.addEventListener('click', handleClickWrapper);
+            
+            return;
+        }
+    } else {
+        // If no button is active, toggle the clicked button on
+        handleClickWrapper = function(event) {
+            handleClick(event, navItemDiv, navItem);
+        };
+        
+        img.addEventListener('click', handleClickWrapper);
+        
+        toggleButtons(false, button); // Disable all other buttons
+        activeButton = button;
+    }
+}
+
+function toggleButtons(enable, excludeButton) {
+    let buttons = document.querySelectorAll('.addMarkerButtonClass'); // Replace with the actual class of your buttons
+    buttons.forEach(button => {
+        if (button !== excludeButton) {
+            button.disabled = enable ? false : true;
+        }
+    });
 }
 function handleClick(event, navItemDiv, navItem) {
     let x = event.offsetX;
