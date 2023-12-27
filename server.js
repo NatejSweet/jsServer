@@ -358,7 +358,7 @@ app.post('/updateNavBarItems', async (req,res) => {
     res.status(500).send('ahhhhh');
   }
 })
-app.post('/editNavBarOptions', async (req,res) => {
+app.post('/editNavBarOptions', async (req,res) => {   //this needs to update mapMarkers hubs as well
   const navOptions = req.body;
   const worldId = req.query.id;
   try {
@@ -368,6 +368,43 @@ app.post('/editNavBarOptions', async (req,res) => {
       [navOptions, BigInt(worldId), req.session.userId]
     );
     console.log(result);
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
+app.get('/mapMarkers', async (req,res) => {
+  const worldId = req.query.id;
+  try {
+    let conn = await pool.getConnection();
+    const mapMarkers = await conn.query(
+      'SELECT mapMarkers FROM worlds WHERE id = ? AND ownerId = ?',
+      [BigInt(worldId), req.session.userId]
+    );
+    if (mapMarkers.length > 0) {
+      const mapMarkersJSON = mapMarkers[0].mapMarkers;
+      res.send({ mapMarkersJSON });
+    } else {
+      res.redirect('/');
+    }
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+})
+
+app.post('/saveMapMarkers', async (req,res) => {
+  const mapMarkers = JSON.stringify(req.body.mapMarkers)
+  const worldId = req.query.id;
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE worlds SET mapMarkers = ? WHERE id = ? AND ownerId = ?',
+      [mapMarkers, BigInt(worldId), req.session.userId]
+    );
     res.end();
     if (conn) conn.end();
   } catch (err) {

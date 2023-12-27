@@ -134,7 +134,9 @@ function fillNavBar(navNames, navItems){
     });
     nav.appendChild(list)
 }
-function fillMap(img1Id, img2Id){                       //this needs to get areas and add them to the map
+function fillMap(img1Id, img2Id){        
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');       
     let mapDiv = document.getElementById("mapDiv");
     let img1 = document.createElement('img')
     img1.setAttribute('id', 'map1Img')
@@ -160,6 +162,31 @@ function fillMap(img1Id, img2Id){                       //this needs to get area
         })
         .then(content => {
             img2.setAttribute('src', content.src);
+        });
+    fetch('/mapMarkers?id=' + encodeURIComponent(id))
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+        })
+        .then(content => {
+            let mapMarkers = content.mapMarkersJSON
+            Object.keys(mapMarkers).forEach(hub => {
+                mapMarkers[hub].forEach(marker => {
+                    let x = marker[0]
+                    let y = marker[1]
+                    let r = marker[2]
+                    let area = document.createElement('area')
+                    area.setAttribute('shape', 'circle')
+                    area.setAttribute('coords', x + ',' + y + ',' + r)
+                    area.setAttribute('href', '#')
+                    area.addEventListener('click', function(event) {
+                        event.preventDefault(); // Prevent the default action
+                        loadHub(hub);
+                    })
+                    map1.appendChild(area)
+                })
+            })
         });
     mapDiv.appendChild(img1);
     mapDiv.appendChild(map1);

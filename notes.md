@@ -44,9 +44,15 @@ fill navs page
 
 
 TO-DO:
-create space in tables for mapmarkers
-create save function
-create data request when loading map
+remove navNames from database
+update website to work withou this useless variable
+map still needs some work, removed markers are not deleted for some reason
+map doesnt reload after saving markers
+there is an issue with replacing the navItem(region) and not creating empty pages for it
+    adding navOptions(hubs) to the new item also does not create anything other than enteries in navItems(need somethin in pages)
+there is also an issue with replacing a navOption(hub), the data for the old option does not dissapear right away
+there is also an issue with the map markers duplicating
+    this is liekly cause by an incomplete place Previous markers function
 
 
 
