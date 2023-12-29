@@ -62,18 +62,14 @@ function removeSaveButton(){
     let saveButton = document.getElementById('saveButton')
     saveButton.remove()
 }
-function editPage() {
+function editPage() {       // this function can be optimized, at least reduce the length of function
     disableNavBar();
     console.log('edit page')
     let editButtonsDiv = document.getElementById('editButtonsDiv')
     editButtonsDiv.innerHTML = ''
     addSaveButton();
     addAddSectionButton();
-    const titleDivs = document.querySelectorAll('.titleDiv');
-    const titles = document.querySelectorAll('.titleText');
-    const subtitles = document.querySelectorAll('.subTitleText');
-    const texts = document.querySelectorAll('.textText');
-
+    const titleDivs = document.querySelectorAll('.titleDiv')
     titleDivs.forEach(titleDiv => {
         let title = titleDiv.getElementsByClassName('titletext')
         let titleLabel = document.createElement('label')
@@ -116,14 +112,14 @@ function editPage() {
             subtitleLabel.appendChild(removeSubtitleButton);
             let textDivs = Array.from(subtitleDiv.getElementsByClassName('textDiv'))
             textDivs.forEach(textDiv =>{
-                let text = textDiv.getElementsByClassName('textText')
+                let text = textDiv.getElementsByClassName('text')
                 let textLabel = document.createElement('label')
                 textLabel.textContent = 'Text: '
-                let textText = document.createElement('input')
-                textText.setAttribute("name", "text")
-                textText.setAttribute('class', 'text')
-                textText.value = text[0].textContent
-                textLabel.appendChild(textText)
+                let textInput = document.createElement('textInput')
+                textInput.setAttribute("name", "text")
+                textInput.setAttribute('class', 'textInput')
+                textInput.value = text[0].textContent
+                textLabel.appendChild(textInput)
                 text[0].replaceWith(textLabel)
                 let removeTextButton = document.createElement('button');
                 removeTextButton.textContent = 'Remove Text';
@@ -204,10 +200,10 @@ function addSubtext(event) {
     subtextDiv.setAttribute('class', 'subTitleDiv');
     let subtextLabel = document.createElement('label');
     subtextLabel.textContent = 'Subtext: ';
-    let subtextText = document.createElement('input');
-    subtextText.setAttribute("name", "subtext");
-    subtextText.setAttribute("class", "subtext");
-    subtextLabel.appendChild(subtextText);
+    let subtext = document.createElement('input');
+    subtext.setAttribute("name", "subtext");
+    subtext.setAttribute("class", "subtext");
+    subtextLabel.appendChild(subtext);
     subtextDiv.appendChild(subtextLabel);
     parentDiv.appendChild(subtextDiv);
     let addTextButton = document.createElement('button');
@@ -230,10 +226,10 @@ function addText(event) {
     textDiv.setAttribute('class', 'textDiv');
     let textLabel = document.createElement('label');
     textLabel.textContent = 'Text: ';
-    let textText = document.createElement('input');
-    textText.setAttribute("name", "text");
-    textText.setAttribute("class", "text");
-    textLabel.appendChild(textText);
+    let text = document.createElement('input');
+    text.setAttribute("name", "text");
+    text.setAttribute("class", "text");
+    textLabel.appendChild(text);
     textDiv.appendChild(textLabel);
     parentDiv.appendChild(textDiv);
     let removeTextButton = document.createElement('button');
@@ -257,6 +253,7 @@ function storeMainContent() {
 
     Array.from(titleDivs).forEach(titleDiv => {
         let title = titleDiv.getElementsByClassName('titletext')[0].value;
+        console.log(title)
         let subDivs = titleDiv.getElementsByClassName('subTitleDiv');
         let subContent = [];
 

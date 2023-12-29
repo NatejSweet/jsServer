@@ -90,11 +90,11 @@ function fillMainContent(mainPage, pageName) {
             subTitle[1].forEach(text => {
                 let textDiv = document.createElement('div');
                 textDiv.setAttribute('class', 'textDiv');
-                let textText = document.createElement('p')
-                textText.setAttribute('class', 'textText');
-                textText.appendChild(document.createTextNode(text));
+                let textLabel = document.createElement('label')
+                textLabel.setAttribute('class', 'text');
+                textLabel.appendChild(document.createTextNode(text));
                 // textText.setAttribute('class', 'textText');
-                textDiv.appendChild(textText);
+                textDiv.appendChild(textLabel);
                 subTitleDiv.appendChild(textDiv);
             }
             );
