@@ -78,31 +78,31 @@ function removeNavOption(button){
 
 function saveNavOptions(){
     let navOptionsDiv = document.getElementById('navOptionsDiv');
-    let navBar = document.getElementById('navBar');
-    let ul = navBar.firstChild;
     let navItems = navOptionsDiv.childNodes;
     let navOptions = {};
+    let pages = {};
     navItems.forEach(navItem => {
         let navItemOptions = navItem.childNodes;
         let navItemOptionValues = [];
         navItemOptions.forEach(navItemOption => {
             if (navItemOption.tagName === 'INPUT'){
                 navItemOptionValues.push(navItemOption.value);
+                pages[navItemOption.value] = [];
             }
         });
         navOptions[navItem.id] = navItemOptionValues;
     });
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
+    console.log(pages)
     fetch('/editNavBarOptions?id=' + encodeURIComponent(id), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(navOptions),
+        body: JSON.stringify({ navOptions, pages }),
     }).then(response => {
         if (response.ok){
-            console.log(response);
             enableNavBar();
             reloadNavBar();
             return reloadContents(editMode=true);

@@ -359,13 +359,15 @@ app.post('/updateNavBarItems', async (req,res) => {
   }
 })
 app.post('/editNavBarOptions', async (req,res) => {   //this needs to update mapMarkers hubs as well
-  const navOptions = req.body;
+  console.log(req.body)
+  const navOptions = req.body.navOptions;
+  const pages = req.body.pages;
   const worldId = req.query.id;
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
-      'UPDATE worlds SET navItems = ? WHERE id = ? AND ownerId = ?',
-      [navOptions, BigInt(worldId), req.session.userId]
+      'UPDATE worlds SET navItems = ?, pages = ? WHERE id = ? AND ownerId = ?',
+      [navOptions, pages, BigInt(worldId), req.session.userId]
     );
     console.log(result);
     res.end();
@@ -375,6 +377,7 @@ app.post('/editNavBarOptions', async (req,res) => {   //this needs to update map
     res.status(500).send('ahhhhh');
   }
 })
+
 app.get('/mapMarkers', async (req,res) => {
   const worldId = req.query.id;
   try {
