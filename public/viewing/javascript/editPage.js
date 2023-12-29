@@ -1,21 +1,14 @@
 
 
-function addSaveButton(){
-    let saveButton = document.createElement('button')
-    saveButton.setAttribute('id', 'saveButton')
-    saveButton.setAttribute('onclick', 'savePage()')
-    saveButton.appendChild(document.createTextNode('Save Page'))
-    let header = document.querySelector('header')
-    header.appendChild(saveButton)
-}
 function savePage(){
     enableNavBar();
     if (document.getElementById('pageTitle')){
         let hubName = document.getElementById('pageTitle').textContent;
         removeSaveButton();
+        removeCancelButton();
         removeMainContentAddButtons();
         let content = storeMainContent();
-        pagesJSON[hubName].content = content;
+        pagesJSON[hubName] = content;
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
         fetch('/updatePage?id=' + encodeURIComponent(id),{
@@ -31,6 +24,7 @@ function savePage(){
         })
     }else{
         removeSaveButton();
+        removeCancelButton();
         removeMainContentAddButtons();
         let content = storeMainContent();
         const urlParams = new URLSearchParams(window.location.search);
@@ -62,12 +56,17 @@ function removeSaveButton(){
     let saveButton = document.getElementById('saveButton')
     saveButton.remove()
 }
+
+function removeCancelButton(){
+    let cancelButton = document.getElementById('cancelButton')
+    cancelButton.remove()
+}
 function editPage() {       // this function can be optimized, at least reduce the length of function
     disableNavBar();
-    console.log('edit page')
     let editButtonsDiv = document.getElementById('editButtonsDiv')
     editButtonsDiv.innerHTML = ''
     addSaveButton();
+    addCancelButton();
     addAddSectionButton();
     const titleDivs = document.querySelectorAll('.titleDiv')
     titleDivs.forEach(titleDiv => {
@@ -119,7 +118,7 @@ function editPage() {       // this function can be optimized, at least reduce t
                 textLabel.textContent = 'Text: '
                 let textInput = document.createElement('input')
                 textInput.setAttribute("name", "text")
-                textInput.setAttribute('class', 'textInput')
+                textInput.setAttribute('class', 'text')
                 textInput.value = text[0].textContent
                 console.log(textInput)
                 console.log(text[0])
@@ -135,37 +134,42 @@ function editPage() {       // this function can be optimized, at least reduce t
         })
 
     })
-
-    // titles.forEach(title => {
-    //     const input = document.createElement('input');
-    //     input.setAttribute('class', 'titletext')
-    //     input.value = title.textContent;
-    //     title.replaceWith(input);
-        
-    // });
-
-    // subtitles.forEach(subtitle => {
-    //     const input = document.createElement('input');
-    //     input.value = subtitle.textContent;
-    //     input.setAttribute('class', 'subtext')
-    //     subtitle.replaceWith(input);
-    // });
-
-    // texts.forEach(text => {
-    //     const input = document.createElement('input');
-    //     input.value = text.textContent;
-    //     input.setAttribute('class', 'text')
-    //     text.replaceWith(input);
-    // });
 }
-function addAddSectionButton(){
+
+function cancelEdit(){
+    let editButtonsDiv = document.getElementById('editButtonsDiv')
+    editButtonsDiv.innerHTML = ''
+    enableNavBar();
+    reloadContents(editMode=true);
+}
+
+function addSaveButton(){
+    let saveButton = document.createElement('button')
+    saveButton.setAttribute('id', 'saveButton')
+    saveButton.setAttribute('onclick', 'savePage()')
+    saveButton.appendChild(document.createTextNode('Save Page'))
+    let editButtonsDiv = document.getElementById('editButtonsDiv')
+    editButtonsDiv.appendChild(saveButton)
+}
+
+function addCancelButton(){
+    let cancelButton = document.createElement('button')
+    cancelButton.setAttribute('id', 'cancelButton')
+    cancelButton.setAttribute('onclick', 'cancelEdit()')
+    cancelButton.appendChild(document.createTextNode('Cancel'))
     let header = document.querySelector('header')
+    let editButtonsDiv = document.getElementById('editButtonsDiv')
+    editButtonsDiv.appendChild(cancelButton)
+}
+
+function addAddSectionButton(){
     let addSectionButton = document.createElement('button')
     addSectionButton.setAttribute('id', 'addSectionButton')
     addSectionButton.setAttribute('class', 'addSectionButton')
     addSectionButton.setAttribute('onclick', 'addTitle()')
     addSectionButton.appendChild(document.createTextNode('Add Section'))
-    header.appendChild(addSectionButton)
+    let editButtonsDiv = document.getElementById('editButtonsDiv')
+    editButtonsDiv.appendChild(addSectionButton)
 }
 
 function addTitle(){
@@ -225,7 +229,7 @@ function addSubtext(event) {
 function addText(event) {
     event.preventDefault();
     let addButton = event.target;
-    let parentDiv = addButton.parentNode.parentNode;
+    let parentDiv = addButton.parentNode
     let textDiv = document.createElement('div');
     textDiv.setAttribute('class', 'textDiv');
     let textLabel = document.createElement('label');
@@ -257,7 +261,6 @@ function storeMainContent() {
 
     Array.from(titleDivs).forEach(titleDiv => {
         let title = titleDiv.getElementsByClassName('titletext')[0].value;
-        console.log(title)
         let subDivs = titleDiv.getElementsByClassName('subTitleDiv');
         let subContent = [];
 
@@ -267,8 +270,7 @@ function storeMainContent() {
             let textContent = [];
 
             Array.from(textDivs).forEach(textDiv => {
-                let text = textDiv.getElementsByClassName('text')[0];
-                console.log(text)
+                let text = textDiv.getElementsByClassName('text')[0].value;
                 textContent.push(text);
             });
 

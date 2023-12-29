@@ -149,7 +149,7 @@ app.post('/createWorld', async (req, res) => {
     const img2Id = img2Result.insertId;
     // Insert world data into worlds table
     const worldResult = await conn.query(
-      'INSERT INTO worlds (worldName, ownerId, img1Id, img2Id, mainPage, navNames) VALUES (?,?,?,?,?,?)',
+      'INSERT INTO worlds (worldName, ownerId, img1Id, img2Id, mainPage, navItems) VALUES (?,?,?,?,?,?)',
       [name, req.session.userId, img1Id, img2Id, content, navItems]
     );
     const worldId = worldResult.insertId; // Get the inserted worldId
@@ -173,17 +173,17 @@ app.post('/createWorld', async (req, res) => {
   }
 });
 
-app.get('/fillNavs', async (req, res) => {
+app.get('/fillNavs', async (req, res) => {    //may want to just send navItems instead of parsing doen to navNames
   try {
     let conn = await pool.getConnection();
     const navs = await conn.query(
-      'SELECT navNames, worldName FROM worlds WHERE id = ? AND ownerId = ?',
+      'SELECT navItems, worldName FROM worlds WHERE id = ? AND ownerId = ?',
       [BigInt(req.session.worldId), req.session.userId]
     );
     if (navs.length > 0) {
-      const navNames = navs[0].navNames;
+      const navItems = navs[0].navItems;
       const worldName = navs[0].worldName;
-      res.send({ navNames, worldName });
+      res.send({ navItems, worldName });
     } else {
       res.redirect('/');
     }
@@ -232,18 +232,17 @@ app.get ('/viewMainPage', async (req, res) => {
     const worldId = req.query.id;
     let conn = await pool.getConnection();
     const mainPage = await conn.query(
-      'SELECT mainPage, worldName, navNames,navItems ,img1Id, img2Id, pages FROM worlds WHERE id = ? AND ownerId = ?',
+      'SELECT mainPage, worldName ,navItems ,img1Id, img2Id, pages FROM worlds WHERE id = ? AND ownerId = ?',
       [BigInt(worldId), req.session.userId]
     );
     if (mainPage.length > 0) {
       const mainPageJSON = mainPage[0].mainPage;
       const worldName = mainPage[0].worldName;
-      const navNames = mainPage[0].navNames;
       const img1Id = mainPage[0].img1Id;
       const img2Id = mainPage[0].img2Id;
       const navItems = mainPage[0].navItems;
       const pages = mainPage[0].pages;
-      res.send({ mainPageJSON, worldName, navNames, img1Id,img2Id, navItems,pages});
+      res.send({ mainPageJSON, worldName, img1Id,img2Id, navItems,pages});
     } else {
       res.redirect('/');
     }
@@ -274,13 +273,8 @@ app.get('/viewImage', async(req,res) => {
   }
 })
 
-function createBaselinePagesJSON(navContents) {
-  console.log(navContents)
-  
-  return pages
-}
-
 app.post('/updatePage', async (req, res) => {
+  console.log
   const page = req.body;
   const pageJSON = JSON.stringify(page);
   const worldId = req.query.id; // Extract worldId from the query string
@@ -299,7 +293,6 @@ app.post('/updatePage', async (req, res) => {
   }
 })
 app.post('/updateMainPage', async (req,res) => {
-  console.log('updatingMainPAge')
   const mainPage = req.body;
   const mainPageJSON = JSON.stringify(mainPage);
   const worldId = req.query.id;
@@ -318,19 +311,18 @@ app.post('/updateMainPage', async (req,res) => {
   }
 })
 
-app.get('/navItems', async (req,res) => {
+app.get('/navItems', async (req,res) => { 
   const worldId = req.query.id;
   try {
     let conn = await pool.getConnection();
     const navItems = await conn.query(
-      'SELECT navItems,navNames,pages FROM worlds WHERE id = ? AND ownerId = ?',
+      'SELECT navItems,pages FROM worlds WHERE id = ? AND ownerId = ?',
       [BigInt(worldId), req.session.userId]
     );
     if (navItems.length > 0) {
       const navItemsJSON = navItems[0].navItems;
-      const navNames = navItems[0].navNames;
       const pages = navItems[0].pages;
-      res.send({ navItemsJSON, navNames, pages});
+      res.send({ navItemsJSON, pages});
     } else {
       res.redirect('/');
     }
@@ -340,16 +332,15 @@ app.get('/navItems', async (req,res) => {
     res.status(500).send('ahhhhh');
   }
 })
-app.post('/updateNavBarItems', async (req,res) => {
+app.post('/updateNavBarItems', async (req,res) => {//could be condensed to reuse code from fillNavs
   const navItems = JSON.stringify(req.body.navItems)
   const pages = JSON.stringify(req.body.pages)
-  const navNames = JSON.stringify(req.body.navNames)
   const worldId = req.query.id;
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
-      'UPDATE worlds SET navItems = ?, pages = ?, navNames = ? WHERE id = ? AND ownerId = ?',
-      [navItems, pages, navNames, BigInt(worldId), req.session.userId]
+      'UPDATE worlds SET navItems = ?, pages = ? WHERE id = ? AND ownerId = ?',
+      [navItems, pages, BigInt(worldId), req.session.userId]
     );
     res.end();
     if (conn) conn.end();

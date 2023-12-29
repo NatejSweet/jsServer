@@ -3,8 +3,8 @@ function createEditButton(){
     editModeButton.setAttribute('id', 'editModeButton')
     editModeButton.setAttribute('onclick', 'enterEditMode()')
     editModeButton.appendChild(document.createTextNode('Enter Edit Mode'))
-    let header = document.querySelector('header')
-    header.appendChild(editModeButton)
+    let editButtonsDiv = document.getElementById('editButtonsDiv');
+    editButtonsDiv.appendChild(editModeButton)
 }
 function enterEditMode(){
     let editButtonsDiv = document.getElementById('editButtonsDiv')

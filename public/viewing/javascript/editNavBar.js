@@ -87,15 +87,14 @@ function saveNavBar(){
         console.log(content);
         let navItems = content.navItemsJSON;
         let pages = content.pages;
-         let navNames = content.navNames;
         console.log(navItems)
-        updateDBNavBarItems(navItems, pages,navNames, ul);
+        updateDBNavBarItems(navItems, pages, ul);
     })
     //scan IDs of inputs replacing matching Ids and removing missing ones
     //create new page items for the new navs and add them to the list
     
 }
-function updateDBNavBarItems(navItems, pages,navNames, ul){
+function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to identify id of a nav item to see if a user is renaming
     console.log(navItems)
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -140,8 +139,7 @@ function updateDBNavBarItems(navItems, pages,navNames, ul){
         },
         body: JSON.stringify({
             navItems: newNavItems,
-            pages: newPages,
-            navNames: newNavBarItems    
+            pages: newPages   
         })
     }).then(response => {
         console.log('a')
