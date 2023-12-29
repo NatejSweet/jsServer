@@ -2,7 +2,6 @@ import {createFillNavsPage} from './fillNavs.js'
 var mainImage = null;
 var secondaryImage = null;
 var mapImageStorage = [{"id":mainImage, "src":""}, {"id":secondaryImage, "src":""}];
-var navItemStorage = [];
 
 document.addEventListener("DOMContentLoaded",function(event){
     addTitle(event)
@@ -222,11 +221,12 @@ function storeWorldName() {
 }
 
 function storeNavItems(){
+    let navItemStorage = {}
     let navItems = document.getElementsByName('navItem')
     
     navItems.forEach( item => {
         
-        navItemStorage.push(item.value)
+        navItemStorage[item.value] = []
     })
     return navItemStorage;
 }

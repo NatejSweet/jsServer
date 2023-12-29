@@ -20,10 +20,12 @@ function viewMainPage() {
             setPages(content.pages);
             worldName.innerHTML = content.worldName;
             fillMainContent(content.mainPageJSON);
-            fillNavBar(content.navNames, content.navItems);
+            fillNavBar(content.navItems);
             fillMap(content.img1Id, content.img2Id);
         });
-    createEditButton();
+    if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')){
+        createEditButton();
+    }
 }
 
 function reloadNavBar() { //probably want to create a specific request for this later
@@ -38,7 +40,7 @@ function reloadNavBar() { //probably want to create a specific request for this 
             }
         }).then(content => {
             console.log(content);
-            fillNavBar(content.navNames, content.navItems);
+            fillNavBar(content.navItems);
         })
 }
             
@@ -85,11 +87,11 @@ function fillMainContent(mainPage, pageName) {
 
 }
 
-function fillNavBar(navNames, navItems){
+function fillNavBar(navItems){
     let list = document.createElement('ul')
     let nav = document.getElementById("navBar");
     nav.innerHTML = '';
-    navNames.forEach(name => {
+    Object.keys(navItems).forEach(name => {
         let li = document.createElement('li')
         let dropDownDiv = document.createElement('div')
         dropDownDiv.setAttribute('class', 'dropdown')
@@ -142,31 +144,31 @@ function fillMap(img1Id, img2Id){
         .then(content => {
             img2.setAttribute('src', content.src);
         });
-    fetch('/mapMarkers?id=' + encodeURIComponent(id))
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-        })
-        .then(content => {
-            let mapMarkers = content.mapMarkersJSON
-            Object.keys(mapMarkers).forEach(hub => {
-                mapMarkers[hub].forEach(marker => {
-                    let x = marker[0]
-                    let y = marker[1]
-                    let r = marker[2]
-                    let area = document.createElement('area')
-                    area.setAttribute('shape', 'circle')
-                    area.setAttribute('coords', x + ',' + y + ',' + r)
-                    area.setAttribute('href', '#')
-                    area.addEventListener('click', function(event) {
-                        event.preventDefault(); // Prevent the default action
-                        loadHub(hub);
-                    })
-                    map1.appendChild(area)
-                })
-            })
-        });
+    // fetch('/mapMarkers?id=' + encodeURIComponent(id))
+    //     .then(response => {
+    //         if (response.ok) {
+    //             return response.json();
+    //         }
+    //     })
+    //     .then(content => {
+    //         let mapMarkers = content.mapMarkersJSON
+    //         Object.keys(mapMarkers).forEach(hub => {
+    //             mapMarkers[hub].forEach(marker => {
+    //                 let x = marker[0]
+    //                 let y = marker[1]
+    //                 let r = marker[2]
+    //                 let area = document.createElement('area')
+    //                 area.setAttribute('shape', 'circle')
+    //                 area.setAttribute('coords', x + ',' + y + ',' + r)
+    //                 area.setAttribute('href', '#')
+    //                 area.addEventListener('click', function(event) {
+    //                     event.preventDefault(); // Prevent the default action
+    //                     loadHub(hub);
+    //                 })
+    //                 map1.appendChild(area)
+    //             })
+    //         })
+    //     });
     mapDiv.appendChild(img1);
     mapDiv.appendChild(map1);
     mapDiv.appendChild(img2);
@@ -177,7 +179,7 @@ function setPages(pages){
     
 function loadHub(hubName){
     let hub = pagesJSON[hubName];
-    fillMainContent(hub.content, hubName);
+    fillMainContent(hub, hubName);
     updateMap(hub.imgId);
     if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')){
         createEditButton();

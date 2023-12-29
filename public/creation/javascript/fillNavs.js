@@ -15,7 +15,7 @@ function createFillNavsPage(){
         }
     }).then(response => {
         createHeader(response.worldName)
-        let navNames = response.navNames
+        let navNames = Object.keys(response.navItems)
         navNames.forEach(navName => {
             let navTitle = document.createElement('h3')
             navTitle.textContent = navName
@@ -72,7 +72,7 @@ function addItem(item){
 function submitNavPage(event){
     event.preventDefault();
     let navNames = Array.from(document.getElementsByClassName('navColumns')[0].children)
-    let navContents = {}
+    let navItemsJSON = {}
     navNames.forEach(navName => {
         let navNameString = navName.children[0].textContent
         let navItems = Array.from(navName.children[1].children)
@@ -81,15 +81,14 @@ function submitNavPage(event){
             let navItemString = navItem.children[0].value
             navItemsArray.push(navItemString)
         })
-        navContents[navNameString] = navItemsArray
+        navItemsJSON[navNameString] = navItemsArray
     })
-    console.log(navContents)
     fetch('/fillNavs', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(navContents),
+        body: JSON.stringify(navItemsJSON),
     })
     .then((response) => {
         if (response.ok) {
