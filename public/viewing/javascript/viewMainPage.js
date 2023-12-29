@@ -1,13 +1,11 @@
 
-// const { text } = require("express");
 var pagesJSON = {};
 document.addEventListener('DOMContentLoaded', function() {
     viewMainPage();
 });
 function viewMainPage() {
     let worldName = document.getElementById("worldName");
-    let navBar = document.getElementById("navBarDiv");
-    let mapDiv = document.getElementById("mapDiv");
+
 
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
@@ -19,30 +17,12 @@ function viewMainPage() {
                 return response.json();
             }
         }).then(content => {
-            console.log(content);
+            setPages(content.pages);
             worldName.innerHTML = content.worldName;
             fillMainContent(content.mainPageJSON);
             fillNavBar(content.navNames, content.navItems);
             fillMap(content.img1Id, content.img2Id);
-            setPages(content.pages);
         });
-    createEditButton();
-}
-
-function reloadMainPage() {
-    const urlParams = new URLSearchParams(window.location.search);  
-    const id = urlParams.get('id');
-    fetch('/viewMainPage?id=' + encodeURIComponent(id))
-        .then(response => {
-            if (response.ok) {
-                console.log(response)
-                return response.json();
-            }
-        }).then(content => {
-            console.log(content);
-            worldName.innerHTML = content.worldName;
-            fillMainContent(content.mainPageJSON);
-        })
     createEditButton();
 }
 
@@ -90,11 +70,10 @@ function fillMainContent(mainPage, pageName) {
             subTitle[1].forEach(text => {
                 let textDiv = document.createElement('div');
                 textDiv.setAttribute('class', 'textDiv');
-                let textLabel = document.createElement('label')
-                textLabel.setAttribute('class', 'text');
-                textLabel.appendChild(document.createTextNode(text));
-                // textText.setAttribute('class', 'textText');
-                textDiv.appendChild(textLabel);
+                let textP= document.createElement('p')
+                textP.setAttribute('class', 'text');
+                textP.appendChild(document.createTextNode(text));
+                textDiv.appendChild(textP);
                 subTitleDiv.appendChild(textDiv);
             }
             );
@@ -107,7 +86,6 @@ function fillMainContent(mainPage, pageName) {
 }
 
 function fillNavBar(navNames, navItems){
-    console.log(navItems)
     let list = document.createElement('ul')
     let nav = document.getElementById("navBar");
     nav.innerHTML = '';
@@ -138,6 +116,7 @@ function fillMap(img1Id, img2Id){
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');       
     let mapDiv = document.getElementById("mapDiv");
+    mapDiv.innerHTML = '';
     let img1 = document.createElement('img')
     img1.setAttribute('id', 'map1Img')
     img1.setAttribute('usemap', '#map1')
@@ -193,7 +172,6 @@ function fillMap(img1Id, img2Id){
     mapDiv.appendChild(img2);
 }
 function setPages(pages){
-    console.log(pages)
     pagesJSON = pages
 }
     

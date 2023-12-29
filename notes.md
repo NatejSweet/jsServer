@@ -53,6 +53,9 @@ there is an issue with replacing the navItem(region) and not creating empty page
 there is also an issue with replacing a navOption(hub), the data for the old option does not dissapear right away
 there is also an issue with the map markers duplicating
     this is liekly cause by an incomplete place Previous markers function
+add cancel button to edit page mode
+add link at worldName to reload to mainPage
+make cancelNavOptionsEdit function
 
 
 

@@ -1,4 +1,4 @@
-const e = require("express")
+
 
 function addSaveButton(){
     let saveButton = document.createElement('button')
@@ -52,7 +52,7 @@ function savePage(){
     if (document.getElementById('pageTitle')){
         loadHub(document.getElementById('pageTitle').textContent)
     }else{
-        reloadMainPage()
+        viewMainPage()
     }
     if (editMode){
         enterEditMode();
@@ -111,14 +111,18 @@ function editPage() {       // this function can be optimized, at least reduce t
             removeSubtitleButton.addEventListener('click', removeItem);
             subtitleLabel.appendChild(removeSubtitleButton);
             let textDivs = Array.from(subtitleDiv.getElementsByClassName('textDiv'))
+            
             textDivs.forEach(textDiv =>{
                 let text = textDiv.getElementsByClassName('text')
+                console.log(text)
                 let textLabel = document.createElement('label')
                 textLabel.textContent = 'Text: '
-                let textInput = document.createElement('textInput')
+                let textInput = document.createElement('input')
                 textInput.setAttribute("name", "text")
                 textInput.setAttribute('class', 'textInput')
                 textInput.value = text[0].textContent
+                console.log(textInput)
+                console.log(text[0])
                 textLabel.appendChild(textInput)
                 text[0].replaceWith(textLabel)
                 let removeTextButton = document.createElement('button');
@@ -263,7 +267,8 @@ function storeMainContent() {
             let textContent = [];
 
             Array.from(textDivs).forEach(textDiv => {
-                let text = textDiv.getElementsByClassName('text')[0].value;
+                let text = textDiv.getElementsByClassName('text')[0];
+                console.log(text)
                 textContent.push(text);
             });
 
