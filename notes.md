@@ -64,5 +64,9 @@ adding a text to a previously erxiting subtext adds the new text above the old t
 
 create edit images functionality
 
+cannot handle two images on upload
+
+changing navName not saving
+
 
 

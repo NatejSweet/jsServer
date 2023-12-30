@@ -42,6 +42,7 @@ function editMapMarkers(){
                 navItemDiv.appendChild(document.createTextNode(navItem));
                 let addMarkerButton = document.createElement('button');
                 addMarkerButton.setAttribute('onclick', 'addMarker(this)');
+                addMarkerButton.setAttribute('class','addMarkerButton')
                 addMarkerButton.appendChild(document.createTextNode('Add Marker'));
                 navItemDiv.appendChild(addMarkerButton);
                 navNameDiv.appendChild(navItemDiv);
@@ -125,12 +126,14 @@ function placeExistingMarkers(){
 let activeButton = null; // global variable to keep track of the active button
 let handleClickWrapper = null; // global variable to keep track of the click handler
 function addMarker(button) {
+    console.log('addMarker')
     let navItemDiv = button.parentNode;
     let navItem = navItemDiv.firstChild.textContent;
     let mapDiv = document.getElementById('mapDiv');
     let img = mapDiv.firstChild;
 
     if (activeButton) {
+        console.log(activeButton)
         // If the clicked button is the active button, toggle it off
         if (activeButton === button) {
             img.removeEventListener('click', handleClickWrapper);
@@ -142,6 +145,7 @@ function addMarker(button) {
             activeButton = button;
             img.removeEventListener('click', handleClickWrapper);
             handleClickWrapper = function(event) {
+                console.log('clicked')
                 handleClick(event, navItemDiv, navItem);
             };
             img.addEventListener('click', handleClickWrapper);
@@ -149,26 +153,28 @@ function addMarker(button) {
             return;
         }
     } else {
+        console.log('button activated')
         // If no button is active, toggle the clicked button on
         handleClickWrapper = function(event) {
+            console.log('clicked')
             handleClick(event, navItemDiv, navItem);
         };
         
         img.addEventListener('click', handleClickWrapper);
         
-        toggleButtons(false, button); // Disable all other buttons
+        // toggleButtons(false, button); // Disable all other buttons
         activeButton = button;
     }
 }
 
-function toggleButtons(enable, excludeButton) {
-    let buttons = document.querySelectorAll('.addMarkerButtonClass'); // Replace with the actual class of your buttons
-    buttons.forEach(button => {
-        if (button !== excludeButton) {
-            button.disabled = enable ? false : true;
-        }
-    });
-}
+// function toggleButtons(enable, excludeButton) {
+//     let buttons = document.querySelectorAll('.addMarkerButton'); // Replace with the actual class of your buttons
+//     buttons.forEach(button => {
+//         if (button !== excludeButton) {
+//             button.disabled = enable ? false : true;
+//         }
+//     });
+// }
 function handleClick(event, navItemDiv, navItem) {
     let x = event.offsetX;
     let y = event.offsetY;
