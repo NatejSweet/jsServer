@@ -68,6 +68,7 @@ function editPage() {       // this function can be optimized, at least reduce t
     addSaveButton();
     addCancelButton();
     addAddSectionButton();
+    addUpdateMapImageButton();
     const titleDivs = document.querySelectorAll('.titleDiv')
     titleDivs.forEach(titleDiv => {
         let title = titleDiv.getElementsByClassName('titletext')
@@ -172,7 +173,17 @@ function addAddSectionButton(){
     editButtonsDiv.appendChild(addSectionButton)
 }
 
-function addTitle(){
+function addUpdateMapImageButton(){
+    let updateMapImageButton = document.createElement('button')
+    updateMapImageButton.setAttribute('id', 'updateMapImageButton')
+    updateMapImageButton.setAttribute('class', 'updateMapImageButton')
+    updateMapImageButton.setAttribute('onclick', 'updateMapImage()')
+    updateMapImageButton.appendChild(document.createTextNode('Update Map Image'))
+    let editButtonsDiv = document.getElementById('editButtonsDiv')
+    editButtonsDiv.appendChild(updateMapImageButton)
+}
+
+function addTitle(){        //when implimenting these in the editPage function, create an optional argument for pre-filled data
     let contentDiv = document.getElementById('mainContentDiv')
     let titleDiv = document.createElement('div')
     titleDiv.setAttribute('class','titleDiv')
@@ -292,6 +303,44 @@ function removeMainContentAddButtons(){
     let addTextButtons = document.getElementsByClassName('addTextButton')
     while (addTextButtons.length > 0){
         addTextButtons[0].remove()
+    }
+}
+var mapImageStorage = [{"id":mainImage, "src":""}, {"id":secondaryImage, "src":""}];
+function updateMapImage(){
+/* <input id="mainMap" type="file" accept=".img,.jpg,.jpeg" onchange="readURL(this,'mainMapImg');" label="main image">
+<form>
+          <h4>input an image for the map</h4><br>
+          <input id="mainMap" type="file" accept=".img,.jpg,.jpeg" onchange="readURL(this,'mainMapImg');" label="main image"><br>
+          </form>
+          <form>
+          <h4>input a second image (optional)</h4><br>
+          <input id="secondaryMap" type="file" accept=".img,.jpg,.jpeg" onchange="readURL(this,'secondaryMapImg');" label="secondary image"><br>
+        </form>
+</input> */
+}
+
+window.readURL = function(input,imgId){
+    console.log('reading url')
+    if (input.files && input.files[0]){
+        if (input.files[0].size > 4 * 1024 * 1024) {
+            alert("File size exceeds 4 MB limit.");
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload=function (e){
+            console.log('hi')
+            let img = document.getElementById(imgId)
+            img.setAttribute('src',e.target.result)
+            if (imgId === 'mainImage'){
+                mapImageStorage[0].name = imgId
+                mapImageStorage[0].src = e.target.result
+            }
+            else if (imgId === 'secondaryImage'){
+                mapImageStorage[1].name = imgId
+                mapImageStorage[1].src = e.target.result
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
     }
 }
 

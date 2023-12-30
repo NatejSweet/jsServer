@@ -1,5 +1,4 @@
 function editMapMarkers(){
-    placeExistingMarkers();
     let editButtonsDiv = document.getElementById('editButtonsDiv');
     while (editButtonsDiv.hasChildNodes()){
         editButtonsDiv.removeChild(editButtonsDiv.firstChild);
@@ -50,6 +49,7 @@ function editMapMarkers(){
             mainContentDiv.appendChild(navNameDiv);
         })
     })
+    placeExistingMarkers();
     //next click on map adds hub
     //this click will add a object next to the hubname showing the size of the dot and a radius slider
     //retain add hub button, every marker made will have a delete button
@@ -76,8 +76,7 @@ function placeExistingMarkers(){
         Object.keys(mapMarkers).forEach(navItem => {
             let navItemDiv = document.getElementById(navItem+'Div');
             console.log(navItem+'Div')
-            mapMarkers[navItem].forEach(markers => {
-                markers.forEach(marker => {
+            mapMarkers[navItem].forEach(marker=> {
             
 
                     let dot = document.createElement('div');
@@ -118,7 +117,6 @@ function placeExistingMarkers(){
                     })
                 });
             });
-        })
     })
 }
 

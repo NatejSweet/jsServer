@@ -62,5 +62,7 @@ optimize editPage function to use add text etc.
 
 adding a text to a previously erxiting subtext adds the new text above the old text, but under any other new text items
 
+create edit images functionality
+
 
 

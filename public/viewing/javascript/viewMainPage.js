@@ -127,6 +127,31 @@ function fillMap(img1Id, img2Id){
     let img2 = document.createElement('img')
     img2.setAttribute('id', 'map2Img')
     console.log(img1Id,img2Id)
+    let img1Button = document.createElement('button')
+    img1Button.textContent = 'Main Map'
+    img1Button.setAttribute('class', 'imgControlButton')
+    img1Button.addEventListener('click', () =>{
+        if (img1.style.display == 'block'){
+            return
+        }
+        else{
+            img1.style.display = 'block' 
+            img2.style.display = 'none'
+        }
+    })
+    let img2Button = document.createElement('button')
+    img2Button.textContent = 'Secondary Map'
+    img2Button.setAttribute('class','imgControlButton')
+    img2Button.addEventListener('click', () =>{
+        if (img2.style.display == 'block'){
+            return
+        }
+        else{
+            img2.style.display = 'block'
+            img1.style.display = 'none'
+        }
+    })
+
     fetch('/viewImage?imgId=' + encodeURIComponent(img1Id))
         .then(response => {
             if (response.ok) {
@@ -143,32 +168,37 @@ function fillMap(img1Id, img2Id){
         })
         .then(content => {
             img2.setAttribute('src', content.src);
+            img2.style.display = 'none'
         });
-    // fetch('/mapMarkers?id=' + encodeURIComponent(id))
-    //     .then(response => {
-    //         if (response.ok) {
-    //             return response.json();
-    //         }
-    //     })
-    //     .then(content => {
-    //         let mapMarkers = content.mapMarkersJSON
-    //         Object.keys(mapMarkers).forEach(hub => {
-    //             mapMarkers[hub].forEach(marker => {
-    //                 let x = marker[0]
-    //                 let y = marker[1]
-    //                 let r = marker[2]
-    //                 let area = document.createElement('area')
-    //                 area.setAttribute('shape', 'circle')
-    //                 area.setAttribute('coords', x + ',' + y + ',' + r)
-    //                 area.setAttribute('href', '#')
-    //                 area.addEventListener('click', function(event) {
-    //                     event.preventDefault(); // Prevent the default action
-    //                     loadHub(hub);
-    //                 })
-    //                 map1.appendChild(area)
-    //             })
-    //         })
-    //     });
+    fetch('/mapMarkers?id=' + encodeURIComponent(id))
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+        })
+        .then(content => {
+            let mapMarkers = content.mapMarkersJSON
+            Object.keys(mapMarkers).forEach(hub => {
+                mapMarkers[hub].forEach(marker => {
+                    let x = marker[0]
+                    let y = marker[1]
+                    let r = marker[2]
+                    let area = document.createElement('area')
+                    area.setAttribute('shape', 'circle')
+                    area.setAttribute('coords', x + ',' + y + ',' + r)
+                    area.setAttribute('href', '#')
+                    area.setAttribute('title', hub)
+                    area.addEventListener('click', function(event) {
+                        event.preventDefault(); // Prevent the default action
+                        loadHub(hub);
+                    })
+                    map1.appendChild(area)
+                })
+            })
+        });
+    mapDiv.appendChild(img1Button)
+    mapDiv.appendChild(img2Button)
+    mapDiv.appendChild(document.createElement('br'))
     mapDiv.appendChild(img1);
     mapDiv.appendChild(map1);
     mapDiv.appendChild(img2);
@@ -187,7 +217,7 @@ function loadHub(hubName){
 }
 
 function updateMap(imgId){
-    let img = document.getElementById('map1Img')
+    let img = document.getElementById('map2Img')
     if (imgId == null){
         img.setAttribute('src', '#')
         return;
