@@ -126,31 +126,30 @@ function fillMap(img1Id, img2Id){
     map1.setAttribute('name', 'map1')
     let img2 = document.createElement('img')
     img2.setAttribute('id', 'map2Img')
-    console.log(img1Id,img2Id)
-    let img1Button = document.createElement('button')
-    img1Button.textContent = 'Main Map'
-    img1Button.setAttribute('class', 'imgControlButton')
-    img1Button.addEventListener('click', () =>{
-        if (img1.style.display == 'block'){
-            return
-        }
-        else{
-            img1.style.display = 'block' 
-            img2.style.display = 'none'
-        }
-    })
-    let img2Button = document.createElement('button')
-    img2Button.textContent = 'Secondary Map'
-    img2Button.setAttribute('class','imgControlButton')
-    img2Button.addEventListener('click', () =>{
-        if (img2.style.display == 'block'){
-            return
-        }
-        else{
-            img2.style.display = 'block'
-            img1.style.display = 'none'
-        }
-    })
+    // let img1Button = document.createElement('button')
+    // img1Button.textContent = 'Main Map'
+    // img1Button.setAttribute('class', 'imgControlButton')
+    // img1Button.addEventListener('click', () =>{
+    //     if (img1.style.display == 'block'){
+    //         return
+    //     }
+    //     else{
+    //         img1.style.display = 'block' 
+    //         img2.style.display = 'none'
+    //     }
+    // })
+    // let img2Button = document.createElement('button')
+    // img2Button.textContent = 'Secondary Map'
+    // img2Button.setAttribute('class','imgControlButton')
+    // img2Button.addEventListener('click', () =>{
+    //     if (img2.style.display == 'block'){
+    //         return
+    //     }
+    //     else{
+    //         img2.style.display = 'block'
+    //         img1.style.display = 'none'
+    //     }
+    // })
 
     fetch('/viewImage?imgId=' + encodeURIComponent(img1Id))
         .then(response => {
@@ -168,7 +167,7 @@ function fillMap(img1Id, img2Id){
         })
         .then(content => {
             img2.setAttribute('src', content.src);
-            img2.style.display = 'none'
+            // img2.style.display = 'none'
         });
     fetch('/mapMarkers?id=' + encodeURIComponent(id))
         .then(response => {
@@ -196,9 +195,9 @@ function fillMap(img1Id, img2Id){
                 })
             })
         });
-    mapDiv.appendChild(img1Button)
-    mapDiv.appendChild(img2Button)
-    mapDiv.appendChild(document.createElement('br'))
+    // mapDiv.appendChild(img1Button)
+    // mapDiv.appendChild(img2Button)
+    // mapDiv.appendChild(document.createElement('br'))
     mapDiv.appendChild(img1);
     mapDiv.appendChild(map1);
     mapDiv.appendChild(img2);
