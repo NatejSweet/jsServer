@@ -1,5 +1,5 @@
 #mapDiv {
-    float: right;
+    float:right;
 }
 #editButton {
     float: right;
@@ -7,4 +7,9 @@
 #editModeButton{
     float: right;
 }
+
+.imgControlButton {
+    float:right
+}
+
 
