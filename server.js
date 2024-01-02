@@ -342,6 +342,7 @@ app.post('/updateNavBarItems', async (req,res) => {//could be condensed to reuse
       'UPDATE worlds SET navItems = ?, pages = ? WHERE id = ? AND ownerId = ?',
       [navItems, pages, BigInt(worldId), req.session.userId]
     );
+    console.log(result);
     res.end();
     if (conn) conn.end();
   } catch (err) {
@@ -351,14 +352,14 @@ app.post('/updateNavBarItems', async (req,res) => {//could be condensed to reuse
 })
 app.post('/editNavBarOptions', async (req,res) => {   //this needs to update mapMarkers hubs as well
   console.log(req.body)
-  const navOptions = req.body.navOptions;
-  const pages = req.body.pages;
+  const navItems = req.body.newNavItems;
+  const newPages = req.body.newPages;
   const worldId = req.query.id;
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
       'UPDATE worlds SET navItems = ?, pages = ? WHERE id = ? AND ownerId = ?',
-      [navOptions, pages, BigInt(worldId), req.session.userId]
+      [navItems, newPages, BigInt(worldId), req.session.userId]
     );
     console.log(result);
     res.end();

@@ -1,5 +1,3 @@
-const { response } = require("express");
-
 function editNavOptions(){
     disableNavBar();
     let editButtonsDiv = document.getElementById('editButtonsDiv');
@@ -79,33 +77,52 @@ function removeNavOption(button){
 function saveNavOptions(){
     let navOptionsDiv = document.getElementById('navOptionsDiv');
     let navItems = navOptionsDiv.childNodes;
-    let navOptions = {};
-    let pages = {};
+    let newNavItems = {};
+    let newPages = {};
+    let newMapMarkers = {};
     navItems.forEach(navItem => {
+        newNavItems[navItem.id] = [];
         let navItemOptions = navItem.childNodes;
-        let navItemOptionValues = [];
         navItemOptions.forEach(navItemOption => {
             if (navItemOption.tagName === 'INPUT'){
-                navItemOptionValues.push(navItemOption.value);
-                pages[navItemOption.value] = [];
+                newNavItems[navItem.id].push(navItemOption.value);
+                newPages[navItemOption.value] = pagesJSON[navItemOption.value];
             }
         });
-        navOptions[navItem.id] = navItemOptionValues;
     });
+    Object.values(newNavItems).forEach(navItem => {
+        if (mapMarkers[navItem]){
+            newMapMarkers[navItem] = mapMarkers[navItem]
+        }
+    })  
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
-    console.log(pages)
+    console.log(newNavItems, newPages)
     fetch('/editNavBarOptions?id=' + encodeURIComponent(id), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ navOptions, pages }),
+        body: JSON.stringify({ newNavItems, newPages }),
     }).then(response => {
         if (response.ok){
             enableNavBar();
             reloadNavBar();
             return reloadContents(editMode=true);
+        }
+    })
+    fetch('/saveMapMarkers?id=' + encodeURIComponent(id), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            mapMarkers: newMapMarkers
+        })
+    }).then(response => {
+        if (response.ok){
+            reloadNavBar();
+            reloadContents(editMode=true);
         }
     })
 }

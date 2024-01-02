@@ -1,5 +1,6 @@
 
 var pagesJSON = {};
+var mapMarkers = {};
 document.addEventListener('DOMContentLoaded', function() {
     viewMainPage();
 });
@@ -176,7 +177,7 @@ function fillMap(img1Id, img2Id){
             }
         })
         .then(content => {
-            let mapMarkers = content.mapMarkersJSON
+            mapMarkers = content.mapMarkersJSON
             Object.keys(mapMarkers).forEach(hub => {
                 mapMarkers[hub].forEach(marker => {
                     let x = marker[0]
