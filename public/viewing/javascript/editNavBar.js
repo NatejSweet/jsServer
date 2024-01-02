@@ -73,7 +73,6 @@ function saveNavBar(){
     const id = urlParams.get('id');
     let navBar = document.getElementById('navBar');
     let ul = navBar.firstChild
-    console.log(ul)
     //Need to fetch pages and navItems
     fetch('/navItems?id=' + encodeURIComponent(id), {
         method: 'GET',
@@ -84,10 +83,8 @@ function saveNavBar(){
         console.log(response)
         return response.json();
     }).then(content => {
-        console.log(content);
         let navItems = content.navItemsJSON;
         let pages = content.pages;
-        console.log(navItems)
         updateDBNavBarItems(navItems, pages, ul);
     })
     //scan IDs of inputs replacing matching Ids and removing missing ones
@@ -95,43 +92,30 @@ function saveNavBar(){
     
 }
 function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to identify id of a nav item to see if a user is renaming
-    console.log(navItems)
-
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
-    let newNavBarItems = [] //array of navbar items
-    let newNavItems = {} //JSON of navbar item and theor hubs
+    let newNavItems = {} //JSON of navbar item and their hubs
     newPages = {} //JSON of new pages
-    console.log(ul)
-    ul.childNodes.forEach(li => {   //scan through the list of navbar items, adding the correct names
-        console.log(li)             // this might not need to sort through the ids since we just comapre the lists
+    let newMapMarkers = {}
+    ul.childNodes.forEach(li => {
         let input = li.firstChild
-        console.log(input)
         let id = input.id
-        console.log(id)
-        if (id=='newNavBarItem'){
-            newNavBarItems.push(input.value)
-        }else{
-            newNavBarItems.push(id)
-        }   
-    })
-    console.log(newNavBarItems)
-    newNavBarItems.forEach(newNavBarItem => {                   //for each new nav item, if the original nav items includes it, copy its info to the new nav items JSON
-        if (Object.keys(navItems).includes(newNavBarItem)){
-            newNavItems[newNavBarItem] = navItems[newNavBarItem]
-        }else{
-            newNavItems[newNavBarItem] = []    
-                   }})           //if the new nav item is not a page, add it to the new nav items JSON
-    Object.values(newNavItems).forEach(pages => {
-        pages.forEach(page => {
-            if (Object.keys(pages).includes(page)){         //if the new nav item is a page, add it to the new pages JSON
-                newPages[page] = pages[page]
-            }else{
-                console.log(page)
-                newPages[page] = []               //if the new nav item is not a page, add it to the new nav items JSON   
-            }
-        })})
-        console.log(newPages)
+        if (id=='newNavBarItem'){           //if is new item
+            newNavItems[input.value] = []
+        }else if (id!=input.value){         //if we rename a nav Item
+            newNavItems[input.value] = navItems[id]
+            newPages[input.value] = pages[id]
+        }else{                              //if remains the same
+            newNavItems[id] = navItems[id]  
+            newPages[id] = pages[id]
+        }
+        
+    })   
+    Object.values(newNavItems).forEach(navItem => {
+        if (mapMarkers[navItem]){
+            newMapMarkers[navItem] = mapMarkers[navItem]
+        }
+    })                                
     fetch('/updateNavBarItems?id=' + encodeURIComponent(id), {
         method: 'POST',
         headers: {
@@ -142,17 +126,24 @@ function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to iden
             pages: newPages   
         })
     }).then(response => {
-        console.log('a')
-        console.log(response)
-        return response;
-    }).then(content => {
-        console.log(content)
-        let editButtonsDiv = document.getElementById('editButtonsDiv');
-        while (editButtonsDiv.hasChildNodes()){
-            editButtonsDiv.removeChild(editButtonsDiv.firstChild);
+        if (response.ok){
+            reloadNavBar();
+            reloadContents(editMode=true);
         }
-        reloadNavBar();
-        reloadContents(editMode=true);
+    })
+    fetch('/saveMapMarkers?id=' + encodeURIComponent(id), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            mapMarkers: newMapMarkers
+        })
+    }).then(response => {
+        if (response.ok){
+            reloadNavBar();
+            reloadContents(editMode=true);
+        }
     })
 }
 

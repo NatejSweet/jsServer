@@ -8,9 +8,8 @@ function createEditButton(){
 }
 function enterEditMode(){
     let editButtonsDiv = document.getElementById('editButtonsDiv')
-    if (document.getElementById('editModeButton')){
-        let editModeButton = document.getElementById('editModeButton')
-        editModeButton.remove()
+    while (editButtonsDiv.hasChildNodes()){
+        editButtonsDiv.removeChild(editButtonsDiv.firstChild);
     }
     let editPageButton = document.createElement('button')
     editPageButton.setAttribute('id', 'editPageButton')
