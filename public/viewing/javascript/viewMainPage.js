@@ -1,6 +1,9 @@
 
 var pagesJSON = {};
 var mapMarkers = {};
+var mainPageJSON = {};
+var img1Id = null;
+var img2Id = null;
 document.addEventListener('DOMContentLoaded', function() {
     viewMainPage();
 });
@@ -18,11 +21,16 @@ function viewMainPage() {
                 return response.json();
             }
         }).then(content => {
-            setPages(content.pages);
+            pagesJSON = content.pages;
+            mapMarkers = content.mapMarkers;
             worldName.innerHTML = content.worldName;
-            fillMainContent(content.mainPageJSON);
+            mainPageJSON = content.mainPageJSON;
+            img1Id = content.img1Id;
+            img2Id = content.img2Id;
+            fillMainContent(mainPageJSON);
             fillNavBar(content.navItems);
-            fillMap(content.img1Id, content.img2Id);
+            fillMap(img1Id, img2Id);
+
         });
     if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')){
         createEditButton();
@@ -60,7 +68,6 @@ function fillMainContent(mainPage, pageName) {
         let titleText = document.createElement('h2')
         titleText.setAttribute('class', 'titleText');
         titleText.appendChild(document.createTextNode(title[0]));
-        // titleText.setAttribute('class', 'titleText');
         titleDiv.appendChild(titleText);
         title[1].forEach(subTitle => {
             let subTitleDiv = document.createElement('div');
@@ -68,7 +75,6 @@ function fillMainContent(mainPage, pageName) {
             let subTitleText = document.createElement('h3')
             subTitleText.setAttribute('class', 'subTitleText');
             subTitleText.appendChild(document.createTextNode(subTitle[0]));
-            // subTitleText.setAttribute('class', 'subTitleText');
             subTitleDiv.appendChild(subTitleText);
             subTitle[1].forEach(text => {
                 let textDiv = document.createElement('div');
@@ -127,30 +133,30 @@ function fillMap(img1Id, img2Id){
     map1.setAttribute('name', 'map1')
     let img2 = document.createElement('img')
     img2.setAttribute('id', 'map2Img')
-    // let img1Button = document.createElement('button')
-    // img1Button.textContent = 'Main Map'
-    // img1Button.setAttribute('class', 'imgControlButton')
-    // img1Button.addEventListener('click', () =>{
-    //     if (img1.style.display == 'block'){
-    //         return
-    //     }
-    //     else{
-    //         img1.style.display = 'block' 
-    //         img2.style.display = 'none'
-    //     }
-    // })
-    // let img2Button = document.createElement('button')
-    // img2Button.textContent = 'Secondary Map'
-    // img2Button.setAttribute('class','imgControlButton')
-    // img2Button.addEventListener('click', () =>{
-    //     if (img2.style.display == 'block'){
-    //         return
-    //     }
-    //     else{
-    //         img2.style.display = 'block'
-    //         img1.style.display = 'none'
-    //     }
-    // })
+    let img1Button = document.createElement('button')
+    img1Button.textContent = 'Main Map'
+    img1Button.setAttribute('class', 'imgControlButton')
+    img1Button.addEventListener('click', () =>{
+        if (img1.style.display == 'block'){
+            return
+        }
+        else{
+            img1.style.display = 'block' 
+            img2.style.display = 'none'
+        }
+    })
+    let img2Button = document.createElement('button')
+    img2Button.textContent = 'Secondary Map'
+    img2Button.setAttribute('class','imgControlButton')
+    img2Button.addEventListener('click', () =>{
+        if (img2.style.display == 'block'){
+            return
+        }
+        else{
+            img2.style.display = 'block'
+            img1.style.display = 'none'
+        }
+    })
 
     fetch('/viewImage?imgId=' + encodeURIComponent(img1Id))
         .then(response => {
@@ -168,7 +174,7 @@ function fillMap(img1Id, img2Id){
         })
         .then(content => {
             img2.setAttribute('src', content.src);
-            // img2.style.display = 'none'
+            img2.style.display = 'none'
         });
     fetch('/mapMarkers?id=' + encodeURIComponent(id))
         .then(response => {
@@ -196,15 +202,12 @@ function fillMap(img1Id, img2Id){
                 })
             })
         });
-    // mapDiv.appendChild(img1Button)
-    // mapDiv.appendChild(img2Button)
-    // mapDiv.appendChild(document.createElement('br'))
+    mapDiv.appendChild(img1Button)
+    mapDiv.appendChild(img2Button)
+    mapDiv.appendChild(document.createElement('br'))
     mapDiv.appendChild(img1);
     mapDiv.appendChild(map1);
     mapDiv.appendChild(img2);
-}
-function setPages(pages){
-    pagesJSON = pages
 }
     
 function loadHub(hubName){

@@ -44,33 +44,26 @@ fill navs page
 
 
 TO-DO:
-there is an issue with replacing the navItem(region) and not creating empty pages for it
-    adding navOptions(hubs) to the new item also does not create anything other than enteries in navItems(need somethin in pages)
-there is also an issue with replacing a navOption(hub), the data for the old option does not dissapear right away
-there is also an issue with the map markers duplicating
-    this is liekly cause by an incomplete place Previous markers function
 
-make cancelNavOptionsEdit function
+complete edit images functionality
+    need to test on hub pages(means I need to store hubImgIds now)
+    need to make work on mainpage secondary image
 
-update updateDBNavBarItems (editnavbar:97) to detect if a user is renaming or not
-
-optimize editPage function to use add text etc. 
-
-adding a text to a previously erxiting subtext adds the new text above the old text, but under any other new text items
-
-create edit images functionality
-
-cannot handle two images on upload
+cannot handle two images on upload                                          goping to disable second image then
     change to have add secondary image button on the edit page mode
         impliment canmge main image as well, allowing for updating images
-
-changing navName not saving
 
 edit nav options -> mainPage, does not load nav
 
 2 images on wqorld startup is too heavy for a request
     change to force only one image (main) on creation
     add functionality to allow for updating images and adding images for pages/ secondary on main
+
+need to change new pages to be created and mantained as hub:{content:[], imgId:null}
+
+add a home button that returns to the dash.html page
+
+probably want ot rework how image ids are stored, however it is not a problem
 
 
 

@@ -15,8 +15,11 @@ function editMapMarkers(){
         mainContentDiv.removeChild(mainContentDiv.firstChild);
     }
     let mapDiv = document.getElementById('mapDiv');
-    let img = mapDiv.firstChild;
-    let map = img.nextSibling
+    let img = document.getElementById('map1Img');
+    // let map = img.nextSibling
+    img.style.display = 'block';
+    mapDiv.innerHTML = '';
+    mapDiv.appendChild(img);
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
     fetch('/navItems?id=' + encodeURIComponent(id), {
@@ -58,10 +61,7 @@ function editMapMarkers(){
 }
 function placeExistingMarkers(){
     let mapDiv = document.getElementById('mapDiv');
-    let img = mapDiv.firstChild;
-    let map = img.nextSibling
-    mapDiv.removeChild(map);
-    //TO-DO: disable other image
+    // let img = document.getElementById('map1Img');
 
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
@@ -76,7 +76,6 @@ function placeExistingMarkers(){
         let mapMarkers = content.mapMarkersJSON;
         Object.keys(mapMarkers).forEach(navItem => {
             let navItemDiv = document.getElementById(navItem+'Div');
-            console.log(navItem+'Div')
             mapMarkers[navItem].forEach(marker=> {
             
 
@@ -84,8 +83,8 @@ function placeExistingMarkers(){
                     dot.setAttribute('class', 'dot');
                     dot.setAttribute('id', navItem);
                     dot.style.position = 'absolute';
-                    dot.style.left = marker[0] + 'px'; // Adjust left position
-                    dot.style.top = marker[1] + 'px'; // Adjust top position
+                    dot.style.left = (marker[0] - marker[2] / 2) + 'px'; // Adjust initial left position
+                    dot.style.top = (marker[1] - marker[2] / 2) + 'px'; // Adjust initial top position
                     dot.style.width = marker[2]+ 'px';
                     dot.style.height = marker[2] + 'px';
                     dot.style.borderRadius = '50%';
@@ -103,8 +102,8 @@ function placeExistingMarkers(){
                     slider.addEventListener('input', function() {
                         dot.style.width = this.value + 'px';
                         dot.style.height = this.value + 'px';
-                        dot.style.left = (x - this.value / 2) + 'px'; // Adjust left position
-                        dot.style.top = (y - this.value / 2) + 'px'; // Adjust top position
+                        dot.style.left = (marker[0] - this.value / 2) + 'px'; // Use marker[0] instead of x
+                        dot.style.top = (marker[1] - this.value  / 2) + 'px'; // Use marker[1] instead of y
                     });
 
                     let removeButton = document.createElement('button');
@@ -228,7 +227,7 @@ function saveMapMarkers(){
     let map = img.nextSibling
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
-    let mapMarkers = {};
+    mapMarkers = {};
     let dotDivs = document.getElementsByClassName('dot');
     for (let i = 0; i < dotDivs.length; i++){
         let dotDiv = dotDivs[i];
