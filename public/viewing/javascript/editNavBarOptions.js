@@ -76,22 +76,27 @@ function removeNavOption(button){
 
 function saveNavOptions(){
     let navOptionsDiv = document.getElementById('navOptionsDiv');
-    let navItems = navOptionsDiv.childNodes;
+    let editedNavItems = navOptionsDiv.childNodes;
     let newNavItems = {};
     let newPages = {};
     let newMapMarkers = {};
-    navItems.forEach(navItem => {
+    editedNavItems.forEach(navItem => {
         newNavItems[navItem.id] = [];
         let navItemOptions = navItem.childNodes;
         navItemOptions.forEach(navItemOption => {
             if (navItemOption.tagName === 'INPUT'){
                 newNavItems[navItem.id].push(navItemOption.value);
-                newPages[navItemOption.value] = pagesJSON[navItemOption.value];
+                if (navItemOption.id === 'newNavOption'){
+                    newPages[navItemOption.value] = pagesJSON[navItemOption.value];
+                }
+                else {
+                    newPages[navItemOption.value] = pagesJSON[navItemOption.id];
+                }
             }
         });
     });
     Object.values(newNavItems).forEach(navItem => {
-        if (mapMarkers[navItem]){
+        if (mapMarkers && mapMarkers[navItem]){
             newMapMarkers[navItem] = mapMarkers[navItem]
         }
     })  
@@ -126,3 +131,9 @@ function saveNavOptions(){
         }
     })
 }
+function cancelNavOptions(){
+    enableNavBar();
+    reloadNavBar();
+    reloadContents(editMode=true);
+}
+

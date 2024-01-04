@@ -60,7 +60,7 @@ async function createTables(){
     try{
         let conn = await pool.getConnection();
         const result = await conn.query(
-            'CREATE TABLE images(id INT AUTO_INCREMENT PRIMARY KEY, src MEDIUMTEXT);');
+            'CREATE TABLE images(id INT AUTO_INCREMENT PRIMARY KEY, src MEDIUMTEXT, ownerId INT);');
         console.log(result);
         if (conn) conn.end();
     }catch (err){

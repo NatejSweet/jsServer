@@ -142,15 +142,15 @@ app.post('/createWorld', async (req, res) => {
   try {
     let conn = await pool.getConnection();
     // Insert img1src into images table and retrieve its id
-    const img1Result = await conn.query('INSERT INTO images (src) VALUES (?)', [images[0]]);
+    const img1Result = await conn.query('INSERT INTO images (src, ownerId) VALUES (?,?)', [images[0], req.session.userId]);
     const img1Id = img1Result.insertId;
     // Insert img2src into images table and retrieve its id
-    const img2Result = await conn.query('INSERT INTO images (src) VALUES (?)', [images[1]]);
+    const img2Result = await conn.query('INSERT INTO images (src, ownerId) VALUES (?,?)', [images[1], req.session.userId]);
     const img2Id = img2Result.insertId;
     // Insert world data into worlds table
     const worldResult = await conn.query(
-      'INSERT INTO worlds (worldName, ownerId, img1Id, img2Id, mainPage, navItems) VALUES (?,?,?,?,?,?)',
-      [name, req.session.userId, img1Id, img2Id, content, navItems]
+      'INSERT INTO worlds (worldName, ownerId, img1Id, img2Id, mainPage, navItems, mapMarkers) VALUES (?,?,?,?,?,?,?)',
+      [name, req.session.userId, img1Id, img2Id, content, navItems, {}]
     );
     const worldId = worldResult.insertId; // Get the inserted worldId
     req.session.worldId = worldId.toString(); // Store the worldId in the session
@@ -232,7 +232,7 @@ app.get ('/viewMainPage', async (req, res) => {
     const worldId = req.query.id;
     let conn = await pool.getConnection();
     const mainPage = await conn.query(
-      'SELECT mainPage, worldName ,navItems ,img1Id, img2Id, pages FROM worlds WHERE id = ? AND ownerId = ?',
+      'SELECT mainPage, worldName ,navItems ,img1Id, img2Id, pages, mapMarkers FROM worlds WHERE id = ? AND ownerId = ?',
       [BigInt(worldId), req.session.userId]
     );
     if (mainPage.length > 0) {
@@ -242,7 +242,8 @@ app.get ('/viewMainPage', async (req, res) => {
       const img2Id = mainPage[0].img2Id;
       const navItems = mainPage[0].navItems;
       const pages = mainPage[0].pages;
-      res.send({ mainPageJSON, worldName, img1Id,img2Id, navItems,pages});
+      const mapMarkers = mainPage[0].mapMarkers;
+      res.send({ mainPageJSON, worldName, img1Id,img2Id, navItems,pages, mapMarkers});
     } else {
       res.redirect('/');
     }
@@ -406,4 +407,23 @@ app.post('/saveMapMarkers', async (req,res) => {
     console.log(err);
     res.status(500).send('ahhhhh');
   }
+})
+
+app.post('/updateImage', async (req,res) => {
+  const src = req.body.src;
+  const imgId = req.query.imgId;
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE images SET src=? WHERE id = ? AND ownerId = ?',
+      [src, BigInt(imgId), req.session.userId]
+    );
+    console.log(result);
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
+  }
+
 })
