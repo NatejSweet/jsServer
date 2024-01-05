@@ -45,21 +45,7 @@ fill navs page
 
 TO-DO:
 
-complete edit images functionality
-    need to test on hub pages(means I need to store hubImgIds now)
-    need to make work on mainpage secondary image
-
-cannot handle two images on upload                                          goping to disable second image then
-    change to have add secondary image button on the edit page mode
-        impliment canmge main image as well, allowing for updating images
-
-edit nav options -> mainPage, does not load nav
-
-2 images on wqorld startup is too heavy for a request
-    change to force only one image (main) on creation
-    add functionality to allow for updating images and adding images for pages/ secondary on main
-
-need to change new pages to be created and mantained as hub:{content:[], imgId:null}
+move entereditmode button to edit buttons div
 
 add a home button that returns to the dash.html page
 

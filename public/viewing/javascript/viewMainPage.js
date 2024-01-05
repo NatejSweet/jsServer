@@ -98,6 +98,7 @@ function fillNavBar(navItems){
     let list = document.createElement('ul')
     let nav = document.getElementById("navBar");
     nav.innerHTML = '';
+    nav.style.display = 'block'
     Object.keys(navItems).forEach(name => {
         let li = document.createElement('li')
         let dropDownDiv = document.createElement('div')
@@ -166,16 +167,18 @@ function fillMap(img1Id, img2Id){
         }).then(content => {
             img1.setAttribute('src', content.src);
         });
-    fetch('/viewImage?imgId=' + encodeURIComponent(img2Id))
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-        })
-        .then(content => {
-            img2.setAttribute('src', content.src);
-            img2.style.display = 'none'
-        });
+    if (img2Id != null){
+        fetch('/viewImage?imgId=' + encodeURIComponent(img2Id))
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+            })
+            .then(content => {
+                img2.setAttribute('src', content.src);
+                img2.style.display = 'none'
+            });
+        }
     fetch('/mapMarkers?id=' + encodeURIComponent(id))
         .then(response => {
             if (response.ok) {
@@ -211,9 +214,10 @@ function fillMap(img1Id, img2Id){
 }
     
 function loadHub(hubName){
+    console.log(pagesJSON)
     let hub = pagesJSON[hubName];
-    fillMainContent(hub, hubName);
-    updateMap(hub.imgId);
+    fillMainContent(hub.content, hubName);
+    fillMap(img1Id, hub.imgId);
     if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')){
         createEditButton();
     }

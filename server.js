@@ -135,17 +135,17 @@ app.post('/createWorld', async (req, res) => {
   const world = req.body;
   const name = world.name;
   var navItems = world.navItems;
-  const images = world.images;
+  const image = world.image;
   var content = world.content;
   content = JSON.stringify(content);
   navItems = JSON.stringify(navItems);
   try {
     let conn = await pool.getConnection();
     // Insert img1src into images table and retrieve its id
-    const img1Result = await conn.query('INSERT INTO images (src, ownerId) VALUES (?,?)', [images[0], req.session.userId]);
+    const img1Result = await conn.query('INSERT INTO images (src, ownerId) VALUES (?,?)', [image, req.session.userId]);
     const img1Id = img1Result.insertId;
-    // Insert img2src into images table and retrieve its id
-    const img2Result = await conn.query('INSERT INTO images (src, ownerId) VALUES (?,?)', [images[1], req.session.userId]);
+    // Insert img2src into images table and retrieve its id. this is done early for simplicity
+    const img2Result = await conn.query('INSERT INTO images (src, ownerId) VALUES (?,?)', ['#', req.session.userId]);
     const img2Id = img2Result.insertId;
     // Insert world data into worlds table
     const worldResult = await conn.query(
@@ -154,6 +154,7 @@ app.post('/createWorld', async (req, res) => {
     );
     const worldId = worldResult.insertId; // Get the inserted worldId
     req.session.worldId = worldId.toString(); // Store the worldId in the session
+    conn.end();
 
     await new Promise((resolve, reject) => {
       req.session.save(err => {
@@ -335,13 +336,12 @@ app.get('/navItems', async (req,res) => {
 })
 app.post('/updateNavBarItems', async (req,res) => {//could be condensed to reuse code from fillNavs
   const navItems = JSON.stringify(req.body.navItems)
-  const pages = JSON.stringify(req.body.pages)
   const worldId = req.query.id;
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
-      'UPDATE worlds SET navItems = ?, pages = ? WHERE id = ? AND ownerId = ?',
-      [navItems, pages, BigInt(worldId), req.session.userId]
+      'UPDATE worlds SET navItems = ? WHERE id = ? AND ownerId = ?',
+      [navItems,BigInt(worldId), req.session.userId]
     );
     console.log(result);
     res.end();
@@ -412,18 +412,37 @@ app.post('/saveMapMarkers', async (req,res) => {
 app.post('/updateImage', async (req,res) => {
   const src = req.body.src;
   const imgId = req.query.imgId;
-  try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      'UPDATE images SET src=? WHERE id = ? AND ownerId = ?',
-      [src, BigInt(imgId), req.session.userId]
-    );
-    console.log(result);
-    res.end();
-    if (conn) conn.end();
-  } catch (err) {
-    console.log(err);
-    res.status(500).send('ahhhhh');
+  if (imgId == 'null'){
+    try {
+      let conn = await pool.getConnection();
+      const result = await conn.query(
+        'INSERT INTO images (src, ownerId) VALUES (?,?)',
+        [src, req.session.userId]
+      );
+      const newImgId = result.insertId; // Store the new image ID
+      console.log(result);
+      if (conn) conn.end();
+      res.send({ imgId: newImgId.toString() }); // Send the new image ID to the user
+    } catch (err) {
+      console.log(err);
+      res.status(500).send('ahhhhh');
+    }
+  }else{
+    console.log('updating')
+    try {
+      let conn = await pool.getConnection();
+      const result = await conn.query(
+        'UPDATE images SET src=? WHERE id = ? AND ownerId = ?',
+        [src, BigInt(imgId), req.session.userId]
+      );
+      console.log(result);
+      res.end();
+      if (conn) conn.end();
+    } catch (err) {
+      console.log(err);
+      res.status(500).send('ahhhhh');
+    }
+    
   }
 
 })

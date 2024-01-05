@@ -4,7 +4,9 @@ function createEditButton(){
     editModeButton.setAttribute('onclick', 'enterEditMode()')
     editModeButton.appendChild(document.createTextNode('Enter Edit Mode'))
     let editButtonsDiv = document.getElementById('editButtonsDiv');
+    editButtonsDiv.innerHTML = '';
     editButtonsDiv.appendChild(editModeButton)
+    editButtonsDiv.appendChild(document.createElement('br'))
 }
 function enterEditMode(){
     let editButtonsDiv = document.getElementById('editButtonsDiv')

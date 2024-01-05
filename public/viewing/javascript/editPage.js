@@ -1,46 +1,7 @@
 
 
-function savePage(){
+function savePage(){    //could be rewritten to be cleaner
     enableNavBar();
-    if (document.getElementById('pageTitle')){
-        let hubName = document.getElementById('pageTitle').textContent;
-        removeSaveButton();
-        removeCancelButton();
-        removeMainContentAddButtons();
-        let content = storeMainContent();
-        pagesJSON[hubName] = content;
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
-        fetch('/updatePage?id=' + encodeURIComponent(id),{
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(pagesJSON)
-        }).then(response => {
-            if (response.ok) {
-                // return reloadContents(editMode=true);
-            }
-        })
-    }else{
-        removeSaveButton();
-        removeCancelButton();
-        removeMainContentAddButtons();
-        let content = storeMainContent();
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
-        fetch('/updateMainPage?id=' + encodeURIComponent(id),{
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(content)
-        }).then(response => {
-            if (response.ok) {
-                // return reloadContents(editMode=true);
-            }
-        })
-    }
     if (document.getElementsByClassName('newImage').length > 0){
         console.log('updating images')
         let newImages = document.getElementsByClassName('newImage')
@@ -49,7 +10,7 @@ function savePage(){
             let imgSrc = newImage.src
             if (document.getElementById('pageTitle')){
                 let hubName = document.getElementById('pageTitle').textContent
-                let imgId = pages[hubName].imgId
+                let imgId = pagesJSON[hubName].imgId
                 fetch('/updateImage?imgId=' + encodeURIComponent(imgId),{
                     method: 'POST',
                     headers: {
@@ -58,8 +19,25 @@ function savePage(){
                     body:  JSON.stringify({src: imgSrc})
                 }).then(response => {
                     if (response.ok) {
-                        return reloadContents(editMode=true);
+                        return response.json(); // Return the Promise returned by response.json()
                     }
+                }).then(res => { // Handle the result of response.json()
+                    let imgId = res.imgId; // Access imgId\
+                    pagesJSON[hubName].imgId = imgId
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const id = urlParams.get('id');
+                    fetch('/updatePage?id=' + encodeURIComponent(id),{
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(pagesJSON)
+                    }).then(response => {
+                        if (response.ok) {
+                            
+                            return reloadContents(editMode=true);
+                        }
+                    })
                 })
             }else{
                 if(newImage.id == 'map1Img'){
@@ -81,9 +59,48 @@ function savePage(){
             }
 
         })
-    }else{
-        reloadContents(editMode=true);
     }
+    if (document.getElementById('pageTitle')){
+        let hubName = document.getElementById('pageTitle').textContent;
+        removeSaveButton();
+        removeCancelButton();
+        removeMainContentAddButtons();
+        let content = storeMainContent();
+        pagesJSON[hubName].content = content;
+        console.log(pagesJSON)
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        fetch('/updatePage?id=' + encodeURIComponent(id),{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(pagesJSON)
+        }).then(response => {
+            if (response.ok) {
+                return reloadContents(editMode=true);
+            }
+        })
+    }else{
+        removeSaveButton();
+        removeCancelButton();
+        removeMainContentAddButtons();
+        let content = storeMainContent();
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        fetch('/updateMainPage?id=' + encodeURIComponent(id),{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(content)
+        }).then(response => {
+            if (response.ok) {
+                return reloadContents(editMode=true);
+            }
+        })
+    }
+    
 }
 function reloadContents(editMode){
     if (document.getElementById('pageTitle')){
@@ -311,32 +328,48 @@ function removeMainContentAddButtons(){
         addTextButtons[0].remove()
     }
 }
-// var mapImageStorage = [{"id":mainImage, "src":""}, {"id":secondaryImage, "src":""}];
 
 function updateMapImage(){
     let mapDiv = document.getElementById('mapDiv')
     let mainContentDiv = document.getElementById('mainContentDiv')
+    let img1 = document.getElementById('map1Img')
+    let img2 = document.getElementById('map2Img')
     if (document.getElementById('pageTitle')){   //if updating image on a hub
         //disable main image
+        img1.style.display = 'none'
         //enable secondary image
+        img2.style.display = 'block'
+        let imgControlButtons = document.getElementsByClassName('imgControlButton') //remove old img control buttons
+        while (imgControlButtons.length > 0){
+            imgControlButtons[0].remove()
+        }
         let inputButton = document.createElement('input')
         inputButton.setAttribute('id', 'secondaryMap')
         inputButton.setAttribute('type', 'file')
         inputButton.setAttribute('accept', '.img,.jpg,.jpeg')
-        inputButton.setAttribute('onchange', 'readURL(this,map2Img);')
+        inputButton.setAttribute('onchange', 'readURL(this,"map2Img");')
         mapDiv.appendChild(inputButton)
         //access pages[hubName].imgId
     }
-    else{       //if updating an image on main page
-        //disable secondary image
-        //enable main image
-        let inputButton = document.createElement('input')
-        inputButton.setAttribute('id', 'mainMap')
-        inputButton.setAttribute('type', 'file')
-        inputButton.setAttribute('accept', '.img,.jpg,.jpeg')
-        inputButton.setAttribute('onchange', 'readURL(this,"map1Img");')
-        mapDiv.appendChild(inputButton)
-        //create buttons to allow user to choose which image to update
+    else{       //if updating an image on main page 
+        img2.style.display = 'block'          //show both images
+        img1.style.display = 'block'
+        let imgControlButtons = document.getElementsByClassName('imgControlButton') //remove old img control buttons
+        while (imgControlButtons.length > 0){
+            imgControlButtons[0].remove()
+        }
+        let inputButton1 = document.createElement('input')      //create input buttons for both images
+        inputButton1.setAttribute('id', 'mainMap')
+        inputButton1.setAttribute('type', 'file')
+        inputButton1.setAttribute('accept', '.img,.jpg,.jpeg')
+        inputButton1.setAttribute('onchange', 'readURL(this,"map1Img");')
+        mapDiv.insertBefore(inputButton1, img1)
+        let inputButton2 = document.createElement('input')
+        inputButton2.setAttribute('id', 'secondaryMap')
+        inputButton2.setAttribute('type', 'file')
+        inputButton2.setAttribute('accept', '.img,.jpg,.jpeg')
+        inputButton2.setAttribute('onchange', 'readURL(this,"map2Img");')
+        mapDiv.insertBefore(inputButton2, img2)
     }
 }
 

@@ -92,10 +92,10 @@ function saveNavBar(){
     
 }
 function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to identify id of a nav item to see if a user is renaming
+    console.log(navItems, pages,ul)
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
     let newNavItems = {} //JSON of navbar item and their hubs
-    newPages = {} //JSON of new pages
     let newMapMarkers = {}
     ul.childNodes.forEach(li => {
         let input = li.firstChild
@@ -104,10 +104,8 @@ function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to iden
             newNavItems[input.value] = []
         }else if (id!=input.value){         //if we rename a nav Item
             newNavItems[input.value] = navItems[id]
-            newPages[input.value] = pages[id]
         }else{                              //if remains the same
             newNavItems[id] = navItems[id]  
-            newPages[id] = pages[id]
         }
         
     })   
@@ -115,15 +113,14 @@ function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to iden
         if (mapMarkers[navItem]){
             newMapMarkers[navItem] = mapMarkers[navItem]
         }
-    })                                
+    })                       
     fetch('/updateNavBarItems?id=' + encodeURIComponent(id), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            navItems: newNavItems,
-            pages: newPages   
+            navItems: newNavItems, 
         })
     }).then(response => {
         if (response.ok){
