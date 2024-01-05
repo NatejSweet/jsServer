@@ -59,7 +59,7 @@ function editMapMarkers(){
     //retain add hub button, every marker made will have a delete button
     //delete button will only dfelete marker, not hub
 }
-function placeExistingMarkers(){
+function placeExistingMarkers() {
     let mapDiv = document.getElementById('mapDiv');
     // let img = document.getElementById('map1Img');
 
@@ -75,49 +75,47 @@ function placeExistingMarkers(){
     }).then(content => {
         let mapMarkers = content.mapMarkersJSON;
         Object.keys(mapMarkers).forEach(navItem => {
-            let navItemDiv = document.getElementById(navItem+'Div');
-            mapMarkers[navItem].forEach(marker=> {
-            
+            let navItemDiv = document.getElementById(navItem + 'Div');
+            mapMarkers[navItem].forEach(marker => {
+                let slider = document.createElement('input');
+                slider.setAttribute('type', 'range');
+                slider.setAttribute('min', '0');
+                slider.setAttribute('max', '100');
+                slider.setAttribute('value', marker[2].toString()); // Use marker[2] as the initial value
+                navItemDiv.appendChild(slider);
 
-                    let dot = document.createElement('div');
-                    dot.setAttribute('class', 'dot');
-                    dot.setAttribute('id', navItem);
-                    dot.style.position = 'absolute';
-                    dot.style.left = (marker[0] - marker[2] / 2) + 'px'; // Adjust initial left position
-                    dot.style.top = (marker[1] - marker[2] / 2) + 'px'; // Adjust initial top position
-                    dot.style.width = marker[2]+ 'px';
-                    dot.style.height = marker[2] + 'px';
-                    dot.style.borderRadius = '50%';
-                    dot.style.backgroundColor = 'green';
-                    mapDiv.style.position = 'relative'; // Set parent element position
-                    mapDiv.appendChild(dot);
+                let dot = document.createElement('div');
+                dot.setAttribute('class', 'dot');
+                dot.setAttribute('id', navItem);
+                dot.style.position = 'absolute';
+                dot.style.left = marker[0] + 'px';
+                dot.style.top = marker[1] + 'px';
+                dot.style.width = marker[2] + 'px';
+                dot.style.height = marker[2] + 'px';
+                dot.style.borderRadius = '50%';
+                dot.style.backgroundColor = 'green';
+                mapDiv.style.position = 'relative';
+                mapDiv.appendChild(dot);
 
-                    let slider = document.createElement('input');
-                    slider.setAttribute('type', 'range');
-                    slider.setAttribute('min', '0');
-                    slider.setAttribute('max', '100');
-                    slider.setAttribute('value', '50');
-                    navItemDiv.appendChild(slider);
+                slider.addEventListener('input', function() {
+                    dot.style.width = this.value + 'px';
+                    dot.style.height = this.value + 'px';
+                    dot.style.left = (marker[0] - (parseInt(this.value) - marker[2]) / 2) + 'px';
+                    dot.style.top = (marker[1] - (parseInt(this.value) - marker[2]) / 2) + 'px';
+                });
 
-                    slider.addEventListener('input', function() {
-                        dot.style.width = this.value + 'px';
-                        dot.style.height = this.value + 'px';
-                        dot.style.left = (marker[0] - this.value / 2) + 'px'; // Use marker[0] instead of x
-                        dot.style.top = (marker[1] - this.value  / 2) + 'px'; // Use marker[1] instead of y
-                    });
+                let removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                navItemDiv.appendChild(removeButton);
 
-                    let removeButton = document.createElement('button');
-                    removeButton.textContent = 'Remove';
-                    navItemDiv.appendChild(removeButton);
-
-                    removeButton.addEventListener('click', function() {
-                        navItemDiv.removeChild(slider);
-                        navItemDiv.removeChild(removeButton);
-                        mapDiv.removeChild(dot);
-                    })
+                removeButton.addEventListener('click', function() {
+                    navItemDiv.removeChild(slider);
+                    navItemDiv.removeChild(removeButton);
+                    mapDiv.removeChild(dot);
                 });
             });
-    })
+        });
+    });
 }
 
 
@@ -232,8 +230,8 @@ function saveMapMarkers(){
     for (let i = 0; i < dotDivs.length; i++){
         let dotDiv = dotDivs[i];
         let navItem = dotDiv.id;
-        let x = dotDiv.offsetLeft;
-        let y = dotDiv.offsetTop;
+        let x = dotDiv.offsetLeft - parseInt(getComputedStyle(mapDiv).paddingLeft);
+        let y = dotDiv.offsetTop - parseInt(getComputedStyle(mapDiv).paddingTop);
         let radius = parseInt(dotDiv.style.width);
         if (!mapMarkers[navItem]){
             mapMarkers[navItem] = [];

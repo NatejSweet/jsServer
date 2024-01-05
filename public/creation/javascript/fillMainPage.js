@@ -1,7 +1,7 @@
 import {createFillNavsPage} from './fillNavs.js'
 var mainImage = null;
 var secondaryImage = null;
-var mapImageStorage = [{"id":mainImage, "src":""}, {"id":secondaryImage, "src":""}];
+var mapImageStorage = {"id":mainImage, "src":""};
 
 document.addEventListener("DOMContentLoaded",function(event){
     addTitle(event)
@@ -134,12 +134,8 @@ window.readURL = function(input,imgId){
             let img = document.getElementById(imgId)
             img.setAttribute('src',e.target.result)
             if (imgId === 'mainImage'){
-                mapImageStorage[0].name = imgId
-                mapImageStorage[0].src = e.target.result
-            }
-            else if (imgId === 'secondaryImage'){
-                mapImageStorage[1].name = imgId
-                mapImageStorage[1].src = e.target.result
+                mapImageStorage.name = imgId
+                mapImageStorage.src = e.target.result
             }
         };
         reader.readAsDataURL(input.files[0]);
@@ -152,14 +148,14 @@ function submitMainPage(event) {
     // Gather the data
     const worldName = storeWorldName();
     const navItems = storeNavItems();
-    const mainImages = storeMainImages();
+    const mainImage = storeMainImage();
     const mainContent = storeMainContent();
 
     // Create the world object
     const world = {
         name: worldName,
         content: mainContent,
-        images: mainImages,
+        image: mainImage,
         navItems: navItems
     };
 
@@ -206,13 +202,14 @@ function storeMainContent() {
     return mainContent;
 }
 
-function storeMainImages() {
+function storeMainImage() {
     let mainMapImg = document.getElementById('mainMapImg');
-    let secondaryMapImg = document.getElementById('secondaryMapImg');
+    // let secondaryMapImg = document.getElementById('secondaryMapImg');
     let mainMapImgSrc = mainMapImg.getAttribute('src');
-    let secondaryMapImgSrc = secondaryMapImg.getAttribute('src');
-    let mapImageSrc = [mainMapImgSrc,secondaryMapImgSrc]
-    return mapImageSrc;
+    // let secondaryMapImgSrc = secondaryMapImg.getAttribute('src');
+    // let mapImageSrc = [mainMapImgSrc,secondaryMapImgSrc]
+    // return mapImageSrc;
+    return mainMapImgSrc
 };
 
 function storeWorldName() {

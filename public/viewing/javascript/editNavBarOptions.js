@@ -47,11 +47,11 @@ function editNavOptions(){
     let saveButton = document.createElement('button');
     saveButton.setAttribute('onclick', 'saveNavOptions()');
     saveButton.appendChild(document.createTextNode('Save Nav Options'));
-    mainContentDiv.appendChild(saveButton);
+    editButtonsDiv.appendChild(saveButton);
     let cancelButton = document.createElement('button');
     cancelButton.setAttribute('onclick', 'cancelNavOptions()');
     cancelButton.appendChild(document.createTextNode('Cancel'));
-    mainContentDiv.appendChild(cancelButton);
+   editButtonsDiv.appendChild(cancelButton);
 }
 function addNavOption(button){
     let navItemDiv = button.parentNode;
@@ -86,11 +86,22 @@ function saveNavOptions(){
         navItemOptions.forEach(navItemOption => {
             if (navItemOption.tagName === 'INPUT'){
                 newNavItems[navItem.id].push(navItemOption.value);
-                if (navItemOption.id === 'newNavOption'){
-                    newPages[navItemOption.value] = pagesJSON[navItemOption.value];
+                if (navItemOption.id == 'newNavOption'){
+                    newPages[navItemOption.value] = {content: [], imgId: null};
+                    try {                                                                                       //checking for same name
+                        newPages[navItemOption.value].content = pagesJSON[navItemOption.value].content;
+                        newPages[navItemOption.value].imgId = pagesJSON[navItemOption.value].imgId;
+                    }
+                    catch (err){
+                        newPages[navItemOption.value].content = [];
+                        newPages[navItemOption.value].imgId = null;
+                    }
                 }
                 else {
-                    newPages[navItemOption.value] = pagesJSON[navItemOption.id];
+                    console.log(navItemOption.id)
+                    newPages[navItemOption.value] = {content: [], imgId: null};
+                    newPages[navItemOption.value].content = pagesJSON[navItemOption.id].content;
+                    newPages[navItemOption.value].imgId = pagesJSON[navItemOption.id].imgId;
                 }
             }
         });
@@ -110,10 +121,11 @@ function saveNavOptions(){
         },
         body: JSON.stringify({ newNavItems, newPages }),
     }).then(response => {
+        console.log(response)
         if (response.ok){
             enableNavBar();
             reloadNavBar();
-            return reloadContents(editMode=true);
+            console.log(newPages);
         }
     })
     fetch('/saveMapMarkers?id=' + encodeURIComponent(id), {
