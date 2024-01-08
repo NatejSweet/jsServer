@@ -45,9 +45,7 @@ fill navs page
 
 TO-DO:
 
-update guest.html to have the login and create account functionality behind a login button
 update your-secret-key ins server.js
-allow for non-signed in users to view but not edit
 allows for private and public worlds
 secure login from spam
 add final styling

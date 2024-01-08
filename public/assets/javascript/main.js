@@ -12,13 +12,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
   });
 
   loginBtn.addEventListener("click", () => {
-    document.getElementsByClassName("search")[0].style.display = "none";
-    document.getElementsByClassName("login")[0].style.display = "block";
+    showLogin();
+
   });
   createAccountBtn.addEventListener("click", () => {
-    document.getElementsByClassName("login")[0].style.display = "none";
-    console.log(document.getElementsByClassName("createAccount")[0]);
-    document.getElementsByClassName("createAccount")[0].style.display = "block";
+    showCreateAccount();
   });
 });
 
@@ -61,4 +59,24 @@ function search(event) {
 
 function loadWorld(option) {
   location.assign(option.value);
+}
+
+function showLogin() {
+  document.getElementById("loginBtn").style.display = "none";
+  document.getElementsByClassName("search")[0].style.display = "none";
+  document.getElementsByClassName("createAccount")[0].style.display = "none";
+  document.getElementsByClassName("login")[0].style.display = "block";
+}
+
+function showCreateAccount() {
+  document.getElementById("loginBtn").style.display = "none";
+  document.getElementsByClassName("search")[0].style.display = "none";
+  document.getElementsByClassName("login")[0].style.display = "none";
+  document.getElementsByClassName("createAccount")[0].style.display = "block";
+}
+function showSearch(){
+  document.getElementById("loginBtn").style.display = "block";
+  document.getElementsByClassName("search")[0].style.display = "block";
+  document.getElementsByClassName("login")[0].style.display = "none";
+  document.getElementsByClassName("createAccount")[0].style.display = "none";
 }
