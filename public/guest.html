@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="./assets/javascript/main.js"></script>
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <title>Login Page</title>
+  </head>
+  <body>
+    <button type="button" id="loginBtn">Login</button>
+    <div class="login">
+      <form action="/login" method="post" id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Login</button>
+        <button type="button" id="createAccountBtn">Create Account</button>
+      </form>
+    </div>
+    <div class="createAccount">
+      <form action="/createAccount" method="post" id="createAccountForm">
+        <label for="username">Username:</label>
+        <input type="text" id="newUsername" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="newPassword" name="password" required>
+        <br>
+        <button type="submit">Create Account</button>
+        <button type="button" class="loginBtn">Login</button>
+      </form>
+    </div>
+    <div class="search">
+      <input type="text" id="searchBar" placeholder="Search for a World">
+      <button type="button" id="searchButton">Search</button>
+      <select id="searchResultsMenu" class="dropbtn">
+        <option value="Search Results" selected hidden>Select a World</option>
+      </select>
+    </div>
+  </body>
+</html>

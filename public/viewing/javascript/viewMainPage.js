@@ -27,14 +27,14 @@ function viewMainPage() {
             mainPageJSON = content.mainPageJSON;
             img1Id = content.img1Id;
             img2Id = content.img2Id;
+            if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')&& content.editAccess){
+                createEditButton();
+            }
             fillMainContent(mainPageJSON);
             fillNavBar(content.navItems);
             fillMap(img1Id, img2Id);
 
         });
-    if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')){
-        createEditButton();
-    }
 }
 
 function reloadNavBar() { //probably want to create a specific request for this later
@@ -218,9 +218,9 @@ function loadHub(hubName){
     let hub = pagesJSON[hubName];
     fillMainContent(hub.content, hubName);
     fillMap(img1Id, hub.imgId);
-    if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')){
-        createEditButton();
-    }
+    // if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')){
+    //     createEditButton();
+    // }
 }
 
 function updateMap(imgId){

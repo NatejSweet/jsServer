@@ -48,8 +48,8 @@ function search(event) {
             }
             worlds.forEach(world => {
                 var option = document.createElement("option");
-                // option.appendChild(document.createTextNode(world.worldName));
-                // link.href =
+                option.appendChild(document.createTextNode(world.worldName));
+                option.value =  "./viewing/viewMainPage.html?id=" + world.id;
                 dropdown.appendChild(option); // Append the <option> to the <select>
             });
             dropdown.classList.add('show');

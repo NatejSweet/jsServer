@@ -45,10 +45,13 @@ fill navs page
 
 TO-DO:
 
-move entereditmode button to edit buttons div
-
-add a home button that returns to the dash.html page
-
+update guest.html to have the login and create account functionality behind a login button
+update your-secret-key ins server.js
+allow for non-signed in users to view but not edit
+allows for private and public worlds
+secure login from spam
+add final styling
+for private worlds, disable access from simply searching the Id
 probably want ot rework how image ids are stored, however it is not a problem
 
 
