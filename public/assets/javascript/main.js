@@ -1,16 +1,64 @@
-window.addEventListener('DOMContentLoaded', (event) => {
-    const createAccountBtn = document.getElementById("createAccountBtn");
-    const createAccountForm = document.getElementById("createAccountForm");
-    const loginBtn = document.getElementById("loginBtn");
-    const loginForm = document.getElementById("loginForm");
+window.addEventListener("DOMContentLoaded", (event) => {
+  const loginBtn = document.getElementById("loginBtn");
+  const createAccountBtn = document.getElementById("createAccountBtn");
+  const searchBar = document.getElementById("searchBar");
 
-    createAccountBtn.addEventListener("click", function(){
-            createAccountForm.style.display = "block";
-            loginForm.style.display = "none";
-    });
+  searchBar.addEventListener("input", search);
+  searchBar.addEventListener("keydown", (event) => {
+    if (event.keyCode === 8) {
+      // backspace key
+      search(event);
+    }
+  });
 
-    loginBtn.addEventListener("click", function(){
-            createAccountForm.style.display = "none";
-            loginForm.style.display = "block";
-    });
+  loginBtn.addEventListener("click", () => {
+    document.getElementsByClassName("search")[0].style.display = "none";
+    document.getElementsByClassName("login")[0].style.display = "block";
+  });
+  createAccountBtn.addEventListener("click", () => {
+    document.getElementsByClassName("login")[0].style.display = "none";
+    console.log(document.getElementsByClassName("createAccount")[0]);
+    document.getElementsByClassName("createAccount")[0].style.display = "block";
+  });
 });
+
+function search(event) {
+  const query = event.target.value;
+  const dropdown = document.getElementById("searchResultsMenu");
+  if (query === "") {
+    dropdown.classList.remove("show");
+    return;
+  }
+  fetch("/search?query=" + encodeURIComponent(query))
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+    })
+    .then((worlds) => {
+      Array.from(dropdown).forEach((option) => {
+        if (option.value != "Search Results") {
+          option.remove();
+        }
+      });
+      if (worlds.length > 0) {
+        dropdown.size = worlds.length; // Make all options visible
+      } else {
+        dropdown.size = 1; // Reset size if no options
+      }
+      worlds.forEach((world) => {
+        var option = document.createElement("option");
+        option.appendChild(document.createTextNode(world.worldName));
+        option.value = "./viewing/viewMainPage.html?id=" + world.id;
+        dropdown.appendChild(option); // Append the <option> to the <select>
+        option.addEventListener("click", () => {
+          loadWorld(option);
+        });
+      });
+      dropdown.classList.add("show");
+    });
+}
+
+function loadWorld(option) {
+  location.assign(option.value);
+}

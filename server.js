@@ -4,6 +4,7 @@ const dotenv = require('dotenv')
 const bcrypt = require('bcryptjs')
 dotenv.config({ path: './.env'})
 const app = express()
+const path = require('path');
 const port  = 3000
 app.use(express.json());
 
@@ -23,16 +24,30 @@ const session = require('express-session');
 app.use(session({
   secret: 'my-secret-key',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: { 
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    secure: false,
+  }
 }));
 
 
 app.use(express.static('public'))
 app.listen(port, () => console.log('server listening at http://localhost:'+port))
 
-app.get('/',(req,res) => {
-  res.sendFile('/public/index.html')
-})
+function checkLoggedIn(req, res, next) {
+  if (req.session.userId) {
+    res.redirect('/dash');
+  } else {
+    next();
+  }
+}
+
+app.get('/', checkLoggedIn, (req, res) => {
+  res.sendFile(path.join(__dirname, '/public/guest.html'));
+});
+
+
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -60,7 +75,7 @@ app.get('/dash', async ( req, res ) => {
     const user = await pool.query(
       'SELECT * FROM users WHERE id = ?', [req.session.userId]);
     if (user) {
-      
+      res.sendFile(path.join(__dirname, '/public/dash.html'));
     } else {
       res.redirect('/');
     }
@@ -125,7 +140,7 @@ app.get('/myWorlds', async (req, res) => {
 app.get('/search', async (req, res) => {
   const query = req.query.query;
   let conn = await pool.getConnection();
-  const items = await conn.query('SELECT * FROM worlds WHERE worldName LIKE ?', ['%' + query + '%']);
+  const items = await conn.query('SELECT worldName, id FROM worlds WHERE worldName LIKE ?', ['%' + query + '%']); //add a public arg in the db to allow for public and private worlds
   res.json(items);
   if (conn) conn.end();
 });
@@ -233,10 +248,11 @@ app.get ('/viewMainPage', async (req, res) => {
     const worldId = req.query.id;
     let conn = await pool.getConnection();
     const mainPage = await conn.query(
-      'SELECT mainPage, worldName ,navItems ,img1Id, img2Id, pages, mapMarkers FROM worlds WHERE id = ? AND ownerId = ?',
-      [BigInt(worldId), req.session.userId]
+      'SELECT mainPage, worldName ,navItems ,img1Id, img2Id, pages, mapMarkers, ownerId FROM worlds WHERE id = ?',
+      [BigInt(worldId)]
     );
     if (mainPage.length > 0) {
+      const editAccess = mainPage[0].ownerId == req.session.userId;
       const mainPageJSON = mainPage[0].mainPage;
       const worldName = mainPage[0].worldName;
       const img1Id = mainPage[0].img1Id;
@@ -244,7 +260,7 @@ app.get ('/viewMainPage', async (req, res) => {
       const navItems = mainPage[0].navItems;
       const pages = mainPage[0].pages;
       const mapMarkers = mainPage[0].mapMarkers;
-      res.send({ mainPageJSON, worldName, img1Id,img2Id, navItems,pages, mapMarkers});
+      res.send({ mainPageJSON, worldName, img1Id,img2Id, navItems,pages, mapMarkers, editAccess});
     } else {
       res.redirect('/');
     }
@@ -318,8 +334,8 @@ app.get('/navItems', async (req,res) => {
   try {
     let conn = await pool.getConnection();
     const navItems = await conn.query(
-      'SELECT navItems,pages FROM worlds WHERE id = ? AND ownerId = ?',
-      [BigInt(worldId), req.session.userId]
+      'SELECT navItems,pages FROM worlds WHERE id = ?',
+      [BigInt(worldId)]
     );
     if (navItems.length > 0) {
       const navItemsJSON = navItems[0].navItems;
@@ -376,7 +392,7 @@ app.get('/mapMarkers', async (req,res) => {
   try {
     let conn = await pool.getConnection();
     const mapMarkers = await conn.query(
-      'SELECT mapMarkers FROM worlds WHERE id = ? AND ownerId = ?',
+      'SELECT mapMarkers FROM worlds WHERE id = ?',
       [BigInt(worldId), req.session.userId]
     );
     if (mapMarkers.length > 0) {
