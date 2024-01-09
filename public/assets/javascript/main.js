@@ -1,6 +1,5 @@
 window.addEventListener("DOMContentLoaded", (event) => {
   const loginBtn = document.getElementById("loginBtn");
-  const createAccountBtn = document.getElementById("createAccountBtn");
   const searchBar = document.getElementById("searchBar");
 
   searchBar.addEventListener("input", search);
@@ -14,9 +13,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
   loginBtn.addEventListener("click", () => {
     showLogin();
 
-  });
-  createAccountBtn.addEventListener("click", () => {
-    showCreateAccount();
   });
 });
 
@@ -49,12 +45,15 @@ function search(event) {
         option.appendChild(document.createTextNode(world.worldName));
         option.value = "./viewing/viewMainPage.html?id=" + world.id;
         dropdown.appendChild(option); // Append the <option> to the <select>
-        option.addEventListener("click", () => {
-          loadWorld(option);
-        });
       });
       dropdown.classList.add("show");
     });
+
+  // Listen for the change event on the dropdown
+  dropdown.addEventListener('change', function() {
+    // Navigate to the selected option's value
+    window.location.href = this.value;
+  });
 }
 
 function loadWorld(option) {

@@ -27,8 +27,10 @@ function viewMainPage() {
             mainPageJSON = content.mainPageJSON;
             img1Id = content.img1Id;
             img2Id = content.img2Id;
+            var public = content.public;
+            console.log(content.public)
             if (!document.getElementById('editModeButton') && !document.getElementById('editPageButton')&& content.editAccess){
-                createEditButton();
+                createEditButton(public);
             }
             fillMainContent(mainPageJSON);
             fillNavBar(content.navItems);

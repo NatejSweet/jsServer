@@ -49,7 +49,7 @@ async function createTables(){
     try {
         let conn = await pool.getConnection();
         const result = await conn.query(
-        'CREATE TABLE worlds (id INT AUTO_INCREMENT PRIMARY KEY,worldName VARCHAR(50) NOT NULL,ownerId INT NOT NULL,img1Id INT,img2Id INT,mainPage JSON,pages JSON,navItems JSON, mapMarkers JSON)');
+        'CREATE TABLE worlds (id INT AUTO_INCREMENT PRIMARY KEY,worldName VARCHAR(50) NOT NULL,ownerId INT NOT NULL,img1Id INT,img2Id INT,mainPage JSON,pages JSON,navItems JSON, mapMarkers JSON, public Boolean)');
         console.log(result);
         if (conn) conn.end();
         // Authentication failed
