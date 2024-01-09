@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: false }));
 const session = require('express-session');
 
 app.use(session({
-  secret: 'my-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: { 
@@ -139,8 +139,13 @@ app.get('/myWorlds', async (req, res) => {
 
 app.get('/search', async (req, res) => {
   const query = req.query.query;
+  var items;
   let conn = await pool.getConnection();
-  const items = await conn.query('SELECT worldName, id FROM worlds WHERE worldName LIKE ?', ['%' + query + '%']); //add a public arg in the db to allow for public and private worlds
+  if (req.session.userId){
+    items = await conn.query('SELECT worldName, id FROM worlds WHERE worldName LIKE ? AND public = ? AND ownerId != ?', ['%' + query + '%',1, req.session.userId]);
+  }else{
+    items = await conn.query('SELECT worldName, id FROM worlds WHERE worldName LIKE ? AND public = ?', ['%' + query + '%', 1]);
+  }
   res.json(items);
   if (conn) conn.end();
 });
@@ -164,8 +169,8 @@ app.post('/createWorld', async (req, res) => {
     const img2Id = img2Result.insertId;
     // Insert world data into worlds table
     const worldResult = await conn.query(
-      'INSERT INTO worlds (worldName, ownerId, img1Id, img2Id, mainPage, navItems, mapMarkers) VALUES (?,?,?,?,?,?,?)',
-      [name, req.session.userId, img1Id, img2Id, content, navItems, {}]
+      'INSERT INTO worlds (worldName, ownerId, img1Id, img2Id, mainPage, navItems, mapMarkers, public) VALUES (?,?,?,?,?,?,?,?)',
+      [name, req.session.userId, img1Id, img2Id, content, navItems, {}, 0]
     );
     const worldId = worldResult.insertId; // Get the inserted worldId
     req.session.worldId = worldId.toString(); // Store the worldId in the session
@@ -248,7 +253,7 @@ app.get ('/viewMainPage', async (req, res) => {
     const worldId = req.query.id;
     let conn = await pool.getConnection();
     const mainPage = await conn.query(
-      'SELECT mainPage, worldName ,navItems ,img1Id, img2Id, pages, mapMarkers, ownerId FROM worlds WHERE id = ?',
+      'SELECT mainPage, worldName ,navItems ,img1Id, img2Id, pages, mapMarkers, ownerId, public FROM worlds WHERE id = ?',
       [BigInt(worldId)]
     );
     if (mainPage.length > 0) {
@@ -260,7 +265,8 @@ app.get ('/viewMainPage', async (req, res) => {
       const navItems = mainPage[0].navItems;
       const pages = mainPage[0].pages;
       const mapMarkers = mainPage[0].mapMarkers;
-      res.send({ mainPageJSON, worldName, img1Id,img2Id, navItems,pages, mapMarkers, editAccess});
+      const public = mainPage[0].public;
+      res.send({ mainPageJSON, worldName, img1Id,img2Id, navItems,pages, mapMarkers, editAccess, public});
     } else {
       res.redirect('/');
     }
@@ -459,6 +465,25 @@ app.post('/updateImage', async (req,res) => {
       res.status(500).send('ahhhhh');
     }
     
+  }
+
+})
+
+app.post('/TogglePublic', async (req,res) => {
+  const public = req.body.public;
+  const worldId = req.query.id;
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      'UPDATE worlds SET public = ? WHERE id = ? AND ownerId = ?',
+      [public, BigInt(worldId), req.session.userId]
+    );
+    console.log(result);
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('ahhhhh');
   }
 
 })

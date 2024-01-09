@@ -1,4 +1,6 @@
-function createEditButton(){
+var public;
+function createEditButton(publicArg){
+    public = publicArg;
     let editModeButton = document.createElement('button')
     editModeButton.setAttribute('id', 'editModeButton')
     editModeButton.setAttribute('onclick', 'enterEditMode()')
@@ -38,6 +40,17 @@ function enterEditMode(){
     editMapMarkersButton.setAttribute('onclick', 'editMapMarkers()')
     editMapMarkersButton.appendChild(document.createTextNode('Edit Map Markers'))
     editButtonsDiv.appendChild(editMapMarkersButton)
+    let publicButton = document.createElement('button')
+    publicButton.setAttribute('id', 'publicButton')
+    publicButton.setAttribute('onclick', 'togglePublic()')
+    console.log(public)
+    if (public){
+        publicButton.appendChild(document.createTextNode('Public'))
+    }
+    else{
+        publicButton.appendChild(document.createTextNode('Private'))
+    }
+    editButtonsDiv.appendChild(publicButton)
 }
 function exitEditMode(){
     console.log('exiting edit mode')
@@ -50,4 +63,28 @@ function exitEditMode(){
         removeMainContentAddButtons();
     }
     reloadContents(editMode=false);
+}
+
+function togglePublic(){
+    let publicButton = document.getElementById('publicButton');
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    if (public){
+        publicButton.innerHTML = 'Private';
+        public = false;
+    }
+    else{
+        publicButton.innerHTML = 'Public';
+        public = true;
+    }
+    fetch('/togglePublic?id=' + encodeURIComponent(id), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            public: public
+        })
+    })
+
 }

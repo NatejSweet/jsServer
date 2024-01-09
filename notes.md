@@ -44,9 +44,8 @@ fill navs page
 
 
 TO-DO:
-
-update your-secret-key ins server.js
-allows for private and public worlds
+edit map markers from hub deletes all map markers
+change map markers to use relative locations
 secure login from spam
 add final styling
 for private worlds, disable access from simply searching the Id
