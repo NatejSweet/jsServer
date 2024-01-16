@@ -193,29 +193,29 @@ function fillMap(img1Id, img2Id){
             mapMarkers = content.mapMarkersJSON
             Object.keys(mapMarkers).forEach(hub => {
                 mapMarkers[hub].forEach(marker => {
-                    let x = marker[0] 
-                    let y = marker[1]
-                    let r = marker[2]
+                    let x = marker[0] *img1.width
+                    let y = marker[1] * img1.height
+                    let r = marker[2] 
                     let area = document.createElement('area')
                     area.setAttribute('shape', 'circle')
-                    area.setAttribute('coords', x + ',' + y + ',' + r)
+                    area.setAttribute('coords', x + ',' + y+ ',' + r)
                     area.setAttribute('href', '#')
                     area.setAttribute('title', hub)
-                    area.setAttribute('class' , 'mapMarker')
+                    area.setAttribute('class', 'mapMarker')
                     area.addEventListener('click', function(event) {
                         event.preventDefault(); // Prevent the default action
                         loadHub(hub);
                     })
-                    map1.appendChild(area)
+                    map1.appendChild(area);
                 })
             })
         });
     mapDiv.appendChild(img1Button)
     mapDiv.appendChild(img2Button)
     mapDiv.appendChild(document.createElement('br'))
-    mapDiv.appendChild(img1);
-    mapDiv.appendChild(map1);
-    mapDiv.appendChild(img2);
+    mapDiv.appendChild(img1)
+    mapDiv.appendChild(map1)
+    mapDiv.appendChild(img2)
 }
     
 function loadHub(hubName){
