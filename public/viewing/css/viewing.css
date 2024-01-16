@@ -23,5 +23,7 @@
 #publicButton button{
     float: right;
 }
-
+.mapMarker {
+    padding : 0px 0px;
+}
 

@@ -2,6 +2,7 @@
 var pagesJSON = {};
 var mapMarkers = {};
 var mainPageJSON = {};
+var navItems = {};
 var img1Id = null;
 var img2Id = null;
 document.addEventListener('DOMContentLoaded', function() {
@@ -25,6 +26,7 @@ function viewMainPage() {
             mapMarkers = content.mapMarkers;
             worldName.innerHTML = content.worldName;
             mainPageJSON = content.mainPageJSON;
+            navItems = content.navItems;
             img1Id = content.img1Id;
             img2Id = content.img2Id;
             var public = content.public;
@@ -33,7 +35,7 @@ function viewMainPage() {
                 createEditButton(public);
             }
             fillMainContent(mainPageJSON);
-            fillNavBar(content.navItems);
+            fillNavBar(navItems);
             fillMap(img1Id, img2Id);
 
         });
@@ -50,8 +52,8 @@ function reloadNavBar() { //probably want to create a specific request for this 
                 return response.json();
             }
         }).then(content => {
-            console.log(content);
-            fillNavBar(content.navItems);
+            navItems = content.navItems;
+            fillNavBar(navItems);
         })
 }
             
@@ -191,7 +193,7 @@ function fillMap(img1Id, img2Id){
             mapMarkers = content.mapMarkersJSON
             Object.keys(mapMarkers).forEach(hub => {
                 mapMarkers[hub].forEach(marker => {
-                    let x = marker[0]
+                    let x = marker[0] 
                     let y = marker[1]
                     let r = marker[2]
                     let area = document.createElement('area')
@@ -199,6 +201,7 @@ function fillMap(img1Id, img2Id){
                     area.setAttribute('coords', x + ',' + y + ',' + r)
                     area.setAttribute('href', '#')
                     area.setAttribute('title', hub)
+                    area.setAttribute('class' , 'mapMarker')
                     area.addEventListener('click', function(event) {
                         event.preventDefault(); // Prevent the default action
                         loadHub(hub);
