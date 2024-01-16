@@ -61,7 +61,7 @@ function editMapMarkers(){
 }
 function placeExistingMarkers() {
     let mapDiv = document.getElementById('mapDiv');
-    // let img = document.getElementById('map1Img');
+    let img = document.getElementById('map1Img');
 
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
@@ -81,27 +81,30 @@ function placeExistingMarkers() {
                 slider.setAttribute('type', 'range');
                 slider.setAttribute('min', '0');
                 slider.setAttribute('max', '100');
-                slider.setAttribute('value', marker[2].toString()); // Use marker[2] as the initial value
+                slider.setAttribute('value', (marker[2]*img.width).toString()); // Use marker[2] as the initial value
                 navItemDiv.appendChild(slider);
 
                 let dot = document.createElement('div');
+                let r = marker[2]*img.width;
+                let x = marker[0]*img.width-r;
+                let y = marker[1]*img.height-r;
                 dot.setAttribute('class', 'dot');
                 dot.setAttribute('id', navItem);
                 dot.style.position = 'absolute';
-                dot.style.left = marker[0] + 'px';
-                dot.style.top = marker[1] + 'px';
-                dot.style.width = marker[2] + 'px';
-                dot.style.height = marker[2] + 'px';
+                dot.style.left = x + 'px';
+                dot.style.top = y + 'px';
+                dot.style.width = r*2+ 'px';
+                dot.style.height = r*2+ 'px';
                 dot.style.borderRadius = '50%';
                 dot.style.backgroundColor = 'green';
                 mapDiv.style.position = 'relative';
                 mapDiv.appendChild(dot);
 
-                slider.addEventListener('input', function() {
-                    dot.style.width = this.value + 'px';
+                slider.addEventListener('input', function() { //77/47 -> 77/36 - r=50  1
+                    dot.style.width = this.value + 'px';    //91/57 -> 91/35 - r=100   1
                     dot.style.height = this.value + 'px';
-                    dot.style.left = (marker[0] - (parseInt(this.value) - marker[2]) / 2) + 'px';
-                    dot.style.top = (marker[1] - (parseInt(this.value) - marker[2]) / 2) + 'px';
+                    dot.style.left =x - (parseInt(this.value) - r*2) / 2 + 'px'; //33/57 -> 33/58 - r=50  2
+                    dot.style.top = y - (parseInt(this.value) - r*2) / 2 + 'px'; //37/113 -> 37 116 - r=100  2
                 });
 
                 let removeButton = document.createElement('button');
@@ -230,9 +233,9 @@ function saveMapMarkers(){
     for (let i = 0; i < dotDivs.length; i++){
         let dotDiv = dotDivs[i];
         let navItem = dotDiv.id;
-        let x = dotDiv.offsetLeft - parseInt(getComputedStyle(mapDiv).paddingLeft);
-        let y = dotDiv.offsetTop - parseInt(getComputedStyle(mapDiv).paddingTop);
-        let radius = parseInt(dotDiv.style.width);
+        let radius = parseInt(dotDiv.style.width)/2 / img.width ;
+        let x = (dotDiv.offsetLeft + radius*img.width) / img.width;
+        let y = (dotDiv.offsetTop + radius*img.width) / img.height;
         if (!mapMarkers[navItem]){
             mapMarkers[navItem] = [];
         }
