@@ -44,7 +44,6 @@ fill navs page
 
 
 TO-DO:
-edit map markers from hub deletes all map markers
 change map markers to use relative locations
 secure login from spam
 add final styling

@@ -106,14 +106,18 @@ function saveNavOptions(){
             }
         });
     });
-    Object.values(newNavItems).forEach(navItem => {
-        if (mapMarkers && mapMarkers[navItem]){
-            newMapMarkers[navItem] = mapMarkers[navItem]
-        }
-    })  
+    Object.values(newNavItems).forEach(navItems => {
+        navItems.forEach(navItem => {
+            if (mapMarkers && mapMarkers[navItem]){
+                newMapMarkers[navItem] = mapMarkers[navItem]
+            }
+        })  
+    })
+    pagesJSON = newPages;
+    navItems = newNavItems;
+    mapMarkers = newMapMarkers;
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
-    console.log(newNavItems, newPages)
     fetch('/editNavBarOptions?id=' + encodeURIComponent(id), {
         method: 'POST',
         headers: {
@@ -125,7 +129,6 @@ function saveNavOptions(){
         if (response.ok){
             enableNavBar();
             reloadNavBar();
-            console.log(newPages);
         }
     })
     fetch('/saveMapMarkers?id=' + encodeURIComponent(id), {
@@ -134,7 +137,7 @@ function saveNavOptions(){
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            mapMarkers: newMapMarkers
+            mapMarkers: mapMarkers
         })
     }).then(response => {
         if (response.ok){

@@ -4,18 +4,23 @@ function editNavBar(){
         editButtonsDiv.removeChild(editButtonsDiv.firstChild);
     }
     let navBar = document.getElementById('navBar');
-    let ul = navBar.firstChild
-    ul.childNodes.forEach(li => {
-        let input = document.createElement('input')
-        input.setAttribute('type', 'text')
-        input.setAttribute('value', li.firstChild.id)
-        input.setAttribute('id', li.firstChild.id)
-        li.replaceChild(input, li.firstChild)
-        let removeButton = document.createElement('button')
-        removeButton.setAttribute('onclick', 'removeNavBarItem(this)')
-        removeButton.appendChild(document.createTextNode('Remove'))
-        li.appendChild(removeButton)
-    })
+    if (navBar.firstChild){
+        let ul = navBar.firstChild;
+        ul.childNodes.forEach(li => {
+            let input = document.createElement('input')
+            input.setAttribute('type', 'text')
+            input.setAttribute('value', li.firstChild.id)
+            input.setAttribute('id', li.firstChild.id)
+            li.replaceChild(input, li.firstChild)
+            let removeButton = document.createElement('button')
+            removeButton.setAttribute('onclick', 'removeNavBarItem(this)')
+            removeButton.appendChild(document.createTextNode('Remove'))
+            li.appendChild(removeButton)
+        })
+    }else{
+        let ul = document.createElement('ul')
+        navBar.appendChild(ul)
+    }
     createAddNavBarItemButton();
     createSaveNavBarButton();
     createCancelNavBarEditButton();
@@ -68,33 +73,13 @@ function removeNavBarItem(button){
     ul.removeChild(li)
 }
 
-function saveNavBar(){
+function saveNavBar(){  
+    console.log(pagesJSON)
+    console.log(mapMarkers)
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
     let navBar = document.getElementById('navBar');
     let ul = navBar.firstChild
-    //Need to fetch pages and navItems
-    fetch('/navItems?id=' + encodeURIComponent(id), {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => {
-        console.log(response)
-        return response.json();
-    }).then(content => {
-        let navItems = content.navItemsJSON;
-        let pages = content.pages;
-        updateDBNavBarItems(navItems, pages, ul);
-    })
-    //scan IDs of inputs replacing matching Ids and removing missing ones
-    //create new page items for the new navs and add them to the list
-    
-}
-function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to identify id of a nav item to see if a user is renaming
-    console.log(navItems, pages,ul)
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
     let newNavItems = {} //JSON of navbar item and their hubs
     let newMapMarkers = {}
     ul.childNodes.forEach(li => {
@@ -108,12 +93,19 @@ function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to iden
             newNavItems[id] = navItems[id]  
         }
         
-    })   
-    Object.values(newNavItems).forEach(navItem => {
-        if (mapMarkers[navItem]){
-            newMapMarkers[navItem] = mapMarkers[navItem]
-        }
-    })                       
+    })
+    navItems = newNavItems
+    Object.values(navItems).forEach(navItems => {
+            navItems.forEach(navItem => {
+            console.log(navItem)
+            console.log(mapMarkers)
+            console.log(mapMarkers[navItem])
+            if (mapMarkers[navItem]){
+                newMapMarkers[navItem] = mapMarkers[navItem]
+            }
+            console.log(newMapMarkers)
+        })       
+    })                
     fetch('/updateNavBarItems?id=' + encodeURIComponent(id), {
         method: 'POST',
         headers: {
@@ -138,6 +130,7 @@ function updateDBNavBarItems(navItems, pages, ul){  //could be rewritten to iden
         })
     }).then(response => {
         if (response.ok){
+            console.log('aved map markers')
             reloadNavBar();
             reloadContents(editMode=true);
         }
