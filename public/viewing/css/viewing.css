@@ -1,8 +1,12 @@
 #mapDiv {
-    float:right;
+    position: fixed;
+    top: 16%;
+    right: 0;
 }
 #editButton {
     float: right;
+    position: fixed;
+    top: 0%;
 }  
 #editModeButton{
     float: right;
@@ -12,15 +16,124 @@
     float:right
 }
 
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 #homeButton img {
     position: fixed;
     width: 50px;
     height: 50px;
     right:1%;
     top:1%;
+    filter: invert(100%);
 }
 
 #publicButton button{
     float: right;
+}
+body {
+    background-color: darkslategrey;
+}
+
+header {
+    position : fixed;
+    background-image: url('../images/foggyForest.jpg'); /* Replace 'path/to/your/image.jpg' with the actual path to your image */
+    background-size: cover; /* Ensures the image covers the entire header */
+    background-position: center;
+    top:0;
+    left:0;
+    height: 16%;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    border-bottom: 1px solid #000000;
+}
+header h1 {
+    margin-bottom: 5px;
+}
+header a {
+    color: blanchedalmond;
+    text-decoration: none;
+    font-size: 120%;
+    padding: 0px 8px;
+    display: inline-block;
+    font-family: "Times New Roman", Times, serif;
+}
+header a:hover {
+    color: #258c4d;
+}
+header button {
+    height : 15%;
+    color: blanchedalmond;
+    text-decoration: none;
+    font-size: 120%;
+    padding: 0px 8px;
+    margin-left: 3px;
+    display: inline-block;
+    font-family: "Times New Roman", Times, serif;
+    background-color: #01443c;
+    border: none;
+    animation: fadeIn 1s ease-in-out;
+}
+
+header button:hover {
+    color: #258c4d;
+    background-color: #012622;
+}
+
+
+/* Remove bullet points from ul elements */
+ul {
+    list-style: none;
+}
+
+select {
+    background-color: #01443c;
+    color: #FFFFFF;
+    animation: fadeIn 1s ease-in-out;
+    padding-right: 10px;
+    font-size: 120%;
+}
+select:hover {
+    background-color: #012622;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+option {
+    color: #038979;
+    padding-right: 10px;
+    font-size: 100%;
+}
+
+#mapDiv button {
+    background-color: #541b0eab;
+    color: #FFFFFF;
+    animation: fadeIn 1s ease-in-out;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-top:3px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    align-self: center;
+    font-size: 100%;
+    border: none;
+    
+}
+
+main {
+    margin-top: 16%;
+    
 }
 
