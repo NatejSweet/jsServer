@@ -44,7 +44,8 @@ fill navs page
 
 
 TO-DO:
-change map markers to use relative locations
+flip some buttons around
+be caution of too many navitems forcing buttons down
 secure login from spam
 add final styling
 for private worlds, disable access from simply searching the Id
