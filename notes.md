@@ -50,6 +50,7 @@ secure login from spam
 add final styling
 for private worlds, disable access from simply searching the Id
 probably want ot rework how image ids are stored, however it is not a problem
+needto rework editNavBarOptions due to changes on navbar(removed labels and replaces with a default option)
 
 
 

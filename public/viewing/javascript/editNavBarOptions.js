@@ -13,15 +13,16 @@ function editNavOptions(){
         let navOptionsDiv = document.createElement('div');
         navOptionsDiv.setAttribute('id', 'navOptionsDiv');
     ul.childNodes.forEach(li => {
-        console.log(li);
-        let label = li.firstChild;
-        let labelText = label.firstChild;
-        let select = labelText.nextSibling;
-        let options = select.childNodes;
+        let select = li.firstChild
+        let options = [];
+        if (select.childNodes){
+             options = select.childNodes;
+        }
+        let label = options[0]
         let navItemDiv = document.createElement('div');
         navItemDiv.setAttribute('id', label.id);
         let navItemLabel = document.createElement('label');
-        navItemLabel.appendChild(document.createTextNode(label.id+': '));
+        navItemLabel.appendChild(document.createTextNode(label.value+': '));
         navItemDiv.appendChild(navItemLabel);
         let addNavOptionButton = document.createElement('button');
         addNavOptionButton.setAttribute('onclick', 'addNavOption(this)');
