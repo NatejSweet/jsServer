@@ -1,26 +1,18 @@
 #mapDiv {
     position: fixed;
-    top: 23%;
+    top: 18%;
     right: 0;
-}
-#editButton {
-    float: right;
-    position: fixed;
-    top: 0%;
-}  
-#editModeButton{
-    float: right;
 }
 
 .imgControlButton {
     float:right
 }
 
-nav {
+header nav {
+    position: absolute;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    top:40%;
 }
 
 #homeButton img {
@@ -32,30 +24,28 @@ nav {
     filter: invert(100%);
 }
 
-#publicButton button{
-    float: right;
-}
+
 body {
     background-color: darkslategrey;
 }
 
 header {
     position : fixed;
-    background-image: url('../images/foggyForest.jpg'); /* Replace 'path/to/your/image.jpg' with the actual path to your image */
-    background-size: cover; /* Ensures the image covers the entire header */
-    background-position: center;
+    background-image: url('../images/foggyForest.jpg'); 
+    background-size: cover; 
     top:0;
     left:0;
-    height: 23%;
+    background-position: center;
+    height: 18%;
     width: 100%;
-    margin: 0 auto;
-    padding: 0;
     border-bottom: 1px solid #000000;
 }
 header h1 {
-    margin-bottom: 5px;
+    position: absolute;
+    margin-left: 5px;
 }
 header a {
+    position: absolute;
     color: blanchedalmond;
     text-decoration: none;
     font-size: 120%;
@@ -66,18 +56,30 @@ header a {
 header a:hover {
     color: #258c4d;
 }
+header div#editButtonsDiv {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    height: 15%;
+    width: 100%;
+    bottom: 3px;
+}
 header button {
-    height : 15%;
+    
     color: blanchedalmond;
     text-decoration: none;
     font-size: 120%;
-    padding: 0px 8px;
-    margin-left: 3px;
+    padding: 3px 8px;
     display: inline-block;
     font-family: "Times New Roman", Times, serif;
     background-color: #01443c;
+    margin-left: 3px;
     border: none;
     animation: fadeIn 1s ease-in-out;
+}
+
+header div#editButtonsDiv button#editModeButton {
+    margin-left: auto;
 }
 
 header button:hover {
@@ -86,19 +88,24 @@ header button:hover {
 }
 
 
-/* Remove bullet points from ul elements */
-ul {
+
+header nav ul {
     list-style: none;
     display: flex;
     flex-direction: row;
 }
 
-select {
+header nav ul li {
+    margin-left: 8px;
+}
+
+header nav select {
     background-color: #01443c;
     color: #FFFFFF;
     animation: fadeIn 1s ease-in-out;
     padding-right: 10px;
     font-size: 120%;
+
 }
 select:hover {
     background-color: #012622;
@@ -143,7 +150,8 @@ option {
 }
 
 main {
-    margin-top: 22%;
-    
+    position: relative;
+    top: 20%;
+    z-index: -1; 
 }
 
