@@ -20,7 +20,7 @@ function editNavOptions(){
         }
         let label = options[0]
         let navItemDiv = document.createElement('div');
-        navItemDiv.setAttribute('id', label.id);
+        navItemDiv.setAttribute('id', label.value);
         let navItemLabel = document.createElement('label');
         navItemLabel.appendChild(document.createTextNode(label.value+': '));
         navItemDiv.appendChild(navItemLabel);
@@ -31,15 +31,17 @@ function editNavOptions(){
         navOptionsDiv.appendChild(navItemDiv);
         
         options.forEach(option => {
-            let navItemOption = document.createElement('input');
-            navItemOption.setAttribute('type', 'text');
-            navItemOption.setAttribute('value', option.value);
-            navItemOption.setAttribute('id', option.value);
-            navItemDiv.insertBefore(navItemOption, addNavOptionButton);
-            let removeButton = document.createElement('button');
-            removeButton.setAttribute('onclick', 'removeNavOption(this)');
-            removeButton.appendChild(document.createTextNode('Remove'));
-            navItemDiv.insertBefore(removeButton, addNavOptionButton);
+            if (option != label){
+                let navItemOption = document.createElement('input');
+                navItemOption.setAttribute('type', 'text');
+                navItemOption.setAttribute('value', option.value);
+                navItemOption.setAttribute('id', option.value);
+                navItemDiv.insertBefore(navItemOption, addNavOptionButton);
+                let removeButton = document.createElement('button');
+                removeButton.setAttribute('onclick', 'removeNavOption(this)');
+                removeButton.appendChild(document.createTextNode('Remove'));
+                navItemDiv.insertBefore(removeButton, addNavOptionButton);
+            }
 
             
         });
