@@ -1,3 +1,4 @@
+const { text } = require("express");
 
 
 function savePage(){    //could be rewritten to be cleaner
@@ -150,34 +151,51 @@ function editPage() {       // this function can be optimized, at least reduce t
         })
 
     })
+    const textareas = document.getElementsByClassName('titletext');
+    Array.from(textareas).forEach(textarea =>{
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight)+'px'
+        textarea.addEventListener('input', function(){
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        },)
+    })
+
+      
+        
 }
-function addTitle(text){        //when implimenting these in the editPage function, create an optional argument for pre-filled data
-    // let contentDiv = document.getElementById('mainContentDiv')
-    let titleDiv = document.createElement('div')
-    titleDiv.setAttribute('class','titleDiv')
-    let titleLabel = document.createElement('label')
-    titleLabel.textContent = 'Title: '
-    let titleText = document.createElement('input')
-    if (text){
-        titleText.value = text
-    }
-    titleText.setAttribute("name", "title")
-    titleText.setAttribute("class", "titletext")
-    titleLabel.appendChild(titleText)
-    let addSubtextButton = document.createElement('button')
-    addSubtextButton.setAttribute('id','subtextAddButton')
-    addSubtextButton.textContent = 'Add Subtext'
-    addSubtextButton.addEventListener('click',function() {
-        titleDiv.appendChild(addSubtext())
-    },false)
-    titleDiv.appendChild(titleLabel)
-    titleLabel.appendChild(addSubtextButton)
-    // contentDiv.appendChild(titleDiv)
+function autoResize() {
+    console.log('resizing')
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+}
+function addTitle(text) {
+    let titleDiv = document.createElement('div');
+    titleDiv.setAttribute('class', 'titleDiv');
+    let titleLabel = document.createElement('label');
+    titleLabel.textContent = 'Title: ';
+    let addSubtextButton = document.createElement('button');
+    addSubtextButton.setAttribute('id', 'subtextAddButton');
+    addSubtextButton.textContent = 'Add Subtext';
+    addSubtextButton.addEventListener('click', function() {
+        titleDiv.appendChild(addSubtext());
+    }, false);
     let removeTitleButton = document.createElement('button');
     removeTitleButton.textContent = 'Remove Title/Section';
     removeTitleButton.addEventListener('click', removeItem);
+    let lineBreak = document.createElement('br');
+    let titleText = document.createElement('textArea');
+    if (text) {
+        titleText.value = text;
+    }
+    titleText.setAttribute("name", "title");
+    titleText.setAttribute("class", "titletext");
+    titleDiv.appendChild(titleLabel);
+    titleDiv.appendChild(addSubtextButton);
     titleDiv.appendChild(removeTitleButton);
-    return titleDiv 
+    titleDiv.appendChild(lineBreak);
+    titleDiv.appendChild(titleText);
+    return titleDiv;
 }
 
 function addSubtext(text) {
@@ -188,14 +206,12 @@ function addSubtext(text) {
     subtextDiv.setAttribute('class', 'subTitleDiv');
     let subtextLabel = document.createElement('label');
     subtextLabel.textContent = 'Subtext: ';
-    let subtext = document.createElement('input');
+    let subtext = document.createElement('textArea');
     if (text){
         subtext.value = text
     }
     subtext.setAttribute("name", "subtext");
     subtext.setAttribute("class", "subtext");
-    subtextLabel.appendChild(subtext);
-    subtextDiv.appendChild(subtextLabel);
     // parentDiv.appendChild(subtextDiv);
     let addTextButton = document.createElement('button');
     addTextButton.setAttribute('class', 'addTextButton');
@@ -203,11 +219,15 @@ function addSubtext(text) {
     addTextButton.addEventListener('click', function() {
         subtextDiv.appendChild(addText());
     }, false);
-    subtextDiv.appendChild(addTextButton);
     let removeSubtextButton = document.createElement('button');
     removeSubtextButton.textContent = 'Remove Subtext/Section';
     removeSubtextButton.addEventListener('click', removeItem);
-    subtextLabel.appendChild(removeSubtextButton);
+    let lineBreak = document.createElement('br');
+    subtextDiv.appendChild(subtextLabel);
+    subtextDiv.appendChild(addTextButton);
+    subtextDiv.appendChild(removeSubtextButton);
+    subtextDiv.appendChild(lineBreak);
+    subtextDiv.appendChild(subtext);
     return subtextDiv
 
 }
@@ -217,18 +237,21 @@ function addText(inputText) {
     textDiv.setAttribute('class', 'textDiv');
     let textLabel = document.createElement('label');
     textLabel.textContent = 'Text: ';
-    let text = document.createElement('input');
+    let text = document.createElement('textArea');
     if (inputText){
         text.value = inputText
     }
     text.setAttribute("name", "text");
     text.setAttribute("class", "text");
-    textLabel.appendChild(text);
-    textDiv.appendChild(textLabel);
     let removeTextButton = document.createElement('button');
     removeTextButton.textContent = 'Remove Text';
     removeTextButton.addEventListener('click', removeItem);
+    let lineBreak = document.createElement('br');
+    textDiv.appendChild(textLabel);
     textDiv.appendChild(removeTextButton);
+    textDiv.appendChild(lineBreak);
+    textDiv.appendChild(text);
+
     return textDiv
 }
 

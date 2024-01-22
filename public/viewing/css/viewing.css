@@ -1,6 +1,7 @@
+
 #mapDiv {
+    flex:1;
     position: fixed;
-    top: 20%;
     right: 0;
 }
 
@@ -34,22 +35,28 @@ header #homeButton img {
 
 body {
     background-color: darkslategrey;
+    display: flex;
+    flex-direction: column;
+    margin:0;
+    padding:0;
+
     
 }
 
 header {
     display: flex;
-    position : fixed;
+    position: sticky;
+    top: 0;
     background-image: url('../images/foggyForest.jpg'); 
     background-size: cover; 
-    top:0;
-    left:0;
     background-position: center;
+    margin-bottom: 0px;
     width: 100%;
     min-height: 20%;
     border-bottom: 1px solid #000000;
     flex-wrap: wrap;
     align-content: left;
+    z-index: 100;
 }
 header h1 {
     position: relative;
@@ -80,11 +87,13 @@ header button {
     color: blanchedalmond;
     text-decoration: none;
     font-size: 120%;
-    padding: 3px 8px;
+    padding: 3px 3px;
     display: inline-block;
     font-family: "Times New Roman", Times, serif;
     background-color: #01443c;
     margin-left: 3px;
+    margin-right: 3px;
+    margin-bottom: 3px;
     border: none;
     animation: fadeIn 1s ease-in-out;
 }
@@ -143,34 +152,70 @@ option {
     font-size: 100%;
 }
 
-#mapDiv button {
+main div#mapDiv button {
     background-color: #541b0eab;
     color: #FFFFFF;
-    padding-right: 10px;
-    padding-left: 10px;
-    margin-top:3px;
-    margin-right: 3px;
-    margin-bottom: 3px;
     align-self: center;
     font-size: 100%;
     border: none;
-    
+    margin-left: 3px;
 }
 
-#mapDiv img{
+main div#mapDiv img{
     position: fixed;
     max-width: 40%;
     max-height: 70%;
     right: 0%;
     margin-top: 5px;
-    padding-top: 5px;
 }
 
 main {
     display: flex;
-    margin-top: auto; /* Adjust the value as needed */
-    /* position: relative;
-    top: 22%;
-    z-index: -1;  */
+    flex-direction: row;
+    margin-top: 3px;
+
+}
+textarea {
+    resize: vertical;
+    width: 100%;
+    height: auto;
+    font-size: 100%;
+    font-family: "Times New Roman", Times, serif;
+    text-align: left;
+    vertical-align: top;
+}
+
+textarea.titletext {
+    margin-left: 15%;
+}
+
+textarea.subtext{
+    margin-left: 25%;
+}
+
+textarea.text{
+    margin-left: 35%;
+}
+
+main h2,h3,p{
+    position: relative;
+    max-width: 55%;
+    color:  beige;
+    word-wrap: break-word; /* Breaks long words if necessary to prevent overflow */
+     white-space: normal;  /* Allows text to wrap onto the next line */
+    overflow-wrap: break-word;
+
+}
+main h2{
+    margin-left: 5px;
+}
+main h3{
+    margin-left: 10px;
+}
+main p{
+    margin-left: 15px;
+}
+div{
+    max-width: 100%;
 }
 
