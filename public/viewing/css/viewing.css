@@ -1,6 +1,6 @@
 #mapDiv {
     position: fixed;
-    top: 18%;
+    top: 20%;
     right: 0;
 }
 
@@ -9,14 +9,21 @@
 }
 
 header nav {
-    position: absolute;
-    display: flex;
+    position: relative;
+    display: inline-flex;
     flex-direction: row;
-    top:40%;
+    /* width: 100%; */
+    max-width: 100%;
+    overflow: block;
 }
 
-#homeButton img {
-    position: fixed;
+header div#navDiv{
+    width:100%;
+}
+
+header #homeButton img {
+    position: relative;
+    flex: 1;
     width: 50px;
     height: 50px;
     right:1%;
@@ -27,25 +34,30 @@ header nav {
 
 body {
     background-color: darkslategrey;
+    
 }
 
 header {
+    display: flex;
     position : fixed;
     background-image: url('../images/foggyForest.jpg'); 
     background-size: cover; 
     top:0;
     left:0;
     background-position: center;
-    height: 18%;
     width: 100%;
+    min-height: 20%;
     border-bottom: 1px solid #000000;
+    flex-wrap: wrap;
+    align-content: left;
 }
 header h1 {
-    position: absolute;
+    position: relative;
+    flex-grow: 1;
+    margin-top: 5px;
     margin-left: 5px;
 }
-header a {
-    position: absolute;
+header h1 a {
     color: blanchedalmond;
     text-decoration: none;
     font-size: 120%;
@@ -57,12 +69,11 @@ header a:hover {
     color: #258c4d;
 }
 header div#editButtonsDiv {
-    position: absolute;
+    position: relative;
     display: flex;
     flex-direction: row;
-    height: 15%;
     width: 100%;
-    bottom: 3px;
+    bottom: 0;
 }
 header button {
     
@@ -91,8 +102,12 @@ header button:hover {
 
 header nav ul {
     list-style: none;
+    /* flex:1; */
     display: flex;
     flex-direction: row;
+    margin-top: 5px;
+    /* justify-content: space-between; */
+    flex-wrap: wrap; 
 }
 
 header nav ul li {
@@ -100,6 +115,8 @@ header nav ul li {
 }
 
 header nav select {
+    flex: 1;
+    display: inline-block;
     background-color: #01443c;
     color: #FFFFFF;
     animation: fadeIn 1s ease-in-out;
@@ -150,8 +167,10 @@ option {
 }
 
 main {
-    position: relative;
-    top: 20%;
-    z-index: -1; 
+    display: flex;
+    margin-top: auto; /* Adjust the value as needed */
+    /* position: relative;
+    top: 22%;
+    z-index: -1;  */
 }
 
