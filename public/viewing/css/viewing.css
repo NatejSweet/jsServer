@@ -1,8 +1,9 @@
 
-#mapDiv {
+div#mapDiv {
     flex:1;
     position: fixed;
     right: 0;
+    animation: fadeIn 1s ease-in-out;
 }
 
 .imgControlButton {
@@ -18,13 +19,8 @@ header nav {
     overflow: block;
 }
 
-header div#navDiv{
-    width:100%;
-}
-
 header #homeButton img {
     position: relative;
-    flex: 1;
     width: 50px;
     height: 50px;
     right:1%;
@@ -52,10 +48,10 @@ header {
     background-position: center;
     margin-bottom: 0px;
     width: 100%;
-    min-height: 20%;
     border-bottom: 1px solid #000000;
     flex-wrap: wrap;
-    align-content: left;
+    align-content: flex-start;
+    align-items: flex-start;
     z-index: 100;
 }
 header h1 {
@@ -63,6 +59,7 @@ header h1 {
     flex-grow: 1;
     margin-top: 5px;
     margin-left: 5px;
+    max-height: 1%;
 }
 header h1 a {
     color: blanchedalmond;
@@ -137,6 +134,7 @@ select:hover {
     background-color: #012622;
 }
 
+
 @keyframes fadeIn {
     0% {
         opacity: 0;
@@ -146,13 +144,7 @@ select:hover {
     }
 }
 
-option {
-    color: #038979;
-    padding-right: 10px;
-    font-size: 100%;
-}
-
-main div#mapDiv button {
+main div button {
     background-color: #541b0eab;
     color: #FFFFFF;
     align-self: center;
@@ -183,39 +175,80 @@ textarea {
     font-family: "Times New Roman", Times, serif;
     text-align: left;
     vertical-align: top;
+    background-color: #01302b;
+    margin-left: 0%;
+    margin-bottom: 2%;
+    color: beige; /* Add this line to set the text color to beige */
 }
 
-textarea.titletext {
-    margin-left: 15%;
+input {
+    max-width: 30%;
+    font-size: 100%;
+    font-family: "Times New Roman", Times, serif;
+    text-align: left;
+    vertical-align: top;
+    background-color: #01302b;
+    margin-left: 0%;
+    margin-bottom: 0%;
+    height: 20px;
+}
+div.titleDiv{
+    margin-left: 2%;
+    animation: fadeIn 1s ease-in-out;
+}
+div.subTitleDiv{
+    margin-left: 5%;
+    animation: fadeIn 1s ease-in-out;
+}
+div.textDiv{
+    margin-left: 8%;
+    animation: fadeIn 1s ease-in-out;
 }
 
-textarea.subtext{
-    margin-left: 25%;
-}
-
-textarea.text{
-    margin-left: 35%;
-}
-
-main h2,h3,p{
+main h2,h3,p,label{
     position: relative;
-    max-width: 55%;
+    width:auto;
     color:  beige;
     word-wrap: break-word; /* Breaks long words if necessary to prevent overflow */
      white-space: normal;  /* Allows text to wrap onto the next line */
     overflow-wrap: break-word;
 
 }
-main h2{
-    margin-left: 5px;
-}
-main h3{
-    margin-left: 10px;
-}
-main p{
-    margin-left: 15px;
-}
 div{
     max-width: 100%;
 }
 
+header div{
+    max-height: 12%;
+    width: 100%;
+}
+
+main div button:hover {
+    background-color: #541b0e;
+}
+
+main div#mainContentDiv{
+    width: 55%;
+}
+
+div#navOptionsDiv div{
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 2%;
+
+    
+}
+div#navOptionsDiv button{
+    margin-right: 2%;
+}
+option{
+    background-color: #01302b;
+    color: #FFFFFF;
+    font-size: 100%;
+    font-family: "Times New Roman", Times, serif;
+    text-align: left;
+    vertical-align: top;
+    margin-left: 0%;
+    margin-bottom: 0%;
+    height: 20px;
+}

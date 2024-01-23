@@ -158,7 +158,25 @@ function editPage() {       // this function can be optimized, at least reduce t
         textarea.addEventListener('input', function(){
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
-        },)
+        })
+    })
+    const subtextareas = document.getElementsByClassName('subtext');
+    Array.from(subtextareas).forEach(subtextarea =>{
+        subtextarea.style.height = 'auto';
+        subtextarea.style.height = (subtextarea.scrollHeight)+'px'
+        subtextarea.addEventListener('input', function(){
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        })
+    })
+    const texttextareas = document.getElementsByClassName('text');
+    Array.from(texttextareas).forEach(texttextarea =>{
+        texttextarea.style.height = 'auto';
+        texttextarea.style.height = (texttextarea.scrollHeight)+'px'
+        texttextarea.addEventListener('input', function(){
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        })
     })
 
       
@@ -181,7 +199,7 @@ function addTitle(text) {
         titleDiv.appendChild(addSubtext());
     }, false);
     let removeTitleButton = document.createElement('button');
-    removeTitleButton.textContent = 'Remove Title/Section';
+    removeTitleButton.textContent = 'Remove Section';
     removeTitleButton.addEventListener('click', removeItem);
     let lineBreak = document.createElement('br');
     let titleText = document.createElement('textArea');
@@ -220,7 +238,7 @@ function addSubtext(text) {
         subtextDiv.appendChild(addText());
     }, false);
     let removeSubtextButton = document.createElement('button');
-    removeSubtextButton.textContent = 'Remove Subtext/Section';
+    removeSubtextButton.textContent = 'Remove Subsection';
     removeSubtextButton.addEventListener('click', removeItem);
     let lineBreak = document.createElement('br');
     subtextDiv.appendChild(subtextLabel);
@@ -251,7 +269,6 @@ function addText(inputText) {
     textDiv.appendChild(removeTextButton);
     textDiv.appendChild(lineBreak);
     textDiv.appendChild(text);
-
     return textDiv
 }
 
@@ -307,7 +324,7 @@ function addUpdateMapImageButton(){
 function removeItem(event) {
     event.preventDefault();
     let removeButton = event.target;
-    let parentDiv = removeButton.parentNode.parentNode;
+    let parentDiv = removeButton.parentNode;
     parentDiv.remove();
 }
 
@@ -420,4 +437,7 @@ function enableNavBar(){
     let navBarDiv = document.getElementById('navBar')
     navBarDiv.style.display = "block";
 }
+
+
+
 

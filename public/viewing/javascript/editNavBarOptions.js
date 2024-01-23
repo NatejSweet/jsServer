@@ -36,11 +36,11 @@ function editNavOptions(){
                 navItemOption.setAttribute('type', 'text');
                 navItemOption.setAttribute('value', option.value);
                 navItemOption.setAttribute('id', option.value);
-                navItemDiv.insertBefore(navItemOption, addNavOptionButton);
+                navItemDiv.appendChild(navItemOption);
                 let removeButton = document.createElement('button');
                 removeButton.setAttribute('onclick', 'removeNavOption(this)');
                 removeButton.appendChild(document.createTextNode('Remove'));
-                navItemDiv.insertBefore(removeButton, addNavOptionButton);
+                navItemDiv.appendChild(removeButton);
             }
 
             
@@ -61,11 +61,11 @@ function addNavOption(button){
     let navItemOption = document.createElement('input');
     navItemOption.setAttribute('type', 'text');
     navItemOption.setAttribute('id', 'newNavOption');
-    navItemDiv.insertBefore(navItemOption, button);
+    navItemDiv.appendChild(navItemOption);
     let removeButton = document.createElement('button');
     removeButton.setAttribute('onclick', 'removeNavOption(this)');
     removeButton.appendChild(document.createTextNode('Remove'));
-    navItemDiv.insertBefore(removeButton, button);
+    navItemDiv.appendChild(removeButton);
 
 
 }
