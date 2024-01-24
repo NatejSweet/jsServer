@@ -198,7 +198,7 @@ function fillMap(img1Id, img2Id){
                 mapMarkers[hub].forEach(marker => {
                     let x = marker[0] *img1.width
                     let y = marker[1] * img1.height
-                    let r = marker[2] 
+                    let r = marker[2] *img1.width
                     let area = document.createElement('area')
                     area.setAttribute('shape', 'circle')
                     area.setAttribute('coords', x + ',' + y+ ',' + r)

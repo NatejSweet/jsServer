@@ -7,6 +7,10 @@ function editMapMarkers(){
     saveButton.setAttribute('onclick', 'saveMapMarkers()');
     saveButton.appendChild(document.createTextNode('Save'));
     editButtonsDiv.appendChild(saveButton);
+    let cancelButton = document.createElement('button');
+    cancelButton.setAttribute('onclick', 'reloadContents(editMode = true)');
+    cancelButton.appendChild(document.createTextNode('Cancel'));
+    editButtonsDiv.appendChild(cancelButton);
     if (document.getElementById('addSectionButton')){
         removeMainContentAddButtons();
     }
@@ -97,7 +101,8 @@ function placeExistingMarkers() {
                 dot.style.height = r*2+ 'px';
                 dot.style.borderRadius = '50%';
                 dot.style.backgroundColor = 'green';
-                mapDiv.style.position = 'relative';
+                dot.style.zIndex = '999';
+                dot.style.display = 'block';
                 mapDiv.appendChild(dot);
 
                 slider.addEventListener('input', function() { //77/47 -> 77/36 - r=50  1
@@ -138,7 +143,6 @@ function addMarker(button) {
         if (activeButton === button) {
             img.removeEventListener('click', handleClickWrapper);
             console.log(img.eventListeners)
-            toggleButtons(true); // Enable all buttons
             activeButton = null;
         } else {
             // Swap the active button to the new button
@@ -162,19 +166,10 @@ function addMarker(button) {
         
         img.addEventListener('click', handleClickWrapper);
         
-        // toggleButtons(false, button); // Disable all other buttons
         activeButton = button;
     }
 }
 
-// function toggleButtons(enable, excludeButton) {
-//     let buttons = document.querySelectorAll('.addMarkerButton'); // Replace with the actual class of your buttons
-//     buttons.forEach(button => {
-//         if (button !== excludeButton) {
-//             button.disabled = enable ? false : true;
-//         }
-//     });
-// }
 function handleClick(event, navItemDiv, navItem) {
     let x = event.offsetX;
     let y = event.offsetY;
@@ -204,7 +199,8 @@ function handleClick(event, navItemDiv, navItem) {
     dot.style.height = slider.value + 'px';
     dot.style.borderRadius = '50%';
     dot.style.backgroundColor = 'red';
-    mapDiv.style.position = 'relative'; // Set parent element position
+    dot.style.zIndex = '999';
+    dot.style.display = 'block';
     mapDiv.appendChild(dot);
 
     // Update the dot size and position based on the slider value
