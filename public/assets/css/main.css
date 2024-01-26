@@ -106,3 +106,65 @@ button:hover {
     opacity: 1;
   }
 }
+
+main div.login,
+div.createAccount {
+  display: hidden;
+  top: calc(50% - width / 2);
+  left: calc(50% - height / 2);
+  background-color: #01302b;
+  padding: 40px 15px;
+}
+
+main div.login input,
+div.createAccount input {
+  width: 100%;
+  font-size: 100%;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  background-color: #01443c;
+  height: 20px;
+  color: beige;
+  margin-top: 5px;
+}
+
+main div.login form,
+div.createAccount form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+main div.login button,
+div.createAccount button {
+  align-self: center;
+  background-color: #541b0eab;
+  width: auto;
+  color: #ffffff;
+  font-size: 100%;
+  padding: 3px 8px;
+  margin-top: 5px;
+}
+
+main div.login label,
+div.createAccount label {
+  margin-top: 5px;
+  color: beige;
+}
+
+main div.login a,
+div.createAccount a {
+  color: beige;
+  margin-top: 5px;
+}
+
+main div.login a:hover,
+div.createAccount a:hover {
+  color: #11927d;
+}
+
+main div.login button:hover,
+div.createAccount button:hover {
+  background-color: #541b0e;
+}
