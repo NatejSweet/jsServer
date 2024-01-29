@@ -2,7 +2,7 @@ div#mapDiv {
   flex: 1;
   position: fixed;
   height: 100%;
-  width: 40%;
+  max-width: 40%;
   right: 0;
   animation: fadeIn 1s ease-in-out;
 }
@@ -90,9 +90,11 @@ header button {
   margin-bottom: 3px;
   border: none;
   animation: fadeIn 1s ease-in-out;
+  overflow: auto;
 }
 
-header div#editButtonsDiv button#editModeButton {
+header div#editButtonsDiv button#editModeButton,
+header div#editButtonsDiv button#exitEditModeButton {
   margin-left: auto;
 }
 
@@ -204,7 +206,8 @@ div.textDiv {
 main h2,
 h3,
 p,
-label {
+label,
+h1 {
   position: relative;
   width: auto;
   color: beige;
@@ -227,7 +230,8 @@ main div button:hover {
 
 main div#mainContentDiv {
   width: 55%;
-  position: fixed;
+  position: relative;
+  overflow: auto;
 }
 
 div#navOptionsDiv div {
@@ -248,4 +252,43 @@ option {
   margin-left: 0%;
   margin-bottom: 0%;
   height: 20px;
+}
+
+div#deleteWorldMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: darkslategrey;
+  color: beige;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  z-index: 10000;
+}
+
+div#deleteWorldMessage button {
+  background-color: #541b0e;
+  color: #ffffff;
+  font-size: 100%;
+  border: none;
+  margin-left: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  header button {
+    font-size: 100%;
+  }
+  header nav select {
+    font-size: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  header button {
+    font-size: 60%;
+  }
+  header nav select {
+    font-size: 80%;
+  }
 }
