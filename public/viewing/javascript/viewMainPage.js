@@ -218,8 +218,8 @@ function fillMap(img1Id, img2Id) {
         });
       });
     });
-  mapDiv.appendChild(img1Button);
   mapDiv.appendChild(img2Button);
+  mapDiv.appendChild(img1Button);
   mapDiv.appendChild(document.createElement("br"));
   mapDiv.appendChild(img1);
   mapDiv.appendChild(map1);

@@ -527,3 +527,20 @@ app.post("/TogglePublic", async (req, res) => {
     res.status(500).send("ahhhhh");
   }
 });
+
+app.post("/deleteWorld", async (req, res) => {
+  const worldId = req.query.id;
+  try {
+    let conn = await pool.getConnection();
+    const result = await conn.query(
+      "DELETE FROM worlds WHERE id = ? and ownerId = ?",
+      [worldId, req.session.userId]
+    );
+    console.log(result);
+    res.end();
+    if (conn) conn.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("nuh uh");
+  }
+});

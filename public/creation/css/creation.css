@@ -1,10 +1,16 @@
 main {
   display: flex;
   background-color: darkslategray;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: flex-start;
   width: 100%;
-  height: 100%;
+  height: auto;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }
 
 nav ul {
@@ -20,26 +26,24 @@ nav ul li {
   display: inline;
 }
 #mapsContainer {
-  float: right;
+  margin-left: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  width: 40%;
   margin-top: 20px; /* Adjust this margin as needed to create space between header and maps */
-  width: 60%; /* Set the width of the container to 60% */
-  height: 400px; /* Set the height of the container to a fixed value */
+  height: auto;
 }
 
-#mainMap,
-#secondaryMap {
+#mainMap {
   width: 100%; /* Set the width of the maps to 100% to fill the container */
-  height: 100%; /* Set the height of the maps to 100% to fill the container */
   margin: 0; /* Remove any margins */
 }
 
-#mainMapImg,
-#secondaryMapImg {
-  width: 100%; /* Set the width of the images to 100% to fill the container */
-  height: auto; /* Set the height to auto to maintain aspect ratio */
+#mainMapImg {
+  max-width: 100%;
+  object-fit: contain;
+  display: hidden;
 }
 
 .navColumns {
@@ -88,4 +92,21 @@ header {
   justify-content: space-between;
   background-color: #01302b;
   top: 0;
+}
+
+main div#mainContentDiv {
+  width: 55%;
+}
+
+div.titleDiv {
+  margin-left: 2%;
+  animation: fadeIn 1s ease-in-out;
+}
+div.subTitleDiv {
+  margin-left: 5%;
+  animation: fadeIn 1s ease-in-out;
+}
+div.textDiv {
+  margin-left: 8%;
+  animation: fadeIn 1s ease-in-out;
 }
