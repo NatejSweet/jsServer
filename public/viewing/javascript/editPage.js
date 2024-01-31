@@ -124,6 +124,22 @@ function removeCancelButton() {
 }
 function editPage() {
   // this function can be optimized, at least reduce the length of function
+
+  window.readURL = function (input, imgId) {
+    if (input.files && input.files[0]) {
+      if (input.files[0].size > 4 * 1024 * 1024) {
+        alert("File size exceeds 4 MB limit.");
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        let img = document.getElementById(imgId);
+        img.setAttribute("src", e.target.result);
+        img.setAttribute("class", "newImage");
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  };
   disableNavBar();
   let editButtonsDiv = document.getElementById("editButtonsDiv");
   editButtonsDiv.innerHTML = "";
@@ -131,17 +147,18 @@ function editPage() {
   addCancelButton();
   addAddSectionButton();
   addUpdateMapImageButton();
-  const titleDivs = document.querySelectorAll(".titleDiv");
-  titleDivs.forEach((titleDiv) => {
-    let title = titleDiv.getElementsByClassName("titletext");
-    let newTitleDiv = addTitle(title[0].innerHTML);
+  const titleDivs = document.getElementsByClassName("titleDiv");
+  Array.from(titleDivs).forEach((titleDiv) => {
+    let title = titleDiv.getElementsByClassName("titleText");
+    let newTitleDiv = addTitle(title[0].textContent);
+    console.log(title);
     titleDiv.replaceWith(newTitleDiv);
     let subtitleDivs = Array.from(
       titleDiv.getElementsByClassName("subTitleDiv")
     );
     subtitleDivs.forEach((subtitleDiv) => {
       let subtitle = subtitleDiv.getElementsByClassName("subTitleText");
-      let newSubtitleDiv = addSubtext(subtitle[0].innerHTML);
+      let newSubtitleDiv = addSubtext(subtitle[0].textContent);
       newTitleDiv.appendChild(newSubtitleDiv);
       let textDivs = Array.from(subtitleDiv.getElementsByClassName("textDiv"));
       textDivs.forEach((textDiv) => {
@@ -382,6 +399,7 @@ function updateMapImage() {
   let mainContentDiv = document.getElementById("mainContentDiv");
   let img1 = document.getElementById("map1Img");
   let img2 = document.getElementById("map2Img");
+  let br = mapDiv.getElementsByTagName("br");
   if (document.getElementById("pageTitle")) {
     //if updating image on a hub
     //disable main image
@@ -412,31 +430,26 @@ function updateMapImage() {
     inputButton1.setAttribute("type", "file");
     inputButton1.setAttribute("accept", ".img,.jpg,.jpeg");
     inputButton1.setAttribute("onchange", 'readURL(this,"map1Img");');
-    mapDiv.insertBefore(inputButton1, img1);
+    let input1Label = document.createElement("label");
+    input1Label.setAttribute("for", "mainMap");
+    input1Label.textContent = "Insert a New Main Map Image";
+    input1Label.appendChild(document.createElement("br"));
+    input1Label.appendChild(inputButton1);
+    mapDiv.insertBefore(input1Label, br[0]);
     let inputButton2 = document.createElement("input");
     inputButton2.setAttribute("id", "secondaryMap");
     inputButton2.setAttribute("type", "file");
     inputButton2.setAttribute("accept", ".img,.jpg,.jpeg");
     inputButton2.setAttribute("onchange", 'readURL(this,"map2Img");');
-    mapDiv.insertBefore(inputButton2, img2);
+    let input2Label = document.createElement("label");
+    input2Label.setAttribute("for", "secondaryMap");
+    input2Label.textContent = "Insert a New Alt Map Image";
+    input2Label.appendChild(document.createElement("br"));
+    input2Label.appendChild(inputButton2);
+    mapDiv.insertBefore(input2Label, img2);
+    mapDiv.insertBefore(document.createElement("br"), input2Label);
   }
 }
-
-window.readURL = function (input, imgId) {
-  if (input.files && input.files[0]) {
-    if (input.files[0].size > 4 * 1024 * 1024) {
-      alert("File size exceeds 4 MB limit.");
-      return;
-    }
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      let img = document.getElementById(imgId);
-      img.setAttribute("src", e.target.result);
-      img.setAttribute("class", "newImage");
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-};
 
 function disableNavBar() {
   let navBarDiv = document.getElementById("navBar");

@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   viewMainPage();
 });
 window.addEventListener("resize", function () {
-  replaceMapMarkers();
+  placeMapMarkers();
 });
 
 function viewMainPage() {
@@ -199,24 +199,7 @@ function fillMap(img1Id, img2Id) {
     })
     .then((content) => {
       mapMarkers = content.mapMarkersJSON;
-      Object.keys(mapMarkers).forEach((hub) => {
-        mapMarkers[hub].forEach((marker) => {
-          let x = marker[0] * img1.width;
-          let y = marker[1] * img1.height;
-          let r = marker[2] * img1.width;
-          let area = document.createElement("area");
-          area.setAttribute("shape", "circle");
-          area.setAttribute("coords", x + "," + y + "," + r);
-          area.setAttribute("href", "#");
-          area.setAttribute("title", hub);
-          area.setAttribute("class", "mapMarker");
-          area.addEventListener("click", function (event) {
-            event.preventDefault(); // Prevent the default action
-            loadHub(hub);
-          });
-          map1.appendChild(area);
-        });
-      });
+      placeMapMarkers();
     });
   mapDiv.appendChild(img2Button);
   mapDiv.appendChild(img1Button);
@@ -224,6 +207,32 @@ function fillMap(img1Id, img2Id) {
   mapDiv.appendChild(img1);
   mapDiv.appendChild(map1);
   mapDiv.appendChild(img2);
+}
+
+function placeMapMarkers() {
+  let map1 = document.getElementsByName("map1");
+  let img1 = document.getElementById("map1Img");
+  if (map1) {
+    map1[0].innerHTML = "";
+  }
+  Object.keys(mapMarkers).forEach((hub) => {
+    mapMarkers[hub].forEach((marker) => {
+      let x = marker[0] * img1.width;
+      let y = marker[1] * img1.height;
+      let r = marker[2] * img1.width;
+      let area = document.createElement("area");
+      area.setAttribute("shape", "circle");
+      area.setAttribute("coords", x + "," + y + "," + r);
+      area.setAttribute("href", "#");
+      area.setAttribute("title", hub);
+      area.setAttribute("class", "mapMarker");
+      area.addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent the default action
+        loadHub(hub);
+      });
+      map1[0].appendChild(area);
+    });
+  });
 }
 
 function loadHub(hubName) {
@@ -252,27 +261,4 @@ function updateMap(imgId) {
     .then((content) => {
       img.setAttribute("src", content.src);
     });
-}
-function replaceMapMarkers() {
-  let map1 = document.getElementsByName("map1");
-  let img1 = document.getElementById("map1Img");
-  map1[0].innerHTML = "";
-  Object.keys(mapMarkers).forEach((hub) => {
-    mapMarkers[hub].forEach((marker) => {
-      let x = marker[0] * img1.width;
-      let y = marker[1] * img1.height;
-      let r = marker[2] * img1.width;
-      let area = document.createElement("area");
-      area.setAttribute("shape", "circle");
-      area.setAttribute("coords", x + "," + y + "," + r);
-      area.setAttribute("href", "#");
-      area.setAttribute("title", hub);
-      area.setAttribute("class", "mapMarker");
-      area.addEventListener("click", function (event) {
-        event.preventDefault(); // Prevent the default action
-        loadHub(hub);
-      });
-      map1[0].appendChild(area);
-    });
-  });
 }

@@ -117,11 +117,10 @@ function placeExistingMarkers() {
           });
 
           slider.addEventListener("input", function () {
-            //77/47 -> 77/36 - r=50  1
-            dot.style.width = this.value + "px"; //91/57 -> 91/35 - r=100   1
+            dot.style.width = this.value + "px";
             dot.style.height = this.value + "px";
-            dot.style.left = x - (parseInt(this.value) - r * 2) / 2 + "px"; //33/57 -> 33/58 - r=50  2
-            dot.style.top = y - (parseInt(this.value) - r * 2) / 2 + "px"; //37/113 -> 37 116 - r=100  2
+            dot.style.left = x - (parseInt(this.value) - r * 2) / 2 + "px";
+            dot.style.top = y - (parseInt(this.value) - r * 2) / 2 + "px";
           });
 
           let removeButton = document.createElement("button");
@@ -183,9 +182,13 @@ function addMarker(button) {
 function handleClick(event, navItemDiv, navItem) {
   let mapDiv = document.getElementById("mapDiv");
   let rect = mapDiv.getBoundingClientRect();
+  let img = mapDiv.firstChild;
   let x = event.pageX - rect.left - window.scrollX;
   let y = event.pageY - rect.top - window.scrollY;
+  let coords = [];
   console.log("Clicked location:", x, y);
+  coords[0] = x / img.width;
+  coords[1] = y / img.height;
 
   // Create a slider in the navItemDiv
   let slider = document.createElement("input");
@@ -193,6 +196,7 @@ function handleClick(event, navItemDiv, navItem) {
   slider.setAttribute("min", "0");
   slider.setAttribute("max", "100");
   slider.setAttribute("value", "50");
+  coords[2] = slider.value / 2 / img.width;
   navItemDiv.appendChild(slider);
 
   // Create a remove button
@@ -205,10 +209,10 @@ function handleClick(event, navItemDiv, navItem) {
   dot.setAttribute("class", "dot");
   dot.setAttribute("id", navItem);
   dot.style.position = "absolute";
-  dot.style.left = x - slider.value / 2 + "px"; // Adjust left position
-  dot.style.top = y - slider.value / 2 + "px"; // Adjust top position
-  dot.style.width = slider.value + "px";
-  dot.style.height = slider.value + "px";
+  dot.style.left = coords[0] * img.width - coords[2] * img.width + "px"; // Adjust left position
+  dot.style.top = coords[1] * img.height - coords[2] * img.width + "px"; // Adjust top position
+  dot.style.width = coords[2] * 2 * img.width + "px";
+  dot.style.height = coords[2] * 2 * img.width + "px";
   dot.style.borderRadius = "50%";
   dot.style.backgroundColor = "red";
   dot.style.zIndex = "999";
@@ -219,8 +223,9 @@ function handleClick(event, navItemDiv, navItem) {
   slider.addEventListener("input", function () {
     dot.style.width = this.value + "px";
     dot.style.height = this.value + "px";
-    dot.style.left = x - this.value / 2 + "px"; // Adjust left position
-    dot.style.top = y - this.value / 2 + "px"; // Adjust top position
+    dot.style.left = coords[0] * img.width - this.value / 2 + "px"; // Adjust left position
+    dot.style.top = coords[1] * img.height - this.value / 2 + "px"; // Adjust top position
+    coords[2] = this.value / 2 / img.width;
   });
 
   // Remove the slider and dot when the remove button is clicked
@@ -228,6 +233,16 @@ function handleClick(event, navItemDiv, navItem) {
     navItemDiv.removeChild(slider);
     navItemDiv.removeChild(removeButton);
     mapDiv.removeChild(dot);
+  });
+
+  window.addEventListener("resize", function () {
+    let x = coords[0] * img.width;
+    let y = coords[1] * img.height;
+    let r = coords[2] * img.width;
+    dot.style.left = x - r + "px"; // Adjust left position
+    dot.style.top = y - r + "px"; // Adjust top position
+    dot.style.width = r * 2 + "px";
+    dot.style.height = r * 2 + "px";
   });
 }
 function saveMapMarkers() {

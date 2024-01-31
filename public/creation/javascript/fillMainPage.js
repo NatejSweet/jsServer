@@ -6,7 +6,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let mainContentDiv = document.getElementById("mainContentDiv");
   mainContentDiv.appendChild(addTitle(event));
   let addTitleButton = document.getElementById("addButton");
-  addTitleButton.addEventListener("click", addTitle, false);
+  addTitleButton.addEventListener("click", function () {
+    mainContentDiv.appendChild(addTitle(event));
+  });
   let addNavButton = document.getElementById("navAddButton");
   addNavButton.addEventListener("click", createNavItem, false);
   let removeNavButton = document.getElementById("navRemoveButton");
@@ -19,7 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function addTitle(event) {
-  event.preventDefault;
+  if (event) {
+    event.preventDefault;
+  }
   let titleDiv = document.createElement("div");
   titleDiv.setAttribute("class", "titleDiv");
   let titleLabel = document.createElement("label");
@@ -50,7 +54,9 @@ function addTitle(event) {
 }
 
 function addSubtext(event) {
-  event.preventDefault();
+  if (event) {
+    event.preventDefault();
+  }
   let subtextDiv = document.createElement("div");
   subtextDiv.setAttribute("class", "subTitleDiv");
   let subtextLabel = document.createElement("label");
@@ -82,7 +88,9 @@ function addSubtext(event) {
 }
 
 function addText(event) {
-  event.preventDefault();
+  if (event) {
+    event.preventDefault();
+  }
   let textDiv = document.createElement("div");
   textDiv.setAttribute("class", "textDiv");
   let textLabel = document.createElement("label");
@@ -118,10 +126,10 @@ function removeNavItem(event) {
 function createNavItem(event) {
   event.preventDefault();
   let ul = document.getElementById("navbar");
-  // <li><input type='text' name='navItem'></li>
   let li = document.createElement("li");
   let input = document.createElement("input");
   input.setAttribute("name", "navItem");
+  input.setAttribute("placeholder", "Nav Item/Region");
   li.appendChild(input);
   ul.appendChild(li);
 }
@@ -184,8 +192,7 @@ function submitMainPage(event) {
 }
 
 function storeMainContent() {
-  let form = document.getElementById("mainContentForm");
-  let titleDivs = form.getElementsByClassName("titleDiv");
+  let titleDivs = document.getElementsByClassName("titleDiv");
   let mainContent = [];
 
   Array.from(titleDivs).forEach((titleDiv) => {
