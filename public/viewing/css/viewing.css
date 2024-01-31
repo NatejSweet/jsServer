@@ -7,7 +7,16 @@ div#mapDiv {
   animation: fadeIn 1s ease-in-out;
 }
 
+div#mapDiv label {
+  text-align: right;
+  white-space: nowrap;
+  margin-right: 5px;
+}
+
 .imgControlButton {
+  float: right;
+}
+main div#mapDiv input {
   float: right;
 }
 
@@ -166,7 +175,7 @@ main {
 }
 textarea {
   resize: vertical;
-  width: 100%;
+  width: 95%;
   height: auto;
   font-size: 100%;
   font-family: "Times New Roman", Times, serif;
@@ -178,7 +187,8 @@ textarea {
   color: beige; /* Add this line to set the text color to beige */
 }
 
-input {
+main div#mainContentDiv input,
+header input {
   max-width: 30%;
   font-size: 100%;
   font-family: "Times New Roman", Times, serif;
@@ -206,7 +216,8 @@ div.textDiv {
 main h2,
 h3,
 p,
-label,
+main div#mainContentDiv label,
+header label,
 h1 {
   position: relative;
   width: auto;

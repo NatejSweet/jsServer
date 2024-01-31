@@ -44,5 +44,7 @@ update where id=worldId (navitems) VALUES ([,,,])
 TO-DO:
 flip some buttons around
 reduce db requests for reload page, reload header, etc.
-impliment deletion, saving, renaming world
+impliment saving and renaming world
 resizing page while placing map markers breaks
+remove unnecessary db calls
+secure search queries

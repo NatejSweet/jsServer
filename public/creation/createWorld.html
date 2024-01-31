@@ -1,14 +1,17 @@
-<body>
+<!DOCTYPE html>
+<html>
+  <head>
   <script type="module" src="./javascript/fillNavs.js"></script>
     <script type='module' src="./javascript/fillMainPage.js"></script>
     <link rel='stylesheet'href='./css/creation.css'>
-    </body>
+    </head>
+    <body>
     <header id="header">
       <div id="mainContentHeaderDiv">
-      <input type="text" id="worldName" name="worldName"><br>
+      <input type="text" id="worldName" name="worldName" placeholder="World Name"><br>
       <nav>
         <ul id="navbar">
-          <li><input type='text' name='navItem'></li>
+          <li><input type='text' name='navItem' placeholder="Nav Item/Region"></li>
         </ul>
       </nav>
       </div>
@@ -22,6 +25,8 @@
       <button id=addButton>Add section</button>
       <button id=submitButton>Submit</button>
     </div>
+    <div id="fillNavsFormDiv">
+      </div>
     <div id="mapsContainer">
         <form>
           <h4>input an image for the map</h4><br>
@@ -30,6 +35,6 @@
           <img id="mainMapImg" src="#" alt="your image" /><br>
         </form>
         </div>
-    <div id="fillNavsFormDiv">
-      </div>
     </main>
+  </body>
+  </html>

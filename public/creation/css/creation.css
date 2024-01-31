@@ -1,16 +1,20 @@
+html {
+  height: auto;
+}
 main {
   display: flex;
   background-color: darkslategray;
   flex-direction: row;
   justify-content: flex-start;
   width: 100%;
-  height: auto;
-  min-height: 100%;
+  min-height: 100vh;
+  flex-wrap: wrap;
 }
 
 body {
   margin: 0;
   padding: 0;
+  min-height: 100vh;
 }
 
 nav ul {
@@ -109,4 +113,30 @@ div.subTitleDiv {
 div.textDiv {
   margin-left: 8%;
   animation: fadeIn 1s ease-in-out;
+}
+textarea {
+  resize: vertical;
+  width: 100%;
+  height: auto;
+  font-size: 100%;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  vertical-align: top;
+  background-color: #01302b;
+  margin-left: 0%;
+  margin-bottom: 2%;
+  color: beige; /* Add this line to set the text color to beige */
+}
+
+h2,
+h3,
+p,
+label,
+h1 {
+  position: relative;
+  width: auto;
+  color: beige;
+  word-wrap: break-word; /* Breaks long words if necessary to prevent overflow */
+  white-space: normal; /* Allows text to wrap onto the next line */
+  overflow-wrap: break-word;
 }
