@@ -25,14 +25,19 @@ function viewMainPage() {
       }
     })
     .then((content) => {
-      pagesJSON = content.pages;
-      mapMarkers = content.mapMarkers;
+      try {
+        mainPageJSON = JSON.parse(content.mainPageJSON);
+        pagesJSON = JSON.parse(content.pages);
+        mapMarkers = JSON.parse(content.mapMarkers);
+        navItems = JSON.parse(content.navItems);
+        mapMarkers = JSON.parse(content.mapMarkers);
+      } catch (error) {
+        console.log(error);
+      }
       worldName.innerHTML = content.worldName;
-      mainPageJSON = content.mainPageJSON;
-      navItems = content.navItems;
-      img1Id = content.img1Id;
-      img2Id = content.img2Id;
-      var public = content.public;
+      img1Id = parseInt(content.img1Id, 10);
+      img2Id = parseInt(content.img2Id, 10);
+      var public = content.public === "true";
       console.log(content.public);
       if (
         !document.getElementById("editModeButton") &&
@@ -48,24 +53,12 @@ function viewMainPage() {
 }
 
 function reloadNavBar() {
-  //probably want to create a specific request for this later
-  const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get("id");
-  console.log("reloading nav bar");
-  fetch("/viewMainPage?id=" + encodeURIComponent(id))
-    .then((response) => {
-      if (response.ok) {
-        console.log(response);
-        return response.json();
-      }
-    })
-    .then((content) => {
-      navItems = content.navItems;
-      fillNavBar(navItems);
-    });
+  // changed to not query db
+  fillNavBar(navItems);
 }
 
 function fillMainContent(mainPage, pageName) {
+  console.log(mainPage);
   let mainContentDiv = document.getElementById("mainContentDiv");
   mainContentDiv.innerHTML = "";
   if (pageName) {
@@ -75,6 +68,7 @@ function fillMainContent(mainPage, pageName) {
     mainContentDiv.appendChild(pageTitle);
   }
   mainPage.forEach((title) => {
+    console.log(title);
     let titleDiv = document.createElement("div");
     titleDiv.setAttribute("class", "titleDiv");
     let titleText = document.createElement("h2");
@@ -122,7 +116,7 @@ function fillNavBar(navItems) {
     defaultOption.setAttribute("selected", "selected");
     defaultOption.setAttribute("hidden", "hidden");
     select.appendChild(defaultOption);
-
+    console.log(navItems);
     navItems[name].forEach((item) => {
       let option = document.createElement("option");
       option.setAttribute("value", item);
@@ -136,8 +130,6 @@ function fillNavBar(navItems) {
 }
 function fillMap(img1Id, img2Id) {
   console.log("filling map");
-  const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get("id");
   let mapDiv = document.getElementById("mapDiv");
   mapDiv.innerHTML = "";
   let img1 = document.createElement("img");
@@ -173,10 +165,12 @@ function fillMap(img1Id, img2Id) {
   fetch("/viewImage?imgId=" + encodeURIComponent(img1Id))
     .then((response) => {
       if (response.ok) {
+        console.log(response);
         return response.json();
       }
     })
     .then((content) => {
+      console.log("seting src");
       img1.setAttribute("src", content.src);
     });
   if (img2Id != null) {
@@ -191,48 +185,42 @@ function fillMap(img1Id, img2Id) {
         img2.style.display = "none";
       });
   }
-  fetch("/mapMarkers?id=" + encodeURIComponent(id))
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-    })
-    .then((content) => {
-      mapMarkers = content.mapMarkersJSON;
-      placeMapMarkers();
-    });
   mapDiv.appendChild(img2Button);
   mapDiv.appendChild(img1Button);
   mapDiv.appendChild(document.createElement("br"));
   mapDiv.appendChild(img1);
   mapDiv.appendChild(map1);
   mapDiv.appendChild(img2);
+  placeMapMarkers();
 }
 
 function placeMapMarkers() {
+  console.log(mapMarkers);
   let map1 = document.getElementsByName("map1");
   let img1 = document.getElementById("map1Img");
-  if (map1) {
-    map1[0].innerHTML = "";
+  if (map1[0]) {
+    map1.innerHTML = "";
   }
-  Object.keys(mapMarkers).forEach((hub) => {
-    mapMarkers[hub].forEach((marker) => {
-      let x = marker[0] * img1.width;
-      let y = marker[1] * img1.height;
-      let r = marker[2] * img1.width;
-      let area = document.createElement("area");
-      area.setAttribute("shape", "circle");
-      area.setAttribute("coords", x + "," + y + "," + r);
-      area.setAttribute("href", "#");
-      area.setAttribute("title", hub);
-      area.setAttribute("class", "mapMarker");
-      area.addEventListener("click", function (event) {
-        event.preventDefault(); // Prevent the default action
-        loadHub(hub);
+  img1.onload = function () {
+    Object.keys(mapMarkers).forEach((hub) => {
+      mapMarkers[hub].forEach((marker) => {
+        let x = marker[0] * img1.width;
+        let y = marker[1] * img1.height;
+        let r = marker[2] * img1.width;
+        let area = document.createElement("area");
+        area.setAttribute("shape", "circle");
+        area.setAttribute("coords", x + "," + y + "," + r);
+        area.setAttribute("href", "#");
+        area.setAttribute("title", hub);
+        area.setAttribute("class", "mapMarker");
+        area.addEventListener("click", function (event) {
+          event.preventDefault(); // Prevent the default action
+          loadHub(hub);
+        });
+        map1[0].appendChild(area);
       });
-      map1[0].appendChild(area);
     });
-  });
+  };
 }
 
 function loadHub(hubName) {

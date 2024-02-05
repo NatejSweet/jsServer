@@ -1,5 +1,3 @@
-const { text } = require("express");
-
 function savePage() {
   //could be rewritten to be cleaner
   enableNavBar();

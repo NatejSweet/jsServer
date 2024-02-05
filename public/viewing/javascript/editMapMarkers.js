@@ -20,45 +20,32 @@ function editMapMarkers() {
   }
   let mapDiv = document.getElementById("mapDiv");
   let img = document.getElementById("map1Img");
-  // let map = img.nextSibling
   img.style.display = "block";
   mapDiv.innerHTML = "";
   mapDiv.appendChild(img);
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
-  fetch("/navItems?id=" + encodeURIComponent(id), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .then((content) => {
-      let navItems = content.navItemsJSON;
-      Object.keys(navItems).forEach((navName) => {
-        let navNameDiv = document.createElement("div");
-        navNameDiv.setAttribute("class", navName + "Div");
-        let navNameText = document.createElement("h2");
-        navNameText.setAttribute("class", "navNameText");
-        navNameText.appendChild(document.createTextNode(navName));
-        navNameDiv.appendChild(navNameText);
-        navItems[navName].forEach((navItem) => {
-          let navItemDiv = document.createElement("div");
-          navItemDiv.setAttribute("class", navItem + "Div");
-          navItemDiv.setAttribute("id", navItem + "Div");
-          navItemDiv.appendChild(document.createTextNode(navItem));
-          let addMarkerButton = document.createElement("button");
-          addMarkerButton.setAttribute("onclick", "addMarker(this)");
-          addMarkerButton.setAttribute("class", "addMarkerButton");
-          addMarkerButton.appendChild(document.createTextNode("Add Marker"));
-          navItemDiv.appendChild(addMarkerButton);
-          navNameDiv.appendChild(navItemDiv);
-        });
-        mainContentDiv.appendChild(navNameDiv);
-      });
+  Object.keys(navItems).forEach((navName) => {
+    let navNameDiv = document.createElement("div");
+    navNameDiv.setAttribute("class", navName + "Div");
+    let navNameText = document.createElement("h2");
+    navNameText.setAttribute("class", "navNameText");
+    navNameText.appendChild(document.createTextNode(navName));
+    navNameDiv.appendChild(navNameText);
+    navItems[navName].forEach((navItem) => {
+      let navItemDiv = document.createElement("div");
+      navItemDiv.setAttribute("class", navItem + "Div");
+      navItemDiv.setAttribute("id", navItem + "Div");
+      navItemDiv.appendChild(document.createTextNode(navItem));
+      let addMarkerButton = document.createElement("button");
+      addMarkerButton.setAttribute("onclick", "addMarker(this)");
+      addMarkerButton.setAttribute("class", "addMarkerButton");
+      addMarkerButton.appendChild(document.createTextNode("Add Marker"));
+      navItemDiv.appendChild(addMarkerButton);
+      navNameDiv.appendChild(navItemDiv);
     });
+    mainContentDiv.appendChild(navNameDiv);
+  });
   placeExistingMarkers();
   //next click on map adds hub
   //this click will add a object next to the hubname showing the size of the dot and a radius slider
@@ -66,75 +53,63 @@ function editMapMarkers() {
   //delete button will only dfelete marker, not hub
 }
 function placeExistingMarkers() {
+  console.log("placing markers");
   let mapDiv = document.getElementById("mapDiv");
   let img = document.getElementById("map1Img");
-
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
-  fetch("/mapMarkers?id=" + encodeURIComponent(id), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .then((content) => {
-      let mapMarkers = content.mapMarkersJSON;
-      Object.keys(mapMarkers).forEach((navItem) => {
-        let navItemDiv = document.getElementById(navItem + "Div");
-        mapMarkers[navItem].forEach((marker) => {
-          let slider = document.createElement("input");
-          slider.setAttribute("type", "range");
-          slider.setAttribute("min", "0");
-          slider.setAttribute("max", "100");
-          slider.setAttribute("value", (marker[2] * img.width).toString()); // Use marker[2] as the initial value
-          navItemDiv.appendChild(slider);
+  Object.keys(mapMarkers).forEach((navItem) => {
+    let navItemDiv = document.getElementById(navItem + "Div");
+    mapMarkers[navItem].forEach((marker) => {
+      let slider = document.createElement("input");
+      slider.setAttribute("type", "range");
+      slider.setAttribute("min", "0");
+      slider.setAttribute("max", "100");
+      slider.setAttribute("value", (marker[2] * img.width).toString()); // Use marker[2] as the initial value
+      navItemDiv.appendChild(slider);
 
-          let dot = document.createElement("div");
-          let r = marker[2] * img.width;
-          let x = marker[0] * img.width - r;
-          let y = marker[1] * img.height - r;
-          dot.setAttribute("class", "dot");
-          dot.setAttribute("id", navItem);
-          dot.style.position = "absolute";
-          dot.style.left = x + "px";
-          dot.style.top = y + "px";
-          dot.style.width = r * 2 + "px";
-          dot.style.height = r * 2 + "px";
-          dot.style.borderRadius = "50%";
-          dot.style.backgroundColor = "green";
-          dot.style.zIndex = "999";
-          dot.style.display = "block";
-          mapDiv.appendChild(dot);
-          window.addEventListener("resize", function () {
-            let r = marker[2] * img.width;
-            let x = marker[0] * img.width - r;
-            let y = marker[1] * img.height - r;
-            dot.style.left = x + "px";
-            dot.style.top = y + "px";
-          });
+      let dot = document.createElement("div");
+      let r = marker[2] * img.width;
+      let x = marker[0] * img.width - r;
+      let y = marker[1] * img.height - r;
+      dot.setAttribute("class", "dot");
+      dot.setAttribute("id", navItem);
+      dot.style.position = "absolute";
+      dot.style.left = x + "px";
+      dot.style.top = y + "px";
+      dot.style.width = r * 2 + "px";
+      dot.style.height = r * 2 + "px";
+      dot.style.borderRadius = "50%";
+      dot.style.backgroundColor = "green";
+      dot.style.zIndex = "999";
+      dot.style.display = "block";
+      mapDiv.appendChild(dot);
+      window.addEventListener("resize", function () {
+        let r = marker[2] * img.width;
+        let x = marker[0] * img.width - r;
+        let y = marker[1] * img.height - r;
+        dot.style.left = x + "px";
+        dot.style.top = y + "px";
+      });
 
-          slider.addEventListener("input", function () {
-            dot.style.width = this.value + "px";
-            dot.style.height = this.value + "px";
-            dot.style.left = x - (parseInt(this.value) - r * 2) / 2 + "px";
-            dot.style.top = y - (parseInt(this.value) - r * 2) / 2 + "px";
-          });
+      slider.addEventListener("input", function () {
+        dot.style.width = this.value + "px";
+        dot.style.height = this.value + "px";
+        dot.style.left = x - (parseInt(this.value) - r * 2) / 2 + "px";
+        dot.style.top = y - (parseInt(this.value) - r * 2) / 2 + "px";
+      });
 
-          let removeButton = document.createElement("button");
-          removeButton.textContent = "Remove";
-          navItemDiv.appendChild(removeButton);
+      let removeButton = document.createElement("button");
+      removeButton.textContent = "Remove";
+      navItemDiv.appendChild(removeButton);
 
-          removeButton.addEventListener("click", function () {
-            navItemDiv.removeChild(slider);
-            navItemDiv.removeChild(removeButton);
-            mapDiv.removeChild(dot);
-          });
-        });
+      removeButton.addEventListener("click", function () {
+        navItemDiv.removeChild(slider);
+        navItemDiv.removeChild(removeButton);
+        mapDiv.removeChild(dot);
       });
     });
+  });
 }
 
 let activeButton = null; // global variable to keep track of the active button

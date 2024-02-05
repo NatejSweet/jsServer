@@ -186,6 +186,7 @@ function submitMainPage(event) {
     body: JSON.stringify(world),
   }).then((response) => {
     if (response.ok) {
+      console.log("ok");
       return createFillNavsPage();
     }
   });
