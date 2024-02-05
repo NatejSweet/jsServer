@@ -48,3 +48,4 @@ impliment saving and renaming world
 resizing page while placing map markers breaks
 remove unnecessary db calls
 secure search queries
+adding a nav item is creating a page for itself and having a selectable value in the dropdown

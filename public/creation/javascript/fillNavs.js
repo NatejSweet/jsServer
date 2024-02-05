@@ -8,40 +8,46 @@ function createFillNavsPage() {
   fetch("/fillNavs")
     .then((response) => {
       if (response.ok) {
-        console.log("responded");
-        return response.json();
+        return response.json().then((data) => {
+          console.log(data);
+          console.log("hi");
+          createHeader(data.worldName);
+          let navItems = JSON.parse(data.navItems);
+          console.log(typeof navItems);
+          let navNames = Object.keys(navItems);
+          console.log(typeof navNames);
+          navNames.forEach((navName) => {
+            let navTitle = document.createElement("h3");
+            navTitle.textContent = navName;
+            let navlist = document.createElement("ul");
+            navlist.setAttribute("id", navName + "List");
+            let inputLi = document.createElement("li");
+            let input = document.createElement("input");
+            inputLi.appendChild(input);
+            navlist.appendChild(inputLi);
+            let addItemButton = document.createElement("button");
+            addItemButton.setAttribute("id", "addItem" + navName);
+            addItemButton.textContent = "Add Item";
+            let navDiv = document.getElementsByClassName("navColumns");
+            let columnDiv = document.createElement("div");
+            columnDiv.setAttribute("class", navName + "Div");
+            columnDiv.appendChild(navTitle);
+            columnDiv.appendChild(navlist);
+            columnDiv.appendChild(addItemButton);
+            navDiv[0].appendChild(columnDiv);
+            addItemButton.addEventListener(
+              "click",
+              function () {
+                addItem(navName);
+              },
+              false
+            );
+          });
+        });
       }
     })
-    .then((response) => {
-      createHeader(response.worldName);
-      let navNames = Object.keys(response.navItems);
-      navNames.forEach((navName) => {
-        let navTitle = document.createElement("h3");
-        navTitle.textContent = navName;
-        let navlist = document.createElement("ul");
-        navlist.setAttribute("id", navName + "List");
-        let inputLi = document.createElement("li");
-        let input = document.createElement("input");
-        inputLi.appendChild(input);
-        navlist.appendChild(inputLi);
-        let addItemButton = document.createElement("button");
-        addItemButton.setAttribute("id", "addItem" + navName);
-        addItemButton.textContent = "Add Item";
-        let navDiv = document.getElementsByClassName("navColumns");
-        let columnDiv = document.createElement("div");
-        columnDiv.setAttribute("class", navName + "Div");
-        columnDiv.appendChild(navTitle);
-        columnDiv.appendChild(navlist);
-        columnDiv.appendChild(addItemButton);
-        navDiv[0].appendChild(columnDiv);
-        addItemButton.addEventListener(
-          "click",
-          function () {
-            addItem(navName);
-          },
-          false
-        );
-      });
+    .catch((error) => {
+      console.error(error);
     });
   let fillNavsFormDiv = document.getElementById("fillNavsFormDiv");
   console.log(fillNavsFormDiv);

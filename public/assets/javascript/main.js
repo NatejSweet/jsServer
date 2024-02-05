@@ -6,7 +6,12 @@ window.addEventListener("DOMContentLoaded", (event) => {
   searchBar.addEventListener("keydown", (event) => {
     if (event.keyCode === 8) {
       // backspace key
-      search(event);
+      if (searchBar.value.length <= 1) {
+        const searchResultsDiv = document.getElementById("searchResults");
+        searchResultsDiv.innerHTML = ""; // Empty the search results
+      } else {
+        search(event);
+      }
     }
   });
 
@@ -25,6 +30,7 @@ function search(event) {
       }
     })
     .then((worlds) => {
+      console.log(worlds);
       Array.from(searchResultsDiv.children).forEach((option) => {
         option.remove();
       });

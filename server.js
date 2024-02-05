@@ -1,4 +1,5 @@
 const express = require("express");
+const { PrismaClient } = require("@prisma/client");
 var mariadb = require("mariadb");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
@@ -7,6 +8,7 @@ const app = express();
 const path = require("path");
 const port = 3000;
 app.use(express.json());
+const prisma = new PrismaClient();
 
 var pool = mariadb.createPool({
   host: process.env.DB_HOST,
@@ -53,24 +55,21 @@ app.get("/", checkLoggedIn, (req, res) => {
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "SELECT id, username, password FROM users WHERE username = ?",
-      [username]
-    );
-    if (
-      result.length > 0 &&
-      (await bcrypt.compare(password, result[0].password))
-    ) {
-      // Authentication successful
-      req.session.userId = result[0].id;
-      res.redirect("dash.html");
-    } else {
-      // Authentication failed
-      req.session.message = "Invalid username or password";
-      res.redirect("/");
-    }
-    if (conn) conn.end();
+    const users = await prisma.users.findMany({
+      where: {
+        username: username,
+      },
+    });
+    users.forEach(async (user) => {
+      if (user && (await bcrypt.compare(password, user.password))) {
+        // Authentication successful
+        req.session.userId = user.id;
+        res.redirect("dash.html");
+      } else {
+        req.session.message = "Invalid username or password";
+        res.redirect("/");
+      }
+    });
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -78,9 +77,11 @@ app.post("/login", async (req, res) => {
 });
 app.get("/dash", async (req, res) => {
   if (req.session.userId) {
-    const user = await pool.query("SELECT * FROM users WHERE id = ?", [
-      req.session.userId,
-    ]);
+    const user = await prisma.users.findUnique({
+      where: {
+        id: req.session.userId,
+      },
+    });
     if (user) {
       res.sendFile(path.join(__dirname, "/public/dash.html"));
     } else {
@@ -99,17 +100,19 @@ app.post("/createAccount", async (req, res) => {
   const { username, password } = req.body;
   try {
     const passwordHash = await bcrypt.hash(password, 10);
-    let conn = await pool.getConnection();
-    const user = await conn.query(
-      "INSERT INTO users (username,password) VALUES (?,?)",
-      [username, passwordHash]
-    );
+    const user = await prisma.users.create({
+      data: {
+        username: username,
+        password: passwordHash,
+      },
+    });
     if (user) {
       try {
-        let login = await conn.query(
-          "SELECT id, username, password FROM users WHERE username = ?",
-          [username]
-        );
+        const login = prisma.users.findUnique({
+          where: {
+            username: username,
+          },
+        });
         if (
           login.length > 0 &&
           (await bcrypt.compare(password, login[0].password))
@@ -127,7 +130,6 @@ app.post("/createAccount", async (req, res) => {
     } else {
       res.redirect("/");
     }
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -136,17 +138,16 @@ app.post("/createAccount", async (req, res) => {
 
 app.get("/myWorlds", async (req, res) => {
   try {
-    let conn = await pool.getConnection();
-    const worlds = await conn.query(
-      "SELECT worldName, id FROM worlds WHERE ownerId = ?",
-      [req.session.userId]
-    );
+    const worlds = await prisma.worlds.findMany({
+      where: {
+        ownerId: req.session.userId,
+      },
+    });
     if (worlds) {
       res.send(worlds);
     } else {
       res.redirect("/");
     }
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -155,21 +156,32 @@ app.get("/myWorlds", async (req, res) => {
 
 app.get("/search", async (req, res) => {
   const query = req.query.query;
-  var items;
-  let conn = await pool.getConnection();
   if (req.session.userId) {
-    items = await conn.query(
-      "SELECT worldName, id FROM worlds WHERE worldName LIKE ? AND public = ? AND ownerId != ?",
-      ["%" + query + "%", 1, req.session.userId]
-    );
+    const items = await prisma.worlds.findMany({
+      where: {
+        worldName: {
+          search: query,
+        },
+        public: true,
+        ownerId: {
+          not: req.session.userId,
+        },
+      },
+    });
+    console.log(items);
+    res.json(items);
   } else {
-    items = await conn.query(
-      "SELECT worldName, id FROM worlds WHERE worldName LIKE ? AND public = ?",
-      ["%" + query + "%", 1]
-    );
+    const items = await prisma.worlds.findMany({
+      where: {
+        worldName: {
+          contains: query,
+        },
+        public: true,
+      },
+    });
+    console.log(items);
+    res.json(items);
   }
-  res.json(items);
-  if (conn) conn.end();
 });
 
 app.post("/createWorld", async (req, res) => {
@@ -181,27 +193,34 @@ app.post("/createWorld", async (req, res) => {
   content = JSON.stringify(content);
   navItems = JSON.stringify(navItems);
   try {
-    let conn = await pool.getConnection();
-    // Insert img1src into images table and retrieve its id
-    const img1Result = await conn.query(
-      "INSERT INTO images (src, ownerId) VALUES (?,?)",
-      [image, req.session.userId]
-    );
-    const img1Id = img1Result.insertId;
-    // Insert img2src into images table and retrieve its id. this is done early for simplicity
-    const img2Result = await conn.query(
-      "INSERT INTO images (src, ownerId) VALUES (?,?)",
-      ["#", req.session.userId]
-    );
-    const img2Id = img2Result.insertId;
-    // Insert world data into worlds table
-    const worldResult = await conn.query(
-      "INSERT INTO worlds (worldName, ownerId, img1Id, img2Id, mainPage, navItems, mapMarkers, public) VALUES (?,?,?,?,?,?,?,?)",
-      [name, req.session.userId, img1Id, img2Id, content, navItems, {}, 0]
-    );
-    const worldId = worldResult.insertId; // Get the inserted worldId
+    let img1Result = await prisma.images.create({
+      data: {
+        src: image,
+        ownerId: req.session.userId,
+      },
+    });
+    const img1Id = img1Result.id;
+    const img2Result = await prisma.images.create({
+      data: {
+        src: "#",
+        ownerId: req.session.userId,
+      },
+    });
+    const img2Id = img2Result.id;
+    const worldResult = await prisma.worlds.create({
+      data: {
+        worldName: name,
+        ownerId: req.session.userId,
+        img1Id: img1Id,
+        img2Id: img2Id,
+        mainPage: content,
+        navItems: navItems,
+        mapMarkers: "{}",
+        public: false,
+      },
+    });
+    const worldId = worldResult.id;
     req.session.worldId = worldId.toString(); // Store the worldId in the session
-    conn.end();
 
     await new Promise((resolve, reject) => {
       req.session.save((err) => {
@@ -212,8 +231,6 @@ app.post("/createWorld", async (req, res) => {
         }
       });
     });
-
-    // End the response without sending any data
     res.end();
   } catch (err) {
     console.log(err);
@@ -224,80 +241,88 @@ app.post("/createWorld", async (req, res) => {
 app.get("/fillNavs", async (req, res) => {
   //may want to just send navItems instead of parsing doen to navNames
   try {
-    let conn = await pool.getConnection();
-    const navs = await conn.query(
-      "SELECT navItems, worldName FROM worlds WHERE id = ? AND ownerId = ?",
-      [BigInt(req.session.worldId), req.session.userId]
-    );
-    if (navs.length > 0) {
-      const navItems = navs[0].navItems;
-      const worldName = navs[0].worldName;
+    const navs = await prisma.worlds.findUnique({
+      where: {
+        id: parseInt(req.session.worldId),
+        ownerId: req.session.userId,
+      },
+      select: {
+        navItems: true,
+        worldName: true,
+      },
+    });
+    if (navs) {
+      const navItems = navs.navItems;
+      const worldName = navs.worldName;
       res.send({ navItems, worldName });
     } else {
       res.redirect("/");
     }
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
   }
 });
+
 app.post("/fillNavs", async (req, res) => {
-  const navContents = req.body;
-  try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "UPDATE worlds SET navItems = ? WHERE id = ? AND ownerId = ?",
-      [
-        JSON.stringify(navContents),
-        BigInt(req.session.worldId),
-        req.session.userId,
-      ]
-    );
-    console.log(result);
-    res.end();
-    if (conn) conn.end();
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("ahhhhh");
-  }
-  console.log(navContents);
+  let navContents = req.body;
   let pages = {};
   Object.values(navContents).forEach((nav) => {
     nav.forEach((navItem) => {
       pages[navItem] = { content: [], imgId: null };
     });
   });
+  pages = JSON.stringify(pages);
+  navContents = JSON.stringify(navContents);
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "UPDATE worlds SET pages=? WHERE id = ? AND ownerId = ?",
-      [pages, BigInt(req.session.worldId), req.session.userId]
-    );
+    const result = await prisma.worlds.update({
+      where: {
+        id: parseInt(req.session.worldId),
+        ownerId: req.session.userId,
+      },
+      data: {
+        pages: pages,
+        navItems: navContents,
+      },
+    });
     console.log(result);
+    res.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
   }
 });
+
 app.get("/viewMainPage", async (req, res) => {
   try {
     const worldId = req.query.id;
-    let conn = await pool.getConnection();
-    const mainPage = await conn.query(
-      "SELECT mainPage, worldName ,navItems ,img1Id, img2Id, pages, mapMarkers, ownerId, public FROM worlds WHERE id = ?",
-      [BigInt(worldId)]
-    );
-    if (mainPage.length > 0) {
-      const editAccess = mainPage[0].ownerId == req.session.userId;
-      const mainPageJSON = mainPage[0].mainPage;
-      const worldName = mainPage[0].worldName;
-      const img1Id = mainPage[0].img1Id;
-      const img2Id = mainPage[0].img2Id;
-      const navItems = mainPage[0].navItems;
-      const pages = mainPage[0].pages;
-      const mapMarkers = mainPage[0].mapMarkers;
-      const public = mainPage[0].public;
+    console.log(worldId);
+    const mainPage = await prisma.worlds.findUnique({
+      where: {
+        id: parseInt(worldId),
+      },
+      select: {
+        mainPage: true,
+        worldName: true,
+        img1Id: true,
+        img2Id: true,
+        navItems: true,
+        pages: true,
+        mapMarkers: true,
+        ownerId: true,
+        public: true,
+      },
+    });
+    if (mainPage != null) {
+      const editAccess = mainPage.ownerId == req.session.userId;
+      const mainPageJSON = mainPage.mainPage;
+      const worldName = mainPage.worldName;
+      const img1Id = mainPage.img1Id;
+      const img2Id = mainPage.img2Id;
+      const navItems = mainPage.navItems;
+      const pages = mainPage.pages;
+      const mapMarkers = mainPage.mapMarkers;
+      const public = mainPage.public;
       res.send({
         mainPageJSON,
         worldName,
@@ -312,7 +337,6 @@ app.get("/viewMainPage", async (req, res) => {
     } else {
       res.redirect("/");
     }
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -321,17 +345,20 @@ app.get("/viewMainPage", async (req, res) => {
 app.get("/viewImage", async (req, res) => {
   try {
     const imageId = req.query.imgId;
-    let conn = await pool.getConnection();
-    const image = await conn.query("SELECT src FROM images WHERE id = ?", [
-      BigInt(imageId),
-    ]);
-    if (image.length > 0) {
-      const src = image[0].src;
+    const image = await prisma.images.findUnique({
+      where: {
+        id: parseInt(imageId),
+      },
+      select: {
+        src: true,
+      },
+    });
+    if (image) {
+      const src = image.src;
       res.send({ src });
     } else {
       res.redirect("/");
     }
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -344,14 +371,17 @@ app.post("/updatePage", async (req, res) => {
   const pageJSON = JSON.stringify(page);
   const worldId = req.query.id; // Extract worldId from the query string
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "UPDATE worlds SET pages = ? WHERE id = ? AND ownerId = ?",
-      [pageJSON, BigInt(worldId), req.session.userId]
-    );
+    const result = await prisma.worlds.update({
+      where: {
+        id: parseInt(worldId),
+        ownerId: req.session.userId,
+      },
+      data: {
+        pages: pageJSON,
+      },
+    });
     console.log(result);
     res.end();
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -362,14 +392,17 @@ app.post("/updateMainPage", async (req, res) => {
   const mainPageJSON = JSON.stringify(mainPage);
   const worldId = req.query.id;
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "UPDATE worlds SET mainPage = ? WHERE id = ? AND ownerId = ?",
-      [mainPageJSON, BigInt(worldId), req.session.userId]
-    );
+    const result = await prisma.worlds.update({
+      where: {
+        id: parseInt(worldId),
+        ownerId: req.session.userId,
+      },
+      data: {
+        mainPage: mainPageJSON,
+      },
+    });
     console.log(result);
     res.end();
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -379,11 +412,15 @@ app.post("/updateMainPage", async (req, res) => {
 app.get("/navItems", async (req, res) => {
   const worldId = req.query.id;
   try {
-    let conn = await pool.getConnection();
-    const navItems = await conn.query(
-      "SELECT navItems,pages FROM worlds WHERE id = ?",
-      [BigInt(worldId)]
-    );
+    const navItems = await prisma.worlds.findUnique({
+      where: {
+        id: parseInt(worldId),
+      },
+      select: {
+        navItems: true,
+        pages: true,
+      },
+    });
     if (navItems.length > 0) {
       const navItemsJSON = navItems[0].navItems;
       const pages = navItems[0].pages;
@@ -391,7 +428,6 @@ app.get("/navItems", async (req, res) => {
     } else {
       res.redirect("/");
     }
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -402,34 +438,41 @@ app.post("/updateNavBarItems", async (req, res) => {
   const navItems = JSON.stringify(req.body.navItems);
   const worldId = req.query.id;
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "UPDATE worlds SET navItems = ? WHERE id = ? AND ownerId = ?",
-      [navItems, BigInt(worldId), req.session.userId]
-    );
+    const result = await prisma.worlds.update({
+      where: {
+        id: parseInt(worldId),
+        ownerId: req.session.userId,
+      },
+      data: {
+        navItems: navItems,
+      },
+    });
     console.log(result);
     res.end();
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
   }
 });
 app.post("/editNavBarOptions", async (req, res) => {
-  //this needs to update mapMarkers hubs as well
-  console.log(req.body);
-  const navItems = req.body.newNavItems;
-  const newPages = req.body.newPages;
+  const navItems = JSON.stringify(req.body.newNavItems);
+  const newPages = JSON.stringify(req.body.newPages);
+  const mapMarkers = JSON.stringify(req.body.mapMarkers);
   const worldId = req.query.id;
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "UPDATE worlds SET navItems = ?, pages = ? WHERE id = ? AND ownerId = ?",
-      [navItems, newPages, BigInt(worldId), req.session.userId]
-    );
+    const result = await prisma.worlds.update({
+      where: {
+        id: parseInt(worldId),
+        ownerId: req.session.userId,
+      },
+      data: {
+        navItems: navItems,
+        pages: newPages,
+        mapMarkers: mapMarkers,
+      },
+    });
     console.log(result);
     res.end();
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -439,18 +482,20 @@ app.post("/editNavBarOptions", async (req, res) => {
 app.get("/mapMarkers", async (req, res) => {
   const worldId = req.query.id;
   try {
-    let conn = await pool.getConnection();
-    const mapMarkers = await conn.query(
-      "SELECT mapMarkers FROM worlds WHERE id = ?",
-      [BigInt(worldId), req.session.userId]
-    );
+    const mapMarkers = await prisma.worlds.findUnique({
+      where: {
+        id: parseInt(worldId),
+      },
+      select: {
+        mapMarkers: true,
+      },
+    });
     if (mapMarkers.length > 0) {
       const mapMarkersJSON = mapMarkers[0].mapMarkers;
       res.send({ mapMarkersJSON });
     } else {
       res.redirect("/");
     }
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -461,13 +506,17 @@ app.post("/saveMapMarkers", async (req, res) => {
   const mapMarkers = JSON.stringify(req.body.mapMarkers);
   const worldId = req.query.id;
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "UPDATE worlds SET mapMarkers = ? WHERE id = ? AND ownerId = ?",
-      [mapMarkers, BigInt(worldId), req.session.userId]
-    );
+    const result = await prisma.worlds.update({
+      where: {
+        id: parseInt(worldId),
+        ownerId: req.session.userId,
+      },
+      data: {
+        mapMarkers: mapMarkers,
+      },
+    });
+    console.log(result);
     res.end();
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -479,14 +528,14 @@ app.post("/updateImage", async (req, res) => {
   const imgId = req.query.imgId;
   if (imgId == "null") {
     try {
-      let conn = await pool.getConnection();
-      const result = await conn.query(
-        "INSERT INTO images (src, ownerId) VALUES (?,?)",
-        [src, req.session.userId]
-      );
-      const newImgId = result.insertId; // Store the new image ID
+      const result = await prisma.images.create({
+        data: {
+          src: src,
+          ownerId: req.session.userId,
+        },
+      });
+      const newImgId = result.id; // Store the new image ID
       console.log(result);
-      if (conn) conn.end();
       res.send({ imgId: newImgId.toString() }); // Send the new image ID to the user
     } catch (err) {
       console.log(err);
@@ -495,14 +544,17 @@ app.post("/updateImage", async (req, res) => {
   } else {
     console.log("updating");
     try {
-      let conn = await pool.getConnection();
-      const result = await conn.query(
-        "UPDATE images SET src=? WHERE id = ? AND ownerId = ?",
-        [src, BigInt(imgId), req.session.userId]
-      );
+      const result = await prisma.images.update({
+        where: {
+          id: parseInt(imgId),
+          ownerId: req.session.userId,
+        },
+        data: {
+          src: src,
+        },
+      });
       console.log(result);
       res.end();
-      if (conn) conn.end();
     } catch (err) {
       console.log(err);
       res.status(500).send("ahhhhh");
@@ -514,14 +566,17 @@ app.post("/TogglePublic", async (req, res) => {
   const public = req.body.public;
   const worldId = req.query.id;
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "UPDATE worlds SET public = ? WHERE id = ? AND ownerId = ?",
-      [public, BigInt(worldId), req.session.userId]
-    );
+    const result = await prisma.worlds.update({
+      where: {
+        id: parseInt(worldId),
+        ownerId: req.session.userId,
+      },
+      data: {
+        public: public,
+      },
+    });
     console.log(result);
     res.end();
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -531,14 +586,14 @@ app.post("/TogglePublic", async (req, res) => {
 app.post("/deleteWorld", async (req, res) => {
   const worldId = req.query.id;
   try {
-    let conn = await pool.getConnection();
-    const result = await conn.query(
-      "DELETE FROM worlds WHERE id = ? and ownerId = ?",
-      [worldId, req.session.userId]
-    );
+    const result = await prisma.worlds.delete({
+      where: {
+        id: parseInt(worldId),
+        ownerId: req.session.userId,
+      },
+    });
     console.log(result);
     res.end();
-    if (conn) conn.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("nuh uh");
