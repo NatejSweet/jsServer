@@ -1,104 +1,121 @@
+function isNewImage() {
+  let newImages = document.getElementsByClassName("newImage");
+  return newImages.length > 0;
+}
+
+function isHub() {
+  return document.getElementById("pageTitle");
+}
+
+function updateHubImage(imgId, imgSrc) {
+  fetch("/updateImage?imgId=" + encodeURIComponent(imgId), {
+    //update image in db
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ src: imgSrc }),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json(); // Return the Promise returned by response.json()
+      }
+    })
+    .then((res) => {
+      pagesJSON[hubName].imgId = res.imgId; //update imgId in pagesJSON
+    });
+}
+
+function updateMainPageImage(imgId, imgSrc) {
+  fetch("/updateImage?imgId=" + encodeURIComponent(imgId), {
+    //update image in db
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ src: imgSrc }),
+  }).then((response) => {
+    if (response.ok) {
+      return reloadContents((editMode = true));
+    }
+  });
+}
+
+function mainImageIsUpdated(imgId) {
+  return imgId == img1Id;
+}
+
+function updatePages() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get("id");
+  fetch("/updatePage?id=" + encodeURIComponent(id), {
+    //update page in db
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(pagesJSON),
+  }).then((response) => {
+    if (response.ok) {
+      return reloadContents((editMode = true));
+    }
+  });
+}
+
+function updateMainPage(content) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get("id");
+  fetch("/updateMainPage?id=" + encodeURIComponent(id), {
+    //update main page in db
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(content),
+  }).then((response) => {
+    if (response.ok) {
+      return reloadContents((editMode = true));
+    }
+  });
+}
+
 function savePage() {
-  //could be rewritten to be cleaner
   enableNavBar();
-  if (document.getElementsByClassName("newImage").length > 0) {
-    console.log("updating images");
+  if (isNewImage()) {
     let newImages = document.getElementsByClassName("newImage");
     Array.from(newImages).forEach((newImage) => {
       let imgId = null;
       let imgSrc = newImage.src;
-      if (document.getElementById("pageTitle")) {
+      if (isHub()) {
         let hubName = document.getElementById("pageTitle").textContent;
         let imgId = pagesJSON[hubName].imgId;
-        fetch("/updateImage?imgId=" + encodeURIComponent(imgId), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ src: imgSrc }),
-        })
-          .then((response) => {
-            if (response.ok) {
-              return response.json(); // Return the Promise returned by response.json()
-            }
-          })
-          .then((res) => {
-            // Handle the result of response.json()
-            let imgId = res.imgId; // Access imgId\
-            pagesJSON[hubName].imgId = imgId;
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get("id");
-            fetch("/updatePage?id=" + encodeURIComponent(id), {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(pagesJSON),
-            }).then((response) => {
-              if (response.ok) {
-                return reloadContents((editMode = true));
-              }
-            });
-          });
+        updateHubImage(imgId, imgSrc);
+        updatePages();
       } else {
-        if (newImage.id == "map1Img") {
+        //if not a hub
+        if (mainImageIsUpdated(imgId)) {
           imgId = img1Id;
         } else {
+          //secondary is updated
           imgId = img2Id;
         }
-        fetch("/updateImage?imgId=" + encodeURIComponent(imgId), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ src: imgSrc }),
-        }).then((response) => {
-          if (response.ok) {
-            return reloadContents((editMode = true));
-          }
-        });
+        updateMainPageImage(imgId, imgSrc);
       }
     });
   }
-  if (document.getElementById("pageTitle")) {
+  removeSaveButton();
+  removeCancelButton();
+  removeMainContentAddButtons();
+  if (isHub()) {
+    //if a hub
     let hubName = document.getElementById("pageTitle").textContent;
-    removeSaveButton();
-    removeCancelButton();
-    removeMainContentAddButtons();
     let content = storeMainContent();
     pagesJSON[hubName].content = content;
-    console.log(pagesJSON);
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
-    fetch("/updatePage?id=" + encodeURIComponent(id), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(pagesJSON),
-    }).then((response) => {
-      if (response.ok) {
-        return reloadContents((editMode = true));
-      }
-    });
+    updatePages();
   } else {
-    removeSaveButton();
-    removeCancelButton();
-    removeMainContentAddButtons();
+    //if not a hub
     let content = storeMainContent();
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
-    fetch("/updateMainPage?id=" + encodeURIComponent(id), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(content),
-    }).then((response) => {
-      if (response.ok) {
-        return reloadContents((editMode = true));
-      }
-    });
+    updateMainPage(content);
   }
 }
 function reloadContents(editMode) {
@@ -147,58 +164,62 @@ function editPage() {
   addUpdateMapImageButton();
   const titleDivs = document.getElementsByClassName("titleDiv");
   Array.from(titleDivs).forEach((titleDiv) => {
-    let title = titleDiv.getElementsByClassName("titleText");
-    let newTitleDiv = addTitle(title[0].textContent);
-    console.log(title);
-    titleDiv.replaceWith(newTitleDiv);
+    let newTitleDiv = createTitleTextArea(titleDiv);
     let subtitleDivs = Array.from(
       titleDiv.getElementsByClassName("subTitleDiv")
     );
     subtitleDivs.forEach((subtitleDiv) => {
-      let subtitle = subtitleDiv.getElementsByClassName("subTitleText");
-      let newSubtitleDiv = addSubtext(subtitle[0].textContent);
-      newTitleDiv.appendChild(newSubtitleDiv);
+      let newSubtitleDiv = createSubtitleTextArea(subtitleDiv, newTitleDiv);
+
       let textDivs = Array.from(subtitleDiv.getElementsByClassName("textDiv"));
       textDivs.forEach((textDiv) => {
-        let text = textDiv.getElementsByClassName("text");
-        let newTextDiv = addText(text[0].innerHTML);
-        newSubtitleDiv.appendChild(newTextDiv);
+        createTextTextArea(textDiv, newSubtitleDiv);
       });
     });
   });
   const textareas = document.getElementsByClassName("titletext");
   Array.from(textareas).forEach((textarea) => {
-    textarea.style.height = "auto";
-    textarea.style.height = textarea.scrollHeight + "px";
-    textarea.addEventListener("input", function () {
-      this.style.height = "auto";
-      this.style.height = this.scrollHeight + "px";
-    });
+    enableAutoResize(textarea);
   });
   const subtextareas = document.getElementsByClassName("subtext");
   Array.from(subtextareas).forEach((subtextarea) => {
-    subtextarea.style.height = "auto";
-    subtextarea.style.height = subtextarea.scrollHeight + "px";
-    subtextarea.addEventListener("input", function () {
-      this.style.height = "auto";
-      this.style.height = this.scrollHeight + "px";
-    });
+    enableAutoResize(subtextarea);
   });
   const texttextareas = document.getElementsByClassName("text");
   Array.from(texttextareas).forEach((texttextarea) => {
-    texttextarea.style.height = "auto";
-    texttextarea.style.height = texttextarea.scrollHeight + "px";
-    texttextarea.addEventListener("input", function () {
-      this.style.height = "auto";
-      this.style.height = this.scrollHeight + "px";
-    });
+    enableAutoResize(texttextarea);
   });
 }
-function autoResize() {
-  console.log("resizing");
-  this.style.height = "auto";
-  this.style.height = this.scrollHeight + "px";
+
+function createTitleTextArea(titleDiv) {
+  let title = titleDiv.getElementsByClassName("titleText");
+  let newTitleDiv = addTitle(title[0].textContent);
+  titleDiv.replaceWith(newTitleDiv);
+  return newTitleDiv;
 }
+
+function createSubtitleTextArea(subtitleDiv, newTitleDiv) {
+  let subtitle = subtitleDiv.getElementsByClassName("subTitleText");
+  let newSubtitleDiv = addSubtext(subtitle[0].textContent);
+  newTitleDiv.appendChild(newSubtitleDiv);
+  return newSubtitleDiv;
+}
+
+function createTextTextArea(textDiv, newSubtitleDiv) {
+  let text = textDiv.getElementsByClassName("text");
+  let newTextDiv = addText(text[0].innerHTML);
+  newSubtitleDiv.appendChild(newTextDiv);
+}
+
+function enableAutoResize(textarea) {
+  textarea.style.height = "auto";
+  textarea.style.height = textarea.scrollHeight + "px";
+  textarea.addEventListener("input", function () {
+    this.style.height = "auto";
+    this.style.height = this.scrollHeight + "px";
+  });
+}
+
 function addTitle(text) {
   let titleDiv = document.createElement("div");
   titleDiv.setAttribute("class", "titleDiv");
@@ -394,7 +415,6 @@ function removeMainContentAddButtons() {
 
 function updateMapImage() {
   let mapDiv = document.getElementById("mapDiv");
-  let mainContentDiv = document.getElementById("mainContentDiv");
   let img1 = document.getElementById("map1Img");
   let img2 = document.getElementById("map2Img");
   let br = mapDiv.getElementsByTagName("br");
