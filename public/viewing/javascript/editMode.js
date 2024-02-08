@@ -1,17 +1,17 @@
 var public;
 function createEditButton(publicArg) {
+  let editButtonsDiv = document.getElementById("editButtonsDiv");
   public = publicArg;
   let editModeButton = document.createElement("button");
   editModeButton.setAttribute("id", "editModeButton");
-  editModeButton.setAttribute("onclick", "enterEditMode()");
+  editModeButton.setAttribute("onclick", "enterEditMode(editButtonsDiv)");
   editModeButton.appendChild(document.createTextNode("Enter Edit Mode"));
-  let editButtonsDiv = document.getElementById("editButtonsDiv");
+
   editButtonsDiv.innerHTML = "";
   editButtonsDiv.appendChild(editModeButton);
   editButtonsDiv.appendChild(document.createElement("br"));
 }
-function enterEditMode() {
-  let editButtonsDiv = document.getElementById("editButtonsDiv");
+function enterEditMode(editButtonsDiv) {
   while (editButtonsDiv.hasChildNodes()) {
     editButtonsDiv.removeChild(editButtonsDiv.firstChild);
   }
@@ -32,7 +32,7 @@ function enterEditMode() {
   // editButtonsDiv.appendChild(editNavItemsButton)
   let exitEditModeButton = document.createElement("button");
   exitEditModeButton.setAttribute("id", "exitEditModeButton");
-  exitEditModeButton.setAttribute("onclick", "exitEditMode()");
+  exitEditModeButton.setAttribute("onclick", "exitEditMode(editButtonsDiv)");
   exitEditModeButton.appendChild(document.createTextNode("Exit Edit Mode"));
   // editButtonsDiv.appendChild(exitEditModeButton)
   let editMapMarkersButton = document.createElement("button");
@@ -62,9 +62,7 @@ function enterEditMode() {
   editButtonsDiv.appendChild(deleteWorldButton);
   editButtonsDiv.appendChild(exitEditModeButton);
 }
-function exitEditMode() {
-  console.log("exiting edit mode");
-  let editButtonsDiv = document.getElementById("editButtonsDiv");
+function exitEditMode(editButtonsDiv) {
   while (editButtonsDiv.hasChildNodes()) {
     console.log(editButtonsDiv.firstChild);
     editButtonsDiv.removeChild(editButtonsDiv.firstChild);

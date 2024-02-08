@@ -46,7 +46,7 @@ function editNavOptions() {
   });
   mainContentDiv.appendChild(navOptionsDiv);
   let saveButton = document.createElement("button");
-  saveButton.setAttribute("onclick", "saveNavOptions()");
+  saveButton.setAttribute("onclick", "saveNavOptions(navOptionsDiv)");
   saveButton.appendChild(document.createTextNode("Save Nav Options"));
   editButtonsDiv.appendChild(saveButton);
   let cancelButton = document.createElement("button");
@@ -72,8 +72,7 @@ function removeNavOption(button) {
   navItemDiv.removeChild(button);
 }
 
-function saveNavOptions() {
-  let navOptionsDiv = document.getElementById("navOptionsDiv");
+function saveNavOptions(navOptionsDiv) {
   let editedNavItems = navOptionsDiv.childNodes;
   let newNavItems = {};
   let newPages = {};

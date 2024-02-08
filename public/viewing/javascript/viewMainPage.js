@@ -80,14 +80,14 @@ function fillMainContent(mainPage, pageName) {
       subTitleDiv.setAttribute("class", "subTitleDiv");
       let subTitleText = document.createElement("h3");
       subTitleText.setAttribute("class", "subTitleText");
-      subTitleText.appendChild(document.createTextNode(subTitle[0]));
+      subTitleText.innerHTML = linkify(subTitle[0]);
       subTitleDiv.appendChild(subTitleText);
       subTitle[1].forEach((text) => {
         let textDiv = document.createElement("div");
         textDiv.setAttribute("class", "textDiv");
         let textP = document.createElement("p");
         textP.setAttribute("class", "text");
-        textP.appendChild(document.createTextNode(text));
+        textP.innerHTML = linkify(text);
         textDiv.appendChild(textP);
         subTitleDiv.appendChild(textDiv);
       });
@@ -191,16 +191,14 @@ function fillMap(img1Id, img2Id) {
   mapDiv.appendChild(img1);
   mapDiv.appendChild(map1);
   mapDiv.appendChild(img2);
-  placeMapMarkers();
+  placeMapMarkers(map1, img1);
 }
 
-function placeMapMarkers() {
-  console.log(mapMarkers);
-  let map1 = document.getElementsByName("map1");
-  let img1 = document.getElementById("map1Img");
-  if (map1[0]) {
-    map1.innerHTML = "";
-  }
+function placeMapMarkers(map1, img1) {
+  // console.log(map1);
+  // if (map1) {
+  //   map1.innerHTML = "";
+  // }
   img1.onload = function () {
     Object.keys(mapMarkers).forEach((hub) => {
       mapMarkers[hub].forEach((marker) => {
@@ -217,7 +215,7 @@ function placeMapMarkers() {
           event.preventDefault(); // Prevent the default action
           loadHub(hub);
         });
-        map1[0].appendChild(area);
+        map1.appendChild(area);
       });
     });
   };

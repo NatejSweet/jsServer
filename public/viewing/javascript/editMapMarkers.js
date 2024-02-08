@@ -1,10 +1,12 @@
 function editMapMarkers() {
+  let mapDiv = document.getElementById("mapDiv");
+  let img = document.getElementById("map1Img");
   let editButtonsDiv = document.getElementById("editButtonsDiv");
   while (editButtonsDiv.hasChildNodes()) {
     editButtonsDiv.removeChild(editButtonsDiv.firstChild);
   }
   let saveButton = document.createElement("button");
-  saveButton.setAttribute("onclick", "saveMapMarkers()");
+  saveButton.setAttribute("onclick", "saveMapMarkers(mapDiv)");
   saveButton.appendChild(document.createTextNode("Save"));
   editButtonsDiv.appendChild(saveButton);
   let cancelButton = document.createElement("button");
@@ -18,8 +20,6 @@ function editMapMarkers() {
   while (mainContentDiv.hasChildNodes()) {
     mainContentDiv.removeChild(mainContentDiv.firstChild);
   }
-  let mapDiv = document.getElementById("mapDiv");
-  let img = document.getElementById("map1Img");
   img.style.display = "block";
   mapDiv.innerHTML = "";
   mapDiv.appendChild(img);
@@ -46,18 +46,9 @@ function editMapMarkers() {
     });
     mainContentDiv.appendChild(navNameDiv);
   });
-  placeExistingMarkers();
-  //next click on map adds hub
-  //this click will add a object next to the hubname showing the size of the dot and a radius slider
-  //retain add hub button, every marker made will have a delete button
-  //delete button will only dfelete marker, not hub
+  placeExistingMarkers(mapDiv, img);
 }
-function placeExistingMarkers() {
-  console.log("placing markers");
-  let mapDiv = document.getElementById("mapDiv");
-  let img = document.getElementById("map1Img");
-  const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get("id");
+function placeExistingMarkers(mapDiv, img) {
   Object.keys(mapMarkers).forEach((navItem) => {
     let navItemDiv = document.getElementById(navItem + "Div");
     mapMarkers[navItem].forEach((marker) => {
@@ -115,7 +106,6 @@ function placeExistingMarkers() {
 let activeButton = null; // global variable to keep track of the active button
 let handleClickWrapper = null; // global variable to keep track of the click handler
 function addMarker(button) {
-  console.log("addMarker");
   let navItemDiv = button.parentNode;
   let navItem = navItemDiv.firstChild.textContent;
   let mapDiv = document.getElementById("mapDiv");
@@ -145,7 +135,7 @@ function addMarker(button) {
     // If no button is active, toggle the clicked button on
     handleClickWrapper = function (event) {
       console.log("clicked");
-      handleClick(event, navItemDiv, navItem);
+      handleClick(event, navItemDiv, navItem, mapDiv);
     };
 
     img.addEventListener("click", handleClickWrapper);
@@ -154,8 +144,7 @@ function addMarker(button) {
   }
 }
 
-function handleClick(event, navItemDiv, navItem) {
-  let mapDiv = document.getElementById("mapDiv");
+function handleClick(event, navItemDiv, navItem, mapDiv) {
   let rect = mapDiv.getBoundingClientRect();
   let img = mapDiv.firstChild;
   let x = event.pageX - rect.left - window.scrollX;
@@ -220,10 +209,8 @@ function handleClick(event, navItemDiv, navItem) {
     dot.style.height = r * 2 + "px";
   });
 }
-function saveMapMarkers() {
-  let mapDiv = document.getElementById("mapDiv");
+function saveMapMarkers(mapDiv) {
   let img = mapDiv.firstChild;
-  let map = img.nextSibling;
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
   mapMarkers = {};
