@@ -254,9 +254,6 @@ function addTitle(text) {
 }
 
 function addSubtext(text) {
-  // let addButton = event.target;
-  // let titleLabel = addButton.parentNode;
-  // let parentDiv = titleLabel.parentNode;
   let subtextDiv = document.createElement("div");
   subtextDiv.setAttribute("class", "subTitleDiv");
   let subtextLabel = document.createElement("label");
@@ -267,7 +264,6 @@ function addSubtext(text) {
   }
   subtext.setAttribute("name", "subtext");
   subtext.setAttribute("class", "subtext");
-  // parentDiv.appendChild(subtextDiv);
   let addTextButton = document.createElement("button");
   addTextButton.setAttribute("class", "addTextButton");
   addTextButton.textContent = "Add Text";

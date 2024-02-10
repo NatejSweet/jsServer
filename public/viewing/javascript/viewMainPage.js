@@ -45,11 +45,32 @@ function viewMainPage() {
         content.editAccess
       ) {
         createEditButton(public);
+      } else {
+        createSaveWorldButton(id);
       }
       fillMainContent(mainPageJSON);
       fillNavBar(navItems);
       fillMap(img1Id, img2Id);
     });
+}
+
+function createSaveWorldButton(id) {
+  let editButtonsDiv = document.getElementById("editButtonsDiv");
+  let saveWorldButton = document.createElement("button");
+  saveWorldButton.setAttribute("id", "saveWorldButton");
+  saveWorldButton.setAttribute("onclick", "saveWorld(id)");
+  saveWorldButton.appendChild(document.createTextNode("Save World"));
+  editButtonsDiv.appendChild(saveWorldButton);
+}
+
+function saveWorld(id) {
+  fetch("/saveWorld?id=" + encodeURIComponent(id), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: null,
+  });
 }
 
 function reloadNavBar() {
