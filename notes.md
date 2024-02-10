@@ -42,10 +42,12 @@ fill navs page
 update where id=worldId (navitems) VALUES ([,,,])
 
 TO-DO:
-flip some buttons around
-reduce db requests for reload page, reload header, etc.
 impliment saving and renaming world
-resizing page while placing map markers breaks
-remove unnecessary db calls
-secure search queries
-adding a nav item is creating a page for itself and having a selectable value in the dropdown
+add ads
+resizing page while placing map markers breaks, some times, may not need fixed
+
+Saving
+add save button is not owner
+call save function
+add id to saved worlds
+when viewing if not owner, but public, and a saved world

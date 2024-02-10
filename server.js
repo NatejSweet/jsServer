@@ -313,7 +313,10 @@ app.get("/viewMainPage", async (req, res) => {
         public: true,
       },
     });
-    if (mainPage != null) {
+    if (
+      mainPage != null &&
+      (mainPage.public || mainPage.ownerId == req.session.userId)
+    ) {
       const editAccess = mainPage.ownerId == req.session.userId;
       const mainPageJSON = mainPage.mainPage;
       const worldName = mainPage.worldName;
@@ -335,6 +338,7 @@ app.get("/viewMainPage", async (req, res) => {
         public,
       });
     } else {
+      alert("You do not have access to this world");
       res.redirect("/");
     }
   } catch (err) {

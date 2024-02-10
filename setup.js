@@ -34,7 +34,7 @@ async function createTables() {
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
-      "CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY,username VARCHAR(50) NOT NULL,password VARCHAR(255) NOT NULL)"
+      "CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY,username VARCHAR(50) NOT NULL,password VARCHAR(255) NOT NULL, savedWorlds JSON)"
     );
     console.log(result);
     // Authentication failed
