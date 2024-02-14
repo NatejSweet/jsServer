@@ -7,7 +7,7 @@ dotenv.config({ path: "./.env" });
 const app = express();
 const path = require("path");
 const port = 3000;
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 const prisma = new PrismaClient();
 
 var pool = mariadb.createPool({
@@ -338,7 +338,7 @@ app.get("/viewMainPage", async (req, res) => {
         public,
       });
     } else {
-      alert("You do not have access to this world");
+      // alert("You do not have access to this world");
       res.redirect("/");
     }
   } catch (err) {

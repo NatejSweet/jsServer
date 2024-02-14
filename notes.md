@@ -51,3 +51,7 @@ add save button is not owner
 call save function
 add id to saved worlds
 when viewing if not owner, but public, and a saved world
+loggin into a non-existant user causes permaload
+margin at /
+edit page on hub works mostly, but leaves edit map button and does not create edit buttons
+should try to impliment drag and drop edit page divs reorganization
