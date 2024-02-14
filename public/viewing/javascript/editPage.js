@@ -1,5 +1,6 @@
 function isNewImage() {
   let newImages = document.getElementsByClassName("newImage");
+  console.log(newImages.length>0)
   return newImages.length > 0;
 }
 
@@ -42,7 +43,8 @@ function updateMainPageImage(imgId, imgSrc) {
 }
 
 function mainImageIsUpdated(imgId) {
-  return imgId == img1Id;
+  console.log(imgId);
+  return imgId == 'map1Img';
 }
 
 function updatePages() {
@@ -86,6 +88,7 @@ function savePage() {
     Array.from(newImages).forEach((newImage) => {
       let imgId = null;
       let imgSrc = newImage.src;
+      console.log(imgSrc);
       if (isHub()) {
         let hubName = document.getElementById("pageTitle").textContent;
         let imgId = pagesJSON[hubName].imgId;
@@ -93,12 +96,15 @@ function savePage() {
         updatePages();
       } else {
         //if not a hub
-        if (mainImageIsUpdated(imgId)) {
+        if (mainImageIsUpdated(newImage.id)) {
+
           imgId = img1Id;
         } else {
           //secondary is updated
           imgId = img2Id;
         }
+        console.log(imgId);
+        console.log(img1Id);
         updateMainPageImage(imgId, imgSrc);
       }
     });
@@ -125,7 +131,7 @@ function reloadContents(editMode) {
     viewMainPage();
   }
   if (editMode) {
-    enterEditMode();
+    enterEditMode(editButtonsDiv);
   }
 }
 function removeSaveButton() {
