@@ -1,7 +1,11 @@
 window.addEventListener("DOMContentLoaded", (event) => {
   const loginBtn = document.getElementById("loginBtn");
   const searchBar = document.getElementById("searchBar");
-
+  let loginForm = document.getElementById("loginForm");
+  loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    login();
+  });
   searchBar.addEventListener("input", search);
   searchBar.addEventListener("keydown", (event) => {
     if (event.keyCode === 8) {
@@ -49,6 +53,31 @@ function search(event) {
 }
 function loadWorld(option) {
   location.assign(option.value);
+}
+
+function login() {
+  let username = document.getElementById("username").value;
+  let password = document.getElementById("password").value;
+  fetch("/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  })
+    .then((response) => {
+      console.log("response", response);
+      if (response.ok) {
+        return response.json();
+      }
+    })
+    .then((data) => {
+      console.log(data);
+      if (data) {
+        sessionStorage.setItem("savedWorlds", JSON.stringify(data.savedWorlds));
+        window.location.href = "/dash.html";
+      }
+    });
 }
 
 function showLogin() {

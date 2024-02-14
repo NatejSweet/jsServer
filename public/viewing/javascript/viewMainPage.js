@@ -12,6 +12,7 @@ window.addEventListener("resize", function () {
 });
 
 function viewMainPage() {
+  console.log("viewing main page");
   let worldName = document.getElementById("worldName");
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -54,22 +55,29 @@ function viewMainPage() {
     });
 }
 
-function createSaveWorldButton(id) {
-  let editButtonsDiv = document.getElementById("editButtonsDiv");
-  let saveWorldButton = document.createElement("button");
-  saveWorldButton.setAttribute("id", "saveWorldButton");
-  saveWorldButton.setAttribute("onclick", "saveWorld(id)");
-  saveWorldButton.appendChild(document.createTextNode("Save World"));
-  editButtonsDiv.appendChild(saveWorldButton);
+function createSaveWorldButton(worldId) {
+  if (!sessionStorage.getItem("savedWorlds").includes(worldId)) {
+    let editButtonsDiv = document.getElementById("editButtonsDiv");
+    let saveWorldButton = document.createElement("button");
+    saveWorldButton.setAttribute("id", "saveWorldButton");
+    saveWorldButton.setAttribute("onclick", "saveWorld()");
+    saveWorldButton.appendChild(document.createTextNode("Save World"));
+    editButtonsDiv.appendChild(saveWorldButton);
+  }
 }
 
-function saveWorld(id) {
-  fetch("/saveWorld?id=" + encodeURIComponent(id), {
+function saveWorld() {
+  let urlParams = new URLSearchParams(window.location.search);
+  let id = urlParams.get("id");
+  let savedWorlds = JSON.parse(sessionStorage.getItem("savedWorlds"));
+  savedWorlds = savedWorlds + id + ",";
+  sessionStorage.setItem("savedWorlds", JSON.stringify(savedWorlds));
+  fetch("/saveWorld", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: null,
+    body: savedWorlds,
   });
 }
 

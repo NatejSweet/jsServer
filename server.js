@@ -7,7 +7,7 @@ dotenv.config({ path: "./.env" });
 const app = express();
 const path = require("path");
 const port = 3000;
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: "50mb" }));
 const prisma = new PrismaClient();
 
 var pool = mariadb.createPool({
@@ -64,7 +64,7 @@ app.post("/login", async (req, res) => {
       if (user && (await bcrypt.compare(password, user.password))) {
         // Authentication successful
         req.session.userId = user.id;
-        res.redirect("dash.html");
+        res.send({ savedWorlds: user.savedWorlds });
       } else {
         req.session.message = "Invalid username or password";
         res.redirect("/");
@@ -104,6 +104,7 @@ app.post("/createAccount", async (req, res) => {
       data: {
         username: username,
         password: passwordHash,
+        savedWorlds: "",
       },
     });
     if (user) {
@@ -160,7 +161,7 @@ app.get("/search", async (req, res) => {
     const items = await prisma.worlds.findMany({
       where: {
         worldName: {
-          search: query,
+          contains: query,
         },
         public: true,
         ownerId: {
@@ -184,6 +185,24 @@ app.get("/search", async (req, res) => {
   }
 });
 
+app.post("/saveWorld?", async (req, res) => {
+  const savedWorlds = req.body;
+  try {
+    const result = await prisma.users.update({
+      where: {
+        id: req.session.userId,
+      },
+      data: {
+        savedWorlds: savedWorlds,
+      },
+    });
+    console.log(result);
+    res.end();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("ahhhhh");
+  }
+});
 app.post("/createWorld", async (req, res) => {
   const world = req.body;
   const name = world.name;

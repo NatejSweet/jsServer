@@ -55,3 +55,10 @@ loggin into a non-existant user causes permaload
 margin at /
 edit page on hub works mostly, but leaves edit map button and does not create edit buttons
 should try to impliment drag and drop edit page divs reorganization
+
+when logged in but not owner
+world has save button, maybe saved worlds is grabbed on login
+if world id not in saved worlds, create savebutton
+else do nothing
+saved worlds dropdown
+div/button with name and side button that when clicked, expects next click on whole button, if next click not on button, cancel delete
