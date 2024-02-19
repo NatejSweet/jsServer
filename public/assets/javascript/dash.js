@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", (event) => {
   dropdown("myWorldsMenu");
+  dropdown("savedWorldsMenu");
   const searchBar = document.getElementById("searchBar");
   searchBar.addEventListener("input", search);
   searchBar.addEventListener("keydown", (event) => {
@@ -11,22 +12,43 @@ document.addEventListener("DOMContentLoaded", (event) => {
 });
 
 function dropdown(id) {
-  document.getElementById(id).classList.toggle("show");
   var dropdown = document.getElementById(id); // Get the <select> element
-  fetch("/myWorlds")
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-    })
-    .then((worlds) => {
-      worlds.forEach((world) => {
-        var option = document.createElement("option");
-        option.appendChild(document.createTextNode(world.worldName));
-        option.value = "./viewing/viewMainPage.html?id=" + world.id;
-        dropdown.appendChild(option); // Append the <option> to the <select>
+  dropdown.classList.toggle("show");
+  if (id == "myWorldsMenu") {
+    fetch("/myWorlds")
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((worlds) => {
+        worlds.forEach((world) => {
+          var option = document.createElement("option");
+          option.appendChild(document.createTextNode(world.worldName));
+          option.value = "./viewing/viewMainPage.html?id=" + world.id;
+          dropdown.appendChild(option); // Append the <option> to the <select>
+        });
       });
-    });
+  } else if (id == "savedWorldsMenu") {
+    console.log("savedWorlds");
+    fetch("/savedWorlds")
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((worlds) => {
+        console.log(worlds);
+        localStorage.setItem("savedWorlds", worlds);
+        Object.keys(worlds).forEach((world) => {
+          var option = document.createElement("option");
+          option.appendChild(document.createTextNode(Object.values(world)[0]));
+          option.value =
+            "./viewing/viewMainPage.html?id=" + Object.keys(world)[0];
+          dropdown.appendChild(option); // Append the <option> to the <select>
+        });
+      });
+  }
 }
 
 function search(event) {
@@ -59,3 +81,5 @@ function search(event) {
 function loadWorld(option) {
   location.assign(option.value);
 }
+
+function savedWorlds() {}
