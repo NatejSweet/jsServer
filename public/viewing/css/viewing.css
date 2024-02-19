@@ -105,7 +105,8 @@ header button {
 
 header div#editButtonsDiv button#editModeButton,
 header div#editButtonsDiv button#exitEditModeButton,
-header div#editButtonsDiv button#saveWorldButton {
+header div#editButtonsDiv button#saveWorldButton,
+header div#editButtonsDiv button#unsaveWorldButton {
   margin-left: auto;
 }
 

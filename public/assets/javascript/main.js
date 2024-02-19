@@ -2,9 +2,14 @@ window.addEventListener("DOMContentLoaded", (event) => {
   const loginBtn = document.getElementById("loginBtn");
   const searchBar = document.getElementById("searchBar");
   let loginForm = document.getElementById("loginForm");
+  let createAccountForm = document.getElementById("createAccountForm");
   loginForm.addEventListener("submit", (event) => {
     event.preventDefault();
     login();
+  });
+  createAccountForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    createAccount();
   });
   searchBar.addEventListener("input", search);
   searchBar.addEventListener("keydown", (event) => {
@@ -64,11 +69,31 @@ function login() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ username, password }),
+  }).then((response) => {
+    console.log("response", response);
+    if (response.ok) {
+      window.location.href = "/dash.html";
+      return;
+    }
+  });
+}
+
+function createAccount() {
+  let username = document.getElementById("newUsername").value;
+  let password = document.getElementById("newPassword").value;
+  fetch("/createAccount", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
   })
     .then((response) => {
       console.log("response", response);
       if (response.ok) {
         return response.json();
+      } else {
+        alert("Username already exists");
       }
     })
     .then((data) => {

@@ -55,21 +55,19 @@ app.get("/", checkLoggedIn, (req, res) => {
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
-    const users = await prisma.users.findMany({
+    const user = await prisma.users.findUnique({
       where: {
         username: username,
       },
     });
-    users.forEach(async (user) => {
-      if (user && (await bcrypt.compare(password, user.password))) {
-        // Authentication successful
-        req.session.userId = user.id;
-        res.send({ savedWorlds: user.savedWorlds });
-      } else {
-        req.session.message = "Invalid username or password";
-        res.redirect("/");
-      }
-    });
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // Authentication successful
+      req.session.userId = user.id;
+      res.send();
+    } else {
+      req.session.message = "Invalid username or password";
+      res.redirect("/");
+    }
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -98,36 +96,30 @@ app.get("/logout", (req, res) => {
 
 app.post("/createAccount", async (req, res) => {
   const { username, password } = req.body;
+  var user = null;
   try {
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await prisma.users.create({
-      data: {
+    const existingUser = await prisma.users.findFirst({
+      where: {
         username: username,
-        password: passwordHash,
-        savedWorlds: "",
       },
     });
+
+    if (existingUser) {
+      res.status(400).send("Username already exists");
+      return;
+    } else {
+      user = await prisma.users.create({
+        data: {
+          username: username,
+          password: passwordHash,
+          savedWorlds: "{}",
+        },
+      });
+    }
     if (user) {
-      try {
-        const login = prisma.users.findUnique({
-          where: {
-            username: username,
-          },
-        });
-        if (
-          login.length > 0 &&
-          (await bcrypt.compare(password, login[0].password))
-        ) {
-          req.session.userId = login[0].id;
-          res.redirect("dash.html");
-        } else {
-          req.session.message = "Invalid username or password";
-          res.redirect("/");
-        }
-      } catch (err) {
-        console.log(err);
-        res.status(500).send("ahhhhh");
-      }
+      req.session.userId = user.id;
+      res.send({ savedWorlds: user.savedWorlds });
     } else {
       res.redirect("/");
     }
@@ -146,6 +138,25 @@ app.get("/myWorlds", async (req, res) => {
     });
     if (worlds) {
       res.send(worlds);
+    } else {
+      res.redirect("/");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("ahhhhh");
+  }
+});
+
+app.get("/savedWorlds", async (req, res) => {
+  console.log(req.session.userId);
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        id: req.session.userId,
+      },
+    });
+    if (user) {
+      res.send(user.savedWorlds);
     } else {
       res.redirect("/");
     }
@@ -185,8 +196,9 @@ app.get("/search", async (req, res) => {
   }
 });
 
-app.post("/saveWorld?", async (req, res) => {
-  const savedWorlds = req.body;
+app.post("/updateSavedWorlds", async (req, res) => {
+  const savedWorlds = JSON.stringify(req.body);
+  console.log("hi!" + " " + savedWorlds);
   try {
     const result = await prisma.users.update({
       where: {

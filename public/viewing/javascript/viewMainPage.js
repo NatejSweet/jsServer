@@ -4,7 +4,9 @@ var mainPageJSON = {};
 var navItems = {};
 var img1Id = null;
 var img2Id = null;
+var savedWorlds = null;
 document.addEventListener("DOMContentLoaded", function () {
+  savedWorlds = localStorage.getItem("savedWorlds");
   viewMainPage();
 });
 window.addEventListener("resize", function () {
@@ -12,16 +14,13 @@ window.addEventListener("resize", function () {
 });
 
 function viewMainPage() {
-  console.log("viewing main page");
   let worldName = document.getElementById("worldName");
 
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
-
   fetch("/viewMainPage?id=" + encodeURIComponent(id))
     .then((response) => {
       if (response.ok) {
-        console.log(response);
         return response.json();
       }
     })
@@ -39,7 +38,6 @@ function viewMainPage() {
       img1Id = parseInt(content.img1Id, 10);
       img2Id = parseInt(content.img2Id, 10);
       var public = content.public === "true";
-      console.log(content.public);
       if (
         !document.getElementById("editModeButton") &&
         !document.getElementById("editPageButton") &&
@@ -56,13 +54,16 @@ function viewMainPage() {
 }
 
 function createSaveWorldButton(worldId) {
-  if (!sessionStorage.getItem("savedWorlds").includes(worldId)) {
+  console.log(savedWorlds);
+  if (!savedWorlds.hasOwnProperty(worldId)) {
     let editButtonsDiv = document.getElementById("editButtonsDiv");
     let saveWorldButton = document.createElement("button");
     saveWorldButton.setAttribute("id", "saveWorldButton");
     saveWorldButton.setAttribute("onclick", "saveWorld()");
     saveWorldButton.appendChild(document.createTextNode("Save World"));
     editButtonsDiv.appendChild(saveWorldButton);
+  } else {
+    createUnsaveWorldButton();
   }
 }
 
@@ -70,14 +71,56 @@ function saveWorld() {
   let urlParams = new URLSearchParams(window.location.search);
   let id = urlParams.get("id");
   let savedWorlds = JSON.parse(sessionStorage.getItem("savedWorlds"));
-  savedWorlds = savedWorlds + id + ",";
+  console.log("id:", id);
+  console.log("worldName.innerHTML:", worldName.innerHTML);
+  if (savedWorlds == "{}") {
+    savedWorlds = {};
+  }
+  savedWorlds[id] = worldName.innerHTML;
+  console.log("savedWorlds:", savedWorlds);
   sessionStorage.setItem("savedWorlds", JSON.stringify(savedWorlds));
-  fetch("/saveWorld", {
+  fetch("/updateSavedWorlds", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(savedWorlds),
+  }).then((response) => {
+    if (response.ok) {
+      let saveWorldButton = document.getElementById("saveWorldButton");
+      saveWorldButton.remove();
+      createUnsaveWorldButton();
+    }
+  });
+}
+
+function createUnsaveWorldButton() {
+  let editButtonsDiv = document.getElementById("editButtonsDiv");
+  let unsaveWorldButton = document.createElement("button");
+  unsaveWorldButton.setAttribute("id", "unsaveWorldButton");
+  unsaveWorldButton.setAttribute("onclick", "unsaveWorld()");
+  unsaveWorldButton.appendChild(document.createTextNode("Unsave World"));
+  editButtonsDiv.appendChild(unsaveWorldButton);
+}
+
+function unsaveWorld() {
+  let urlParams = new URLSearchParams(window.location.search);
+  let id = urlParams.get("id");
+  let savedWorlds = JSON.parse(sessionStorage.getItem("savedWorlds"));
+  delete savedWorlds[id];
+  sessionStorage.setItem("savedWorlds", JSON.stringify(savedWorlds));
+  fetch("/updateSavedWorlds", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: savedWorlds,
+  }).then((response) => {
+    if (response.ok) {
+      let unsaveWorldButton = document.getElementById("unsaveWorldButton");
+      unsaveWorldButton.remove();
+      createSaveWorldButton(id);
+    }
   });
 }
 
