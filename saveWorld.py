@@ -18,7 +18,7 @@ def add_world_to_important_worlds(conn, world_name):
 import mysql.connector
 import os
 from dotenv import load_dotenv
-
+load_dotenv()
 world_id = {world_id}
 world_name = "{world_name}"
 mainPage = "{mainPage}"
@@ -39,7 +39,7 @@ conn = mysql.connector.connect(
 cursor = conn.cursor()
 # Insert the other data
 
-query = 'INSERT INTO worlds (world_id, world_name, mainPage, img1Id, img2Id, NavItems, mapMarkers, public, ownerId) (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+query = 'INSERT INTO worlds (id, world_name, mainPage, img1Id, img2Id, NavItems, mapMarkers, public, ownerId) (%s, %s, %s, %s, %s, %s, %s, %s, %s);
 VALUES = (world_id, world_name, mainPage, img1Id, img2Id, NavItems, mapMarkers, public, ownerId)'
 # Update the pages column
 query = 'UPDATE worlds SET pages = pages WHERE world_id = world_id'

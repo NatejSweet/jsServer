@@ -42,6 +42,8 @@ fill navs page
 update where id=worldId (navitems) VALUES ([,,,])
 
 TO-DO:
+editPage-> save page creates an unsave world button
+updating image from hub updates main image(khorvair)
 impliment saving and renaming world
 add ads
 resizing page while placing map markers breaks, some times, may not need fixed
@@ -62,3 +64,7 @@ if world id not in saved worlds, create savebutton
 else do nothing
 saved worlds dropdown
 div/button with name and side button that when clicked, expects next click on whole button, if next click not on button, cancel delete
+
+Khorvair Migrations:
+pip3 install mysql-connector-python
+pip3 install python-dotenv
