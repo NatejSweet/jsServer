@@ -55,19 +55,21 @@ app.get("/", checkLoggedIn, (req, res) => {
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
-    const user = await prisma.users.findUnique({
+    const users = await prisma.users.findMany({
       where: {
         username: username,
       },
     });
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // Authentication successful
-      req.session.userId = user.id;
-      res.send();
-    } else {
-      req.session.message = "Invalid username or password";
-      res.redirect("/");
-    }
+    users.forEach(async (user) => {
+      if (user && (await bcrypt.compare(password, user.password))) {
+        // Authentication successful
+        req.session.userId = user.id;
+        res.send();
+      } else {
+        req.session.message = "Invalid username or password";
+        res.redirect("/");
+      }
+    });
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");
@@ -394,6 +396,27 @@ app.get("/viewImage", async (req, res) => {
     } else {
       res.redirect("/");
     }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("ahhhhh");
+  }
+});
+
+app.post("/renameWorld", async (req, res) => {
+  const worldName = req.body.worldName;
+  const worldId = req.query.id;
+  try {
+    const result = await prisma.worlds.update({
+      where: {
+        id: parseInt(worldId),
+        ownerId: req.session.userId,
+      },
+      data: {
+        worldName: worldName,
+      },
+    });
+    console.log(result);
+    res.end();
   } catch (err) {
     console.log(err);
     res.status(500).send("ahhhhh");

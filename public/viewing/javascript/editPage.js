@@ -1,3 +1,5 @@
+const { create } = require("hbs");
+
 function isNewImage() {
   let newImages = document.getElementsByClassName("newImage");
   console.log(newImages.length>0)
@@ -65,6 +67,7 @@ function updatePages() {
 }
 
 function updateMainPage(content) {
+  mainPageJSON = content;
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
   fetch("/updateMainPage?id=" + encodeURIComponent(id), {
@@ -103,8 +106,6 @@ function savePage() {
           //secondary is updated
           imgId = img2Id;
         }
-        console.log(imgId);
-        console.log(img1Id);
         updateMainPageImage(imgId, imgSrc);
       }
     });
@@ -124,11 +125,11 @@ function savePage() {
     updateMainPage(content);
   }
 }
-function reloadContents(editMode) {
+function reloadContents(editMode, editAccess) {
   if (document.getElementById("pageTitle")) {
-    loadHub(document.getElementById("pageTitle").textContent);
+    loadHub(document.getElementById("pageTitle").textContent,editAccess);
   } else {
-    viewMainPage();
+    reloadMainPage(editAccess);
   }
   if (editMode) {
     enterEditMode(editButtonsDiv);

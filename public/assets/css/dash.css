@@ -89,7 +89,7 @@ header button {
 }
 
 main div div#searchResults {
-  width: 100%;
+  width: calc(100% - 8px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -97,7 +97,6 @@ main div div#searchResults {
   margin-top: 3px;
   margin-bottom: 3px;
   color: #ffffff;
-  padding: 3px 8px;
   border: none;
   animation: fadeIn 1s ease-in-out;
 }

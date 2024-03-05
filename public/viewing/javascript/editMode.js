@@ -15,6 +15,10 @@ function enterEditMode(editButtonsDiv) {
   while (editButtonsDiv.hasChildNodes()) {
     editButtonsDiv.removeChild(editButtonsDiv.firstChild);
   }
+  let renameWorldButton = document.createElement("button");
+  renameWorldButton.setAttribute("id", "renameWorldButton");
+  renameWorldButton.setAttribute("onclick", "renameWorld()");
+  renameWorldButton.appendChild(document.createTextNode("Rename World"));
   let editPageButton = document.createElement("button");
   editPageButton.setAttribute("id", "editPageButton");
   editPageButton.setAttribute("onclick", "editPage()");
@@ -54,6 +58,7 @@ function enterEditMode(editButtonsDiv) {
   deleteWorldButton.setAttribute("onclick", "deleteWorldCheck()");
   deleteWorldButton.appendChild(document.createTextNode("Delete World"));
   // editButtonsDiv.appendChild(publicButton)
+  editButtonsDiv.appendChild(renameWorldButton);
   editButtonsDiv.appendChild(editPageButton);
   editButtonsDiv.appendChild(editNavBarButton);
   editButtonsDiv.appendChild(editNavItemsButton);
@@ -64,14 +69,14 @@ function enterEditMode(editButtonsDiv) {
 }
 function exitEditMode(editButtonsDiv) {
   while (editButtonsDiv.hasChildNodes()) {
-    console.log(editButtonsDiv.firstChild);
     editButtonsDiv.removeChild(editButtonsDiv.firstChild);
   }
   if (document.getElementById("addSectionButton")) {
     removeMainContentAddButtons();
   }
-  reloadContents((editMode = false));
+  createEditButton();
 }
+
 
 function togglePublic() {
   let publicButton = document.getElementById("publicButton");
