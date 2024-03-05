@@ -38,13 +38,13 @@ function dropdown(id) {
         }
       })
       .then((worlds) => {
-        console.log(worlds);
-        localStorage.setItem("savedWorlds", worlds);
+        localStorage.setItem("savedWorlds", JSON.stringify(worlds));
         Object.keys(worlds).forEach((world) => {
+          console.log(world);
           var option = document.createElement("option");
-          option.appendChild(document.createTextNode(Object.values(world)[0]));
+          option.appendChild(document.createTextNode(worlds[world]));
           option.value =
-            "./viewing/viewMainPage.html?id=" + Object.keys(world)[0];
+            "./viewing/viewMainPage.html?id=" + world;
           dropdown.appendChild(option); // Append the <option> to the <select>
         });
       });
