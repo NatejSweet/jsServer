@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta name="google-signin-client_id"
+      content="158223117090-mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js?onload=init" async
+      defer></script>
     <script src="./assets/javascript/main.js"></script>
     <link rel="stylesheet" href="./assets/css/main.css">
     <title>Login Page</title>
@@ -11,37 +15,6 @@
       <button type="button" id="loginBtn">Login</button>
     </header>
     <main>
-      <div class="login">
-        <form method="post" id="loginForm">
-          <label for="username">Username:</label>
-          <input type="text" id="username" name="username" required>
-          <br>
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required>
-          <br>
-          <button type="submit">Login</button>
-          <br>
-          <a href="#0" id="createAccount" onclick=showCreateAccount()>Create an
-            Account</a>
-          <br>
-          <a href="#0" id="continueAsGuest" onclick=showSearch()>Back</a>
-        </form>
-      </div>
-      <div class="createAccount">
-        <form method="post" id="createAccountForm">
-          <label for="username">Username:</label>
-          <input type="text" id="newUsername" name="username" required>
-          <br>
-          <label for="password">Password:</label>
-          <input type="password" id="newPassword" name="password" required>
-          <br>
-          <button type="submit">Create Account</button>
-          <a href="#0" id="backToLogin" onclick=showLogin()><--Back to Login
-          </a>
-          <br>
-          <a href="#0" id="continueAsGuest" onclick=showSearch()>Back</a>
-        </form>
-      </div>
       <div class="search">
         <input type="text" id="searchBar" placeholder="Search for a World">
         <br>

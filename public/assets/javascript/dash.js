@@ -43,8 +43,7 @@ function dropdown(id) {
           console.log(world);
           var option = document.createElement("option");
           option.appendChild(document.createTextNode(worlds[world]));
-          option.value =
-            "./viewing/viewMainPage.html?id=" + world;
+          option.value = "./viewing/viewMainPage.html?id=" + world;
           dropdown.appendChild(option); // Append the <option> to the <select>
         });
       });

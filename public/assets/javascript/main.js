@@ -1,15 +1,14 @@
 window.addEventListener("DOMContentLoaded", (event) => {
-  const loginBtn = document.getElementById("loginBtn");
   const searchBar = document.getElementById("searchBar");
-  let loginForm = document.getElementById("loginForm");
-  let createAccountForm = document.getElementById("createAccountForm");
-  loginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    login();
-  });
-  createAccountForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    createAccount();
+  let loginButton = document.getElementById("loginBtn");
+  googleInit();
+  loginButton.addEventListener("click", () => {
+    gapi.auth2
+      .getAuthInstance()
+      .signIn({
+        scope: "profile", // Specify the scope here
+      })
+      .then(onSuccess, onFailure);
   });
   searchBar.addEventListener("input", search);
   searchBar.addEventListener("keydown", (event) => {
@@ -23,11 +22,38 @@ window.addEventListener("DOMContentLoaded", (event) => {
       }
     }
   });
-
-  loginBtn.addEventListener("click", () => {
-    showLogin();
-  });
 });
+
+function googleInit() {
+  gapi.load("auth2", function () {
+    gapi.auth2.init({
+      client_id:
+        "158223117090-mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com",
+    });
+  });
+}
+
+function onSuccess(googleUser) {
+  console.log("Logged in as: " + googleUser.getBasicProfile().getName());
+  var id_token = googleUser.getAuthResponse().id_token;
+  fetch("/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id_token }),
+  }).then((response) => {
+    console.log("response", response);
+    if (response.ok) {
+      window.location.href = "/dash.html";
+      return;
+    }
+  });
+}
+
+function onFailure(error) {
+  console.log(error);
+}
 
 function search(event) {
   const query = event.target.value;
