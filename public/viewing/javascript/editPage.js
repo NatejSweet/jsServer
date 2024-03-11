@@ -1,8 +1,6 @@
-const { create } = require("hbs");
-
 function isNewImage() {
   let newImages = document.getElementsByClassName("newImage");
-  console.log(newImages.length>0)
+  console.log(newImages.length > 0);
   return newImages.length > 0;
 }
 
@@ -46,7 +44,7 @@ function updateMainPageImage(imgId, imgSrc) {
 
 function mainImageIsUpdated(imgId) {
   console.log(imgId);
-  return imgId == 'map1Img';
+  return imgId == "map1Img";
 }
 
 function updatePages() {
@@ -100,7 +98,6 @@ function savePage() {
       } else {
         //if not a hub
         if (mainImageIsUpdated(newImage.id)) {
-
           imgId = img1Id;
         } else {
           //secondary is updated
@@ -127,7 +124,7 @@ function savePage() {
 }
 function reloadContents(editMode, editAccess) {
   if (document.getElementById("pageTitle")) {
-    loadHub(document.getElementById("pageTitle").textContent,editAccess);
+    loadHub(document.getElementById("pageTitle").textContent, editAccess);
   } else {
     reloadMainPage(editAccess);
   }

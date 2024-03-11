@@ -34,7 +34,7 @@ async function createTables() {
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
-      "CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY,username VARCHAR(50) NOT NULL,password VARCHAR(255) NOT NULL, savedWorlds JSON)"
+      "CREATE TABLE users (id VARCHAR(80) PRIMARY KEY, savedWorlds JSON)"
     );
     console.log(result);
     // Authentication failed
@@ -46,7 +46,7 @@ async function createTables() {
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
-      "CREATE TABLE worlds (id INT AUTO_INCREMENT PRIMARY KEY,worldName VARCHAR(50) NOT NULL,ownerId INT NOT NULL,img1Id INT,img2Id INT,mainPage JSON,pages JSON,navItems JSON, mapMarkers JSON, public Boolean)"
+      "CREATE TABLE worlds (id INT AUTO_INCREMENT PRIMARY KEY,worldName VARCHAR(50) NOT NULL,ownerId VARCHAR(80) NOT NULL,img1Id INT,img2Id INT,mainPage JSON,pages JSON,navItems JSON, mapMarkers JSON, public Boolean)"
     );
     console.log(result);
     if (conn) conn.end();
@@ -58,7 +58,7 @@ async function createTables() {
   try {
     let conn = await pool.getConnection();
     const result = await conn.query(
-      "CREATE TABLE images(id INT AUTO_INCREMENT PRIMARY KEY, src MEDIUMTEXT, ownerId INT);"
+      "CREATE TABLE images(id INT AUTO_INCREMENT PRIMARY KEY, src MEDIUMTEXT, ownerId VARCHAR(80) NOT NULL);"
     );
     console.log(result);
     if (conn) conn.end();
@@ -84,6 +84,6 @@ CREATE TABLE worlds (
 */
 // CREATE TABLE users (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
-//     username VARCHAR(50) NOT NULL,
-//     password VARCHAR(255) NOT NULL
+//     savedWorlds JSON,
+//
 // )

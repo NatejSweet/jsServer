@@ -11,26 +11,24 @@ datasource db {
 model images {
   id      Int     @id @default(autoincrement())
   src     String? @db.MediumText
-  ownerId Int?
+  ownerId String  @db.VarChar(80)
 }
 
 model save {
   id      Int     @id @default(autoincrement())
-  user_id Int?
+  user_id String  @db.VarChar(80)
   content String? @db.VarChar(255)
 }
 
 model users {
-  id          Int     @id @default(autoincrement())
-  username    String  @db.VarChar(50) @unique
-  password    String  @db.VarChar(255)
+  id          String @db.VarChar(80) @unique
   savedWorlds String? @db.LongText
 }
 
 model worlds {
-  id         Int      @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   worldName  String   @db.VarChar(50)
-  ownerId    Int
+  ownerId    String
   img1Id     Int?
   img2Id     Int?
   mainPage   String?  @db.LongText
