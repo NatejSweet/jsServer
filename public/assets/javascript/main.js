@@ -1,14 +1,15 @@
 window.addEventListener("DOMContentLoaded", (event) => {
+  console.log("DOM fully loaded and parsed");
   const searchBar = document.getElementById("searchBar");
   let loginButton = document.getElementById("loginBtn");
-  googleInit();
   loginButton.addEventListener("click", () => {
-    gapi.auth2
-      .getAuthInstance()
-      .signIn({
-        scope: "profile", // Specify the scope here
-      })
-      .then(onSuccess, onFailure);
+    console.log("login button clicked");
+    google.accounts.id.initialize({
+      client_id:
+        "158223117090-mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com",
+      callback: handleCredentialResponse,
+    });
+    google.accounts.id.prompt();
   });
   searchBar.addEventListener("input", search);
   searchBar.addEventListener("keydown", (event) => {
@@ -24,35 +25,31 @@ window.addEventListener("DOMContentLoaded", (event) => {
   });
 });
 
-function googleInit() {
-  gapi.load("auth2", function () {
-    gapi.auth2.init({
-      client_id:
-        "158223117090-mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com",
-    });
-  });
-}
-
-function onSuccess(googleUser) {
-  console.log("Logged in as: " + googleUser.getBasicProfile().getName());
-  var id_token = googleUser.getAuthResponse().id_token;
-  fetch("/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ id_token }),
-  }).then((response) => {
-    console.log("response", response);
-    if (response.ok) {
-      window.location.href = "/dash.html";
-      return;
-    }
-  });
-}
-
-function onFailure(error) {
-  console.log(error);
+function handleCredentialResponse(response) {
+  if (response.error) {
+    console.error(response.error);
+    return;
+  } else {
+    fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ idToken: response.credential }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        if (data) {
+          localStorage.setItem("savedWorlds", JSON.stringify(data.savedWorlds));
+          window.location.href = "/dash.html";
+        }
+      });
+  }
 }
 
 function search(event) {
@@ -98,38 +95,40 @@ function login() {
   }).then((response) => {
     console.log("response", response);
     if (response.ok) {
+      localStorage.setItem("savedWorlds", JSON.stringify(response.savedWorlds));
+      console.log(localStorage.getItem("savedWorlds"));
       window.location.href = "/dash.html";
       return;
     }
   });
 }
 
-function createAccount() {
-  let username = document.getElementById("newUsername").value;
-  let password = document.getElementById("newPassword").value;
-  fetch("/createAccount", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ username, password }),
-  })
-    .then((response) => {
-      console.log("response", response);
-      if (response.ok) {
-        return response.json();
-      } else {
-        alert("Username already exists");
-      }
-    })
-    .then((data) => {
-      console.log(data);
-      if (data) {
-        sessionStorage.setItem("savedWorlds", JSON.stringify(data.savedWorlds));
-        window.location.href = "/dash.html";
-      }
-    });
-}
+// function createAccount() {
+//   let username = document.getElementById("newUsername").value;
+//   let password = document.getElementById("newPassword").value;
+//   fetch("/createAccount", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({ username, password }),
+//   })
+//     .then((response) => {
+//       console.log("response", response);
+//       if (response.ok) {
+//         return response.json();
+//       } else {
+//         alert("Username already exists");
+//       }
+//     })
+//     .then((data) => {
+//       console.log(data);
+//       if (data) {
+//         sessionStorage.setItem("savedWorlds", JSON.stringify(data.savedWorlds));
+//         window.location.href = "/dash.html";
+//       }
+//     });
+// }
 
 function showLogin() {
   document.getElementById("loginBtn").style.display = "none";

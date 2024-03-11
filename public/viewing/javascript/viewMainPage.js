@@ -45,7 +45,7 @@ function viewMainPage() {
       ) {
         createEditButton(public);
       } else {
-        console.log("no edit access")
+        console.log("no edit access");
         console.log(savedWorlds);
         createSaveWorldButton(id);
       }
@@ -60,10 +60,9 @@ function reloadMainPage(editAccess) {
     createSaveWorldButton();
   }
   fillMainContent(mainPageJSON);
-      fillNavBar(navItems);
-      fillMap(img1Id, img2Id);
+  fillNavBar(navItems);
+  fillMap(img1Id, img2Id);
 }
-  
 
 function createSaveWorldButton(worldId) {
   console.log(savedWorlds);
@@ -84,9 +83,10 @@ function saveWorld() {
   let urlParams = new URLSearchParams(window.location.search);
   let id = urlParams.get("id");
   let savedWorlds = JSON.parse(sessionStorage.getItem("savedWorlds"));
+  console.log(savedWorlds);
   console.log("id:", id);
   console.log("worldName.innerHTML:", worldName.innerHTML);
-  if (savedWorlds == "{}") {
+  if (savedWorlds == "{}" || savedWorlds == null) {
     savedWorlds = {};
   }
   savedWorlds[id] = worldName.innerHTML;
@@ -121,7 +121,7 @@ function unsaveWorld() {
   let id = urlParams.get("id");
   delete savedWorlds[id];
   console.log(savedWorlds);
-  let savedWorldsString = JSON.stringify(savedWorlds); 
+  let savedWorldsString = JSON.stringify(savedWorlds);
   fetch("/updateSavedWorlds", {
     method: "POST",
     headers: {

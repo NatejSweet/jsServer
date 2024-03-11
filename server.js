@@ -2,13 +2,17 @@ const express = require("express");
 const { PrismaClient } = require("@prisma/client");
 var mariadb = require("mariadb");
 const dotenv = require("dotenv");
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs");
 dotenv.config({ path: "./.env" });
 const app = express();
 const path = require("path");
 const port = 3000;
 app.use(express.json({ limit: "50mb" }));
 const prisma = new PrismaClient();
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(
+  "158223117090 - mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com"
+);
 
 var pool = mariadb.createPool({
   host: process.env.DB_HOST,
@@ -53,28 +57,50 @@ app.get("/", checkLoggedIn, (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { idToken } = req.body;
+
   try {
-    const users = await prisma.users.findMany({
-      where: {
-        username: username,
-      },
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience:
+        "158223117090-mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com",
     });
-    users.forEach(async (user) => {
-      if (user && (await bcrypt.compare(password, user.password))) {
-        // Authentication successful
+    const payload = ticket.getPayload();
+    const userid = payload["sub"];
+    if (userid) {
+      const user = await prisma.users.findFirst({
+        where: {
+          id: userid,
+        },
+      });
+      console.log(user);
+      if (user) {
         req.session.userId = user.id;
-        res.send();
+        res.send({ savedWorlds: user.savedWorlds });
+        return;
       } else {
-        req.session.message = "Invalid username or password";
-        res.redirect("/");
+        const user = await prisma.users.create({
+          data: {
+            id: userid,
+            savedWorlds: "{}",
+          },
+        });
+        console.log(user);
+        if (user) {
+          req.session.userId = user.id;
+          res.send({ savedWorlds: user.savedWorlds });
+          return;
+        } else {
+          res.status(401).send("Not logged in");
+        }
       }
-    });
+    }
   } catch (err) {
     console.log(err);
-    res.status(500).send("ahhhhh");
+    res.status(401).send("Not logged in");
   }
 });
+
 app.get("/dash", async (req, res) => {
   if (req.session.userId) {
     const user = await prisma.users.findUnique({
@@ -96,40 +122,40 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-app.post("/createAccount", async (req, res) => {
-  const { username, password } = req.body;
-  var user = null;
-  try {
-    const passwordHash = await bcrypt.hash(password, 10);
-    const existingUser = await prisma.users.findFirst({
-      where: {
-        username: username,
-      },
-    });
+// app.post("/createAccount", async (req, res) => {
+//   const { username, password } = req.body;
+//   var user = null;
+//   try {
+//     const passwordHash = await bcrypt.hash(password, 10);
+//     const existingUser = await prisma.users.findFirst({
+//       where: {
+//         username: username,
+//       },
+//     });
 
-    if (existingUser) {
-      res.status(400).send("Username already exists");
-      return;
-    } else {
-      user = await prisma.users.create({
-        data: {
-          username: username,
-          password: passwordHash,
-          savedWorlds: "{}",
-        },
-      });
-    }
-    if (user) {
-      req.session.userId = user.id;
-      res.send({ savedWorlds: user.savedWorlds });
-    } else {
-      res.redirect("/");
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("ahhhhh");
-  }
-});
+//     if (existingUser) {
+//       res.status(400).send("Username already exists");
+//       return;
+//     } else {
+//       user = await prisma.users.create({
+//         data: {
+//           username: username,
+//           password: passwordHash,
+//           savedWorlds: "{}",
+//         },
+//       });
+//     }
+//     if (user) {
+//       req.session.userId = user.id;
+//       res.send({ savedWorlds: user.savedWorlds });
+//     } else {
+//       res.redirect("/");
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send("ahhhhh");
+//   }
+// });
 
 app.get("/myWorlds", async (req, res) => {
   try {
