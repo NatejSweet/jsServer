@@ -17,3 +17,11 @@ https://console.cloud.google.com/welcome/new?authuser=3&project=lorelibrary-4164
 
 Db Migrate from prisma file:
 npx prisma migrate dev --name init
+
+Image storage:
+get connection to firebase bucket
+get uploads and GETs
+update text db to handle links to bucket for getting images
+
+https://console.firebase.google.com/u/3/project/lorekeeper-ebf9b/storage/lorekeeper-ebf9b.appspot.com/files/~2Fimages?consoleUI=FIREBASE
+https://firebase.google.com/docs/storage/web/upload-files

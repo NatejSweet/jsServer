@@ -13,6 +13,55 @@ const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(
   "158223117090 - mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com"
 );
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
+
+const filePath = "./public/viewing/images/home.png";
+const destination = "images/home.png";
+
+bucket
+  .upload(filePath, {
+    destination: destination,
+    public: true,
+  })
+  .then(() => {
+    console.log("File uploaded to", destination);
+  })
+  .catch((err) => {
+    console.error("Error uploading file:", err);
+  });
+
+// const { initializeApp, getApps } = require("firebase/app");
+// const { getStorage, ref, uploadBytes } = require("firebase/storage");
+
+// let firebaseApp;
+
+// // Check if any Firebase apps have been initialized
+// if (!getApps().length) {
+//   firebaseApp = initializeApp({
+//     apiKey: process.env.FIREBASE_API_KEY,
+//     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+//     projectId: process.env.FIREBASE_PROJECT_ID,
+//     storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+//     appId: process.env.FIREBASE_APP_ID,
+//   });
+// } else {
+//   firebaseApp = getApps()[0]; // Use the first app if one has already been initialized
+// }
+
+// const storage = getStorage(firebaseApp);
+// const storageRef = ref(storage, "images");
+// var file = "/public/viewing/images/home.jpg";
+// uploadBytes(storageRef, file).then((snapshot) => {
+//   console.log("Uploaded a blob or file!");
+// });
 
 var pool = mariadb.createPool({
   host: process.env.DB_HOST,
@@ -26,6 +75,7 @@ module.exports = Object.freeze({
 });
 app.use(express.urlencoded({ extended: false }));
 const session = require("express-session");
+const { env } = require("process");
 
 app.use(
   session({
