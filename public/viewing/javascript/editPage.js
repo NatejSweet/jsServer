@@ -87,9 +87,11 @@ function savePage() {
   if (isNewImage()) {
     let newImages = document.getElementsByClassName("newImage");
     Array.from(newImages).forEach((newImage) => {
+      console.log(newImage);
+      // let file = newImage.files[0];
+      // console.log(file);
       let imgId = null;
       let imgSrc = newImage.src;
-      console.log(imgSrc);
       if (isHub()) {
         let hubName = document.getElementById("pageTitle").textContent;
         let imgId = pagesJSON[hubName].imgId;

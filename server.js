@@ -23,45 +23,32 @@ admin.initializeApp({
 
 const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
 
-const filePath = "./public/viewing/images/home.png";
-const destination = "images/home.png";
+const multer = require("multer");
+const upload = multer();
 
-bucket
-  .upload(filePath, {
-    destination: destination,
-    public: true,
-  })
-  .then(() => {
-    console.log("File uploaded to", destination);
-  })
-  .catch((err) => {
-    console.error("Error uploading file:", err);
-  });
+// const filePath = "./public/viewing/images/home.png";
+// const destination = "images/home.png";
 
-// const { initializeApp, getApps } = require("firebase/app");
-// const { getStorage, ref, uploadBytes } = require("firebase/storage");
-
-// let firebaseApp;
-
-// // Check if any Firebase apps have been initialized
-// if (!getApps().length) {
-//   firebaseApp = initializeApp({
-//     apiKey: process.env.FIREBASE_API_KEY,
-//     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-//     projectId: process.env.FIREBASE_PROJECT_ID,
-//     storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-//     appId: process.env.FIREBASE_APP_ID,
+// bucket
+//   .upload(filePath, {
+//     destination: destination,
+//     public: true,
+//   })
+//   .then(() => {
+//     console.log("File uploaded to", destination);
+//   })
+//   .catch((err) => {
+//     console.error("Error uploading file:", err);
 //   });
-// } else {
-//   firebaseApp = getApps()[0]; // Use the first app if one has already been initialized
-// }
 
-// const storage = getStorage(firebaseApp);
-// const storageRef = ref(storage, "images");
-// var file = "/public/viewing/images/home.jpg";
-// uploadBytes(storageRef, file).then((snapshot) => {
-//   console.log("Uploaded a blob or file!");
-// });
+async function uploadImage(image, name) {
+  const file = bucket.file(name);
+  await file.save(image.buffer, {
+    public: true,
+    contentType: image.mimetype,
+  });
+  return `https://storage.googleapis.com/${process.env.FIREBASE_STORAGE_BUCKET}/images/${name}`;
+}
 
 var pool = mariadb.createPool({
   host: process.env.DB_HOST,
@@ -293,59 +280,77 @@ app.post("/updateSavedWorlds", async (req, res) => {
     res.status(500).send("ahhhhh");
   }
 });
-app.post("/createWorld", async (req, res) => {
-  const world = req.body;
-  const name = world.name;
-  var navItems = world.navItems;
-  const image = world.image;
-  var content = world.content;
-  content = JSON.stringify(content);
-  navItems = JSON.stringify(navItems);
-  try {
-    let img1Result = await prisma.images.create({
-      data: {
-        src: image,
-        ownerId: req.session.userId,
-      },
-    });
-    const img1Id = img1Result.id;
-    const img2Result = await prisma.images.create({
-      data: {
-        src: "#",
-        ownerId: req.session.userId,
-      },
-    });
-    const img2Id = img2Result.id;
-    const worldResult = await prisma.worlds.create({
-      data: {
-        worldName: name,
-        ownerId: req.session.userId,
-        img1Id: img1Id,
-        img2Id: img2Id,
-        mainPage: content,
-        navItems: navItems,
-        mapMarkers: "{}",
-        public: false,
-      },
-    });
-    const worldId = worldResult.id;
-    req.session.worldId = worldId.toString(); // Store the worldId in the session
 
-    await new Promise((resolve, reject) => {
-      req.session.save((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+app.post(
+  "/createWorld",
+  upload.fields([
+    { name: "world", maxCount: 1 },
+    { name: "image", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    const world = JSON.parse(req.body.world);
+    const name = world.name;
+    var navItems = world.navItems;
+    const image = req.files.image[0]; // Assuming 'image' is the name of the file field in the FormData
+    var content = world.content;
+    content = JSON.stringify(content);
+    navItems = JSON.stringify(navItems);
+    try {
+      // Create the world first
+      const worldResult = await prisma.worlds.create({
+        data: {
+          worldName: name,
+          ownerId: req.session.userId,
+          mainPage: content,
+          navItems: navItems,
+          mapMarkers: "{}",
+          public: false,
+        },
       });
-    });
-    res.end();
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("ahhhhh");
+      const worldId = worldResult.id;
+      req.session.worldId = worldId.toString(); // Store the worldId in the session
+
+      // Then upload the image using the worldId
+      console.log(image);
+      let downloadUrl = await uploadImage(image, name + worldId + "mainImg");
+      let img1Result = await prisma.images.create({
+        data: {
+          src: downloadUrl,
+          ownerId: req.session.userId,
+        },
+      });
+      const img1Id = img1Result.id;
+      const img2Result = await prisma.images.create({
+        data: {
+          src: "#",
+          ownerId: req.session.userId,
+        },
+      });
+      const img2Id = img2Result.id;
+
+      // Update the world with the image IDs
+      await prisma.worlds.update({
+        where: { id: worldId },
+        data: { img1Id: img1Id, img2Id: img2Id },
+      });
+
+      await new Promise((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+      res.end();
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("ahhhhh");
+    }
+    console.log("bye");
   }
-});
+);
 
 app.get("/fillNavs", async (req, res) => {
   //may want to just send navItems instead of parsing doen to navNames

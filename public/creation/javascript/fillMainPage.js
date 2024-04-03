@@ -1,6 +1,6 @@
 import { createFillNavsPage } from "./fillNavs.js";
 var mainImage = null;
-var mapImageStorage = { id: mainImage, src: "" };
+var mapImageStorage = { id: mainImage, file: null };
 
 document.addEventListener("DOMContentLoaded", function (event) {
   let mainContentDiv = document.getElementById("mainContentDiv");
@@ -138,8 +138,7 @@ function createJson(obj) {
   this.text = obj.text;
   this.subtext = obj.subtext;
 }
-window.readURL = function (input, imgId) {
-  console.log("reading url");
+window.readImage = function (input, imgId) {
   if (input.files && input.files[0]) {
     if (input.files[0].size > 4 * 1024 * 1024) {
       alert("File size exceeds 4 MB limit.");
@@ -147,13 +146,12 @@ window.readURL = function (input, imgId) {
     }
     var reader = new FileReader();
     reader.onload = function (e) {
-      console.log("hi");
       let img = document.getElementById(imgId);
       img.setAttribute("src", e.target.result);
       img.style.display = "block";
       if (imgId === "mainImage") {
         mapImageStorage.name = imgId;
-        mapImageStorage.src = e.target.result;
+        mapImageStorage.file = input.files[0];
       }
     };
     reader.readAsDataURL(input.files[0]);
@@ -173,17 +171,17 @@ function submitMainPage(event) {
   const world = {
     name: worldName,
     content: mainContent,
-    image: mainImage,
     navItems: navItems,
   };
 
   // Send the data to the server
+  const formData = new FormData();
+  formData.append("world", JSON.stringify(world));
+  formData.append("image", mainImage); // Assuming `imageFile` is the File object for the image
+
   fetch("/createworld", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(world),
+    body: formData,
   }).then((response) => {
     if (response.ok) {
       console.log("ok");
@@ -221,13 +219,9 @@ function storeMainContent() {
 }
 
 function storeMainImage() {
-  let mainMapImg = document.getElementById("mainMapImg");
-  // let secondaryMapImg = document.getElementById('secondaryMapImg');
-  let mainMapImgSrc = mainMapImg.getAttribute("src");
-  // let secondaryMapImgSrc = secondaryMapImg.getAttribute('src');
-  // let mapImageSrc = [mainMapImgSrc,secondaryMapImgSrc]
-  // return mapImageSrc;
-  return mainMapImgSrc;
+  let mainMap = document.getElementById("mainMap");
+  console.log(mainMap.files[0]);
+  return mainMap.files[0];
 }
 
 function storeWorldName() {
