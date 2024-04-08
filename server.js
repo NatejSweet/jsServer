@@ -47,7 +47,17 @@ async function uploadImage(image, name) {
     public: true,
     contentType: image.mimetype,
   });
-  return `https://storage.googleapis.com/${process.env.FIREBASE_STORAGE_BUCKET}/images/${name}`;
+
+  // Get the signed URL for the file
+  return file
+    .getSignedUrl({
+      action: "read",
+      expires: "03-09-2491",
+    })
+    .then((signedUrls) => {
+      // signedUrls[0] contains the file's public URL
+      return signedUrls[0];
+    });
 }
 
 var pool = mariadb.createPool({
@@ -309,10 +319,11 @@ app.post(
       });
       const worldId = worldResult.id;
       req.session.worldId = worldId.toString(); // Store the worldId in the session
-
-      // Then upload the image using the worldId
-      console.log(image);
-      let downloadUrl = await uploadImage(image, name + worldId + "mainImg");
+      let downloadUrl = await uploadImage(
+        image,
+        name + "_" + worldId + "_" + "mainImg"
+      );
+      console.log("downloadUrl: " + downloadUrl);
       let img1Result = await prisma.images.create({
         data: {
           src: downloadUrl,
@@ -663,8 +674,24 @@ app.post("/saveMapMarkers", async (req, res) => {
 });
 
 app.post("/updateImage", async (req, res) => {
-  const src = req.body.src;
+  console.log("updating Image");
   const imgId = req.query.imgId;
+  let src;
+  upload.fields([
+    { name: "imgTag", maxCount: 1 },
+    { name: "worldName", maxCount: 1 },
+    { name: "image", maxCount: 1 },
+  ]),
+    async (req, res) => {
+      const image = req.files.image[0];
+      const worldName = req.files.worldName[0];
+      const tag = req.files.imgTag[0];
+      let imgName = worldName + "_" + worldId + "_" + tag;
+      console.log("uploading alt image");
+      src = await uploadImage(image, imgName);
+      console.log("src: " + src);
+    };
+
   if (imgId == "null") {
     try {
       const result = await prisma.images.create({
@@ -682,6 +709,7 @@ app.post("/updateImage", async (req, res) => {
     }
   } else {
     console.log("updating");
+    console.log(src);
     try {
       const result = await prisma.images.update({
         where: {

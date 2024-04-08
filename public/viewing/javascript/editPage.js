@@ -8,14 +8,17 @@ function isHub() {
   return document.getElementById("pageTitle");
 }
 
-function updateHubImage(imgId, imgSrc) {
+function updateHubImage(imgId, imgFiles, hubName) {
+  let formData = new FormData();
+  formData.append("image", imgFiles[0]);
+  formData.append("imgTag", hubName);
+  let worldName = document.getElementById("worldName").textContent;
+  formData.append("worldName", worldName);
+  console.log("updateing hub image");
   fetch("/updateImage?imgId=" + encodeURIComponent(imgId), {
     //update image in db
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ src: imgSrc }),
+    body: formData,
   })
     .then((response) => {
       if (response.ok) {
@@ -27,19 +30,31 @@ function updateHubImage(imgId, imgSrc) {
     });
 }
 
-function updateMainPageImage(imgId, imgSrc) {
+function updateMainPageImage(imgId, imgFiles, imgTag) {
+  let formData = new FormData();
+  formData.append("image", imgFiles[0]);
+  formData.append("imgTag", imgTag);
+  let worldName = document.getElementById("worldName").textContent;
+  formData.append("worldName", worldName);
+  console.log("updating main page image");
   fetch("/updateImage?imgId=" + encodeURIComponent(imgId), {
     //update image in db
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ src: imgSrc }),
-  }).then((response) => {
-    if (response.ok) {
-      return reloadContents((editMode = true));
-    }
-  });
+    body: formData,
+  })
+    .then((response) => {
+      if (response.ok) {
+        // return reloadContents((editMode = true));
+        return response.json();
+      }
+    })
+    .then((res) => {
+      if (imgTag == "mainImg") {
+        mainPageJSON.img1Id = res.imgId;
+      } else {
+        mainPageJSON.img2Id = res.imgId;
+      }
+    });
 }
 
 function mainImageIsUpdated(imgId) {
@@ -86,26 +101,32 @@ function savePage() {
   enableNavBar();
   if (isNewImage()) {
     let newImages = document.getElementsByClassName("newImage");
+    console.log(newImages);
     Array.from(newImages).forEach((newImage) => {
       console.log(newImage);
-      // let file = newImage.files[0];
+      let file = newImage.files[0];
       // console.log(file);
       let imgId = null;
       let imgSrc = newImage.src;
       if (isHub()) {
         let hubName = document.getElementById("pageTitle").textContent;
         let imgId = pagesJSON[hubName].imgId;
-        updateHubImage(imgId, imgSrc);
+        console.log("updating hub image");
+        updateHubImage(imgId, file, hubName);
         updatePages();
       } else {
+        var imgTag;
         //if not a hub
         if (mainImageIsUpdated(newImage.id)) {
           imgId = img1Id;
+          imgTag = "mainImg";
         } else {
           //secondary is updated
           imgId = img2Id;
+          imgTag = "secondaryImg";
         }
-        updateMainPageImage(imgId, imgSrc);
+        console.log("updating main page image");
+        updateMainPageImage(imgId, imgSrc, imgTag);
       }
     });
   }
@@ -145,8 +166,8 @@ function removeCancelButton() {
 }
 function editPage() {
   // this function can be optimized, at least reduce the length of function
-
-  window.readURL = function (input, imgId) {
+  window.readImage = function (input, imgId) {
+    input.setAttribute("class", "newImage");
     if (input.files && input.files[0]) {
       if (input.files[0].size > 4 * 1024 * 1024) {
         alert("File size exceeds 4 MB limit.");
@@ -156,7 +177,7 @@ function editPage() {
       reader.onload = function (e) {
         let img = document.getElementById(imgId);
         img.setAttribute("src", e.target.result);
-        img.setAttribute("class", "newImage");
+        img.style.display = "block";
       };
       reader.readAsDataURL(input.files[0]);
     }
@@ -434,7 +455,7 @@ function updateMapImage() {
     inputButton.setAttribute("id", "secondaryMap");
     inputButton.setAttribute("type", "file");
     inputButton.setAttribute("accept", ".img,.jpg,.jpeg");
-    inputButton.setAttribute("onchange", 'readURL(this,"map2Img");');
+    inputButton.setAttribute("onchange", 'readImage(this,"map2Img");');
     mapDiv.appendChild(inputButton);
     //access pages[hubName].imgId
   } else {
@@ -449,7 +470,7 @@ function updateMapImage() {
     inputButton1.setAttribute("id", "mainMap");
     inputButton1.setAttribute("type", "file");
     inputButton1.setAttribute("accept", ".img,.jpg,.jpeg");
-    inputButton1.setAttribute("onchange", 'readURL(this,"map1Img");');
+    inputButton1.setAttribute("onchange", 'readImage(this,"map1Img");');
     let input1Label = document.createElement("label");
     input1Label.setAttribute("for", "mainMap");
     input1Label.textContent = "Insert a New Main Map Image";
@@ -460,7 +481,7 @@ function updateMapImage() {
     inputButton2.setAttribute("id", "secondaryMap");
     inputButton2.setAttribute("type", "file");
     inputButton2.setAttribute("accept", ".img,.jpg,.jpeg");
-    inputButton2.setAttribute("onchange", 'readURL(this,"map2Img");');
+    inputButton2.setAttribute("onchange", 'readImage(this,"map2Img");');
     let input2Label = document.createElement("label");
     input2Label.setAttribute("for", "secondaryMap");
     input2Label.textContent = "Insert a New Alt Map Image";
