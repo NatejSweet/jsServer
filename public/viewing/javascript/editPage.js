@@ -32,16 +32,24 @@ function updateHubImage(imgId, imgFiles, hubName) {
 
 function updateMainPageImage(imgId, imgFiles, imgTag) {
   let formData = new FormData();
-  formData.append("image", imgFiles[0]);
+  formData.append("image", imgFiles);
   formData.append("imgTag", imgTag);
   let worldName = document.getElementById("worldName").textContent;
   formData.append("worldName", worldName);
-  console.log("updating main page image");
-  fetch("/updateImage?imgId=" + encodeURIComponent(imgId), {
-    //update image in db
-    method: "POST",
-    body: formData,
-  })
+  // console.log("updating main page image");
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get("id");
+  fetch(
+    "/updateImage?imgId=" +
+      encodeURIComponent(imgId) +
+      "&worldId=" +
+      encodeURIComponent(id),
+    {
+      //update image in db
+      method: "POST",
+      body: formData,
+    }
+  )
     .then((response) => {
       if (response.ok) {
         // return reloadContents((editMode = true));
@@ -59,7 +67,7 @@ function updateMainPageImage(imgId, imgFiles, imgTag) {
 
 function mainImageIsUpdated(imgId) {
   console.log(imgId);
-  return imgId == "map1Img";
+  return imgId == "mainMap";
 }
 
 function updatePages() {
@@ -107,7 +115,6 @@ function savePage() {
       let file = newImage.files[0];
       // console.log(file);
       let imgId = null;
-      let imgSrc = newImage.src;
       if (isHub()) {
         let hubName = document.getElementById("pageTitle").textContent;
         let imgId = pagesJSON[hubName].imgId;
@@ -126,7 +133,7 @@ function savePage() {
           imgTag = "secondaryImg";
         }
         console.log("updating main page image");
-        updateMainPageImage(imgId, imgSrc, imgTag);
+        updateMainPageImage(imgId, file, imgTag);
       }
     });
   }

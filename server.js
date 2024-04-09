@@ -673,61 +673,64 @@ app.post("/saveMapMarkers", async (req, res) => {
   }
 });
 
-app.post("/updateImage", async (req, res) => {
-  console.log("updating Image");
-  const imgId = req.query.imgId;
-  let src;
-  upload.fields([
-    { name: "imgTag", maxCount: 1 },
-    { name: "worldName", maxCount: 1 },
-    { name: "image", maxCount: 1 },
-  ]),
-    async (req, res) => {
-      const image = req.files.image[0];
-      const worldName = req.files.worldName[0];
-      const tag = req.files.imgTag[0];
+app.post(
+  "/updateImage",
+  upload.fields([{ name: "image", maxCount: 1 }]),
+  async (req, res) => {
+    let src;
+    let image = req.files.image[0];
+    let worldName = req.body.worldName;
+    let tag = req.body.imgTag;
+    let imgId = req.query.imgId;
+    let worldId = req.query.worldId;
+    console.log("worldId: " + worldId);
+    console.log("worldName: " + worldName);
+    try {
       let imgName = worldName + "_" + worldId + "_" + tag;
-      console.log("uploading alt image");
+      console.log("uploading alt image: " + imgName);
       src = await uploadImage(image, imgName);
       console.log("src: " + src);
-    };
-
-  if (imgId == "null") {
-    try {
-      const result = await prisma.images.create({
-        data: {
-          src: src,
-          ownerId: req.session.userId,
-        },
-      });
-      const newImgId = result.id; // Store the new image ID
-      console.log(result);
-      res.send({ imgId: newImgId.toString() }); // Send the new image ID to the user
-    } catch (err) {
-      console.log(err);
-      res.status(500).send("ahhhhh");
-    }
-  } else {
-    console.log("updating");
-    console.log(src);
-    try {
-      const result = await prisma.images.update({
-        where: {
-          id: parseInt(imgId),
-          ownerId: req.session.userId,
-        },
-        data: {
-          src: src,
-        },
-      });
-      console.log(result);
-      res.end();
+      if (imgId == null) {
+        try {
+          const result = await prisma.images.create({
+            data: {
+              src: src,
+              ownerId: req.session.userId,
+            },
+          });
+          const newImgId = result.id; // Store the new image ID
+          console.log(result);
+          res.send({ imgId: newImgId.toString() }); // Send the new image ID to the user
+        } catch (err) {
+          console.log(err);
+          res.status(500).send("ahhhhh");
+        }
+      } else {
+        console.log("updating");
+        console.log(src);
+        try {
+          const result = await prisma.images.update({
+            where: {
+              id: parseInt(imgId),
+              ownerId: req.session.userId,
+            },
+            data: {
+              src: src,
+            },
+          });
+          console.log(result);
+          res.end();
+        } catch (err) {
+          console.log(err);
+          res.status(500).send("ahhhhh");
+        }
+      }
     } catch (err) {
       console.log(err);
       res.status(500).send("ahhhhh");
     }
   }
-});
+);
 
 app.post("/TogglePublic", async (req, res) => {
   const public = req.body.public;
