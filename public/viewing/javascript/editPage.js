@@ -10,16 +10,24 @@ function isHub() {
 
 function updateHubImage(imgId, imgFiles, hubName) {
   let formData = new FormData();
-  formData.append("image", imgFiles[0]);
+  formData.append("image", imgFiles);
   formData.append("imgTag", hubName);
   let worldName = document.getElementById("worldName").textContent;
   formData.append("worldName", worldName);
   console.log("updateing hub image");
-  fetch("/updateImage?imgId=" + encodeURIComponent(imgId), {
-    //update image in db
-    method: "POST",
-    body: formData,
-  })
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get("id");
+  return fetch(
+    "/updateImage?imgId=" +
+      encodeURIComponent(imgId) +
+      "&worldId=" +
+      encodeURIComponent(id),
+    {
+      //update image in db
+      method: "POST",
+      body: formData,
+    }
+  )
     .then((response) => {
       if (response.ok) {
         return response.json(); // Return the Promise returned by response.json()
@@ -27,6 +35,8 @@ function updateHubImage(imgId, imgFiles, hubName) {
     })
     .then((res) => {
       pagesJSON[hubName].imgId = res.imgId; //update imgId in pagesJSON
+      console.log(res.imgId);
+      console.log(pagesJSON[hubName].imgId);
     });
 }
 
@@ -39,7 +49,7 @@ function updateMainPageImage(imgId, imgFiles, imgTag) {
   // console.log("updating main page image");
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
-  fetch(
+  return fetch(
     "/updateImage?imgId=" +
       encodeURIComponent(imgId) +
       "&worldId=" +
@@ -105,7 +115,7 @@ function updateMainPage(content) {
   });
 }
 
-function savePage() {
+async function savePage() {
   enableNavBar();
   if (isNewImage()) {
     let newImages = document.getElementsByClassName("newImage");
@@ -119,8 +129,13 @@ function savePage() {
         let hubName = document.getElementById("pageTitle").textContent;
         let imgId = pagesJSON[hubName].imgId;
         console.log("updating hub image");
-        updateHubImage(imgId, file, hubName);
-        updatePages();
+        updateHubImage(imgId, file, hubName)
+          .then(() => {
+            updatePages();
+          })
+          .catch((error) => {
+            console.error("Error updating hub image:", error);
+          });
       } else {
         var imgTag;
         //if not a hub
@@ -133,7 +148,8 @@ function savePage() {
           imgTag = "secondaryImg";
         }
         console.log("updating main page image");
-        updateMainPageImage(imgId, file, imgTag);
+        await updateMainPageImage(imgId, file, imgTag)
+        reloadContents((editMode = true));
       }
     });
   }

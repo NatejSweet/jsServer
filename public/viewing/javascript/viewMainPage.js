@@ -246,7 +246,7 @@ function fillMap(img1Id, img2Id) {
       img1.style.display = "none";
     }
   });
-
+  let time = new Date().getTime();
   fetch("/viewImage?imgId=" + encodeURIComponent(img1Id))
     .then((response) => {
       if (response.ok) {
@@ -255,8 +255,8 @@ function fillMap(img1Id, img2Id) {
       }
     })
     .then((content) => {
-      console.log("seting src");
-      img1.setAttribute("src", content.src);
+      console.log("seting src: " + content.src);
+      img1.setAttribute("src", content.src + "&t=" + time);
     });
   if (img2Id != null) {
     fetch("/viewImage?imgId=" + encodeURIComponent(img2Id))
@@ -266,7 +266,8 @@ function fillMap(img1Id, img2Id) {
         }
       })
       .then((content) => {
-        img2.setAttribute("src", content.src);
+        img2.setAttribute("src", content.src + "&t=" + time);
+        console.log("HERE: " + content.src);
         img2.style.display = "none";
       });
   }

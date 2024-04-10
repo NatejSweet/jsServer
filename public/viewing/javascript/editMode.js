@@ -77,7 +77,6 @@ function exitEditMode(editButtonsDiv) {
   createEditButton();
 }
 
-
 function togglePublic() {
   let publicButton = document.getElementById("publicButton");
   const urlParams = new URLSearchParams(window.location.search);

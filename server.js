@@ -41,25 +41,6 @@ const upload = multer();
 //     console.error("Error uploading file:", err);
 //   });
 
-async function uploadImage(image, name) {
-  const file = bucket.file(name);
-  await file.save(image.buffer, {
-    public: true,
-    contentType: image.mimetype,
-  });
-
-  // Get the signed URL for the file
-  return file
-    .getSignedUrl({
-      action: "read",
-      expires: "03-09-2491",
-    })
-    .then((signedUrls) => {
-      // signedUrls[0] contains the file's public URL
-      return signedUrls[0];
-    });
-}
-
 var pool = mariadb.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -321,7 +302,8 @@ app.post(
       req.session.worldId = worldId.toString(); // Store the worldId in the session
       let downloadUrl = await uploadImage(
         image,
-        name + "_" + worldId + "_" + "mainImg"
+        "images/" + name + "_" + worldId + "/mainImg"
+        // name + "_" + worldId + "_" + "mainImg"
       );
       console.log("downloadUrl: " + downloadUrl);
       let img1Result = await prisma.images.create({
@@ -683,14 +665,13 @@ app.post(
     let tag = req.body.imgTag;
     let imgId = req.query.imgId;
     let worldId = req.query.worldId;
-    console.log("worldId: " + worldId);
-    console.log("worldName: " + worldName);
     try {
-      let imgName = worldName + "_" + worldId + "_" + tag;
+      console.log("imgId:" + imgId);
+      let imgName = "images/" + worldName + "_" + worldId + "/" + tag;
       console.log("uploading alt image: " + imgName);
       src = await uploadImage(image, imgName);
       console.log("src: " + src);
-      if (imgId == null) {
+      if (imgId == null || imgId == "null") {
         try {
           const result = await prisma.images.create({
             data: {
@@ -699,6 +680,7 @@ app.post(
             },
           });
           const newImgId = result.id; // Store the new image ID
+          console.log("newImgID: " + newImgId);
           console.log(result);
           res.send({ imgId: newImgId.toString() }); // Send the new image ID to the user
         } catch (err) {
@@ -756,12 +738,36 @@ app.post("/TogglePublic", async (req, res) => {
 app.post("/deleteWorld", async (req, res) => {
   const worldId = req.query.id;
   try {
+    const world = await prisma.worlds.findUnique({
+      where: {
+        id: parseInt(worldId),
+      },
+    });
+    const worldName = world.worldName;
+    const imgIds = [world.img1Id, world.img2Id];
+    const pagesJSON = world.pages;
+    const pages = JSON.parse(pagesJSON);
+    Object.keys(pages).forEach((page) => {
+      let id = pages[page].imgId;
+      if (id != null) {
+        imgIds.push(parseInt(id));
+      }
+    });
+    console.log(imgIds);
+    await prisma.images.deleteMany({
+      where: {
+        id: {
+          in: imgIds,
+        },
+      },
+    });
     const result = await prisma.worlds.delete({
       where: {
         id: parseInt(worldId),
         ownerId: req.session.userId,
       },
     });
+    deleteImages(worldId, worldName);
     console.log(result);
     res.end();
   } catch (err) {
@@ -769,3 +775,32 @@ app.post("/deleteWorld", async (req, res) => {
     res.status(500).send("nuh uh");
   }
 });
+
+async function uploadImage(image, name) {
+  const file = bucket.file(name);
+  await file.save(image.buffer, {
+    public: true,
+    contentType: image.mimetype,
+    metadata: {
+      cacheControl: "no-cache, max-age=0",
+    },
+  });
+
+  // Get the signed URL for the file
+  return file
+    .getSignedUrl({
+      action: "read",
+      expires: "03-09-2491",
+    })
+    .then((signedUrls) => {
+      // signedUrls[0] contains the file's public URL
+      return signedUrls[0];
+    });
+}
+
+async function deleteImages(worldId, worldName) {
+  const folderName = `images/${worldName}_${worldId}`;
+  await bucket.deleteFiles({
+    prefix: folderName,
+  });
+}

@@ -4,7 +4,7 @@ add ads
 should try to impliment drag and drop edit page divs reorganization
 add logo to get rid of favicon error
 updating images on main page forces second image too far down witout scroll
-updating an image (main at least) requires a reload in order to display
+timestamps are added to img urls, this causes some slowdown
 
 Later Plans(post production):
 allow world copying
