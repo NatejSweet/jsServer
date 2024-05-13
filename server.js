@@ -682,7 +682,7 @@ app.post(
           const newImgId = result.id; // Store the new image ID
           console.log("newImgID: " + newImgId);
           console.log(result);
-          res.send({ imgId: newImgId.toString() }); // Send the new image ID to the user
+          res.json({ imgId: newImgId.toString() });
         } catch (err) {
           console.log(err);
           res.status(500).send("ahhhhh");
@@ -700,8 +700,10 @@ app.post(
               src: src,
             },
           });
+          const newImgId = result.id; // Store the new image ID
+          console.log("newImgID: " + newImgId);
           console.log(result);
-          res.end();
+          res.json({ imgId: newImgId.toString() });
         } catch (err) {
           console.log(err);
           res.status(500).send("ahhhhh");

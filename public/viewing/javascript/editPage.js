@@ -62,7 +62,7 @@ function updateMainPageImage(imgId, imgFiles, imgTag) {
   )
     .then((response) => {
       if (response.ok) {
-        // return reloadContents((editMode = true));
+        console.log("json TIME");
         return response.json();
       }
     })
@@ -92,7 +92,7 @@ function updatePages() {
     body: JSON.stringify(pagesJSON),
   }).then((response) => {
     if (response.ok) {
-      return reloadContents((editMode = true));
+      return reloadContents(((editMode = true), (editAccess = true)));
     }
   });
 }
@@ -110,7 +110,7 @@ function updateMainPage(content) {
     body: JSON.stringify(content),
   }).then((response) => {
     if (response.ok) {
-      return reloadContents((editMode = true));
+      return reloadContents(((editMode = true), (editAccess = true)));
     }
   });
 }
@@ -118,57 +118,60 @@ function updateMainPage(content) {
 async function savePage() {
   enableNavBar();
   if (isNewImage()) {
-    let newImages = document.getElementsByClassName("newImage");
+    //if we uploaded a new image
+    let newImages = document.getElementsByClassName("newImage"); //get the image
     console.log(newImages);
-    Array.from(newImages).forEach((newImage) => {
+    for (let newImage of Array.from(newImages)) {
+      //in case of 2
       console.log(newImage);
       let file = newImage.files[0];
-      // console.log(file);
       let imgId = null;
       if (isHub()) {
+        //if a hub image
         let hubName = document.getElementById("pageTitle").textContent;
         let imgId = pagesJSON[hubName].imgId;
         console.log("updating hub image");
-        updateHubImage(imgId, file, hubName)
-          .then(() => {
-            updatePages();
-          })
-          .catch((error) => {
-            console.error("Error updating hub image:", error);
-          });
+        try {
+          await updateHubImage(imgId, file, hubName);
+          updatePages();
+        } catch (error) {
+          console.error("Error updating hub image:", error);
+        }
       } else {
+        //if main page image
         var imgTag;
-        //if not a hub
         if (mainImageIsUpdated(newImage.id)) {
           imgId = img1Id;
           imgTag = "mainImg";
         } else {
-          //secondary is updated
           imgId = img2Id;
           imgTag = "secondaryImg";
         }
         console.log("updating main page image");
-        await updateMainPageImage(imgId, file, imgTag)
-        reloadContents((editMode = true));
+        await updateMainPageImage(imgId, file, imgTag); //send image
       }
-    });
+    }
   }
-  removeSaveButton();
-  removeCancelButton();
-  removeMainContentAddButtons();
+  console.log("removing buttons"); //remove buttons in edit div, might be innecessary
+  // removeSaveButton();
+  // removeCancelButton();
+  // removeMainContentAddButtons();
   if (isHub()) {
-    //if a hub
+    //if we are saving a hub
     let hubName = document.getElementById("pageTitle").textContent;
     let content = storeMainContent();
     pagesJSON[hubName].content = content;
-    updatePages();
+    updatePages(); //update the pages object
   } else {
+    //if saving main page
     //if not a hub
     let content = storeMainContent();
-    updateMainPage(content);
+    updateMainPage(content); //update main page object
   }
+  reloadContents(((editMode = true), (editAccess = true))); //reload the contents
 }
 function reloadContents(editMode, editAccess) {
+  console.log("rloading content");
   if (document.getElementById("pageTitle")) {
     loadHub(document.getElementById("pageTitle").textContent, editAccess);
   } else {
@@ -362,7 +365,7 @@ function cancelEdit() {
   let editButtonsDiv = document.getElementById("editButtonsDiv");
   editButtonsDiv.innerHTML = "";
   enableNavBar();
-  reloadContents((editMode = true));
+  reloadContents(((editMode = true), (editAccess = true)));
 }
 
 function addSaveButton() {

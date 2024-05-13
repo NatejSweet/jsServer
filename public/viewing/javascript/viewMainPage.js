@@ -1,3 +1,5 @@
+// const { doc } = require("firebase/firestore");
+
 var pagesJSON = {};
 var mapMarkers = {};
 var mainPageJSON = {};
@@ -26,11 +28,13 @@ function viewMainPage() {
     })
     .then((content) => {
       try {
+        // console.log(JSON.parse(content));
         mainPageJSON = JSON.parse(content.mainPageJSON);
         pagesJSON = JSON.parse(content.pages);
         mapMarkers = JSON.parse(content.mapMarkers);
         navItems = JSON.parse(content.navItems);
         mapMarkers = JSON.parse(content.mapMarkers);
+        console.log(content.editAccess);
       } catch (error) {
         console.log(error);
       }
@@ -39,10 +43,18 @@ function viewMainPage() {
       img2Id = parseInt(content.img2Id, 10);
       var public = content.public === "true";
       if (
-        !document.getElementById("editModeButton") &&
-        !document.getElementById("editPageButton") &&
+        // !document.getElementById("editModeButton") &&
+        // !document.getElementById("editPageButton") &&
         content.editAccess
       ) {
+        if (document.getElementById("editModeButton")) {
+          if (document.getElementById("editModeButton")) {
+            document.getElementById("editModeButton").remove();
+          }
+        }
+        if (document.getElementById("editPageButton")) {
+          document.getElementById("editPageButton").remove();
+        }
         createEditButton(public);
       } else {
         console.log("no edit access");
@@ -214,7 +226,6 @@ function fillNavBar(navItems) {
   nav.appendChild(list);
 }
 function fillMap(img1Id, img2Id) {
-  console.log("filling map");
   let mapDiv = document.getElementById("mapDiv");
   mapDiv.innerHTML = "";
   let img1 = document.createElement("img");
@@ -227,6 +238,7 @@ function fillMap(img1Id, img2Id) {
   let img1Button = document.createElement("button");
   img1Button.textContent = "Main Map";
   img1Button.setAttribute("class", "imgControlButton");
+  img1Button.setAttribute("id", "img1Button");
   img1Button.addEventListener("click", () => {
     if (img1.style.display == "block") {
       return;
@@ -238,6 +250,7 @@ function fillMap(img1Id, img2Id) {
   let img2Button = document.createElement("button");
   img2Button.textContent = "Secondary Map";
   img2Button.setAttribute("class", "imgControlButton");
+  img2Button.setAttribute("id", "img2Button");
   img2Button.addEventListener("click", () => {
     if (img2.style.display == "block") {
       return;
@@ -280,11 +293,36 @@ function fillMap(img1Id, img2Id) {
   placeMapMarkers(map1, img1);
 }
 
+function getAltImage(img2Id) {
+  let img1 = document.getElementById("map1Img");
+  let img2 = document.getElementById("map2Img");
+  let img2Button = document.getElementById("img2Button");
+  img2Button.addEventListener("click", () => {
+    if (img2.style.display == "block") {
+      return;
+    } else {
+      img2.style.display = "block";
+      img1.style.display = "none";
+    }
+  });
+  if (img2Id != null) {
+    fetch("/viewImage?imgId=" + encodeURIComponent(img2Id))
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((content) => {
+        img2.setAttribute("src", content.src);
+        img2.style.display = "none";
+      });
+  } else {
+    img2.setAttribute("src", "#");
+    img2.style.display = "none";
+  }
+}
+
 function placeMapMarkers(map1, img1) {
-  // console.log(map1);
-  // if (map1) {
-  //   map1.innerHTML = "";
-  // }
   img1.onload = function () {
     Object.keys(mapMarkers).forEach((hub) => {
       mapMarkers[hub].forEach((marker) => {
@@ -311,28 +349,11 @@ function loadHub(hubName) {
   console.log(pagesJSON);
   let hub = pagesJSON[hubName];
   fillMainContent(hub.content, hubName);
-  fillMap(img1Id, hub.imgId);
+  getAltImage(hub.imgId);
   let selects = document.getElementsByTagName("select");
   for (let i = 0; i < selects.length; i++) {
     selects[i].selectedIndex = 0;
   }
-}
-
-function updateMap(imgId) {
-  let img = document.getElementById("map2Img");
-  if (imgId == null) {
-    img.setAttribute("src", "#");
-    return;
-  }
-  fetch("/viewImage?imgId=" + encodeURIComponent(imgId))
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-    })
-    .then((content) => {
-      img.setAttribute("src", content.src);
-    });
 }
 
 function linkify(inputText) {

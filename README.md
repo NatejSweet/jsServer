@@ -1,8 +1,8 @@
-# JS SERVER
+# JS SERVER, LoreKeeper
 
-npm i to install dependencies
-npm run setup to setup database
-npm run start to start server
+`npm i` to install dependencies
+`npm run setup` to setup database
+`npm run start` to start server
 
 ## insatlling mariadb and create database
 
@@ -13,13 +13,17 @@ CREATE DATABASE databaseName
 CREATE USER 'user1'@localhost IDENTIFIED BY 'password1';
 GRANT ALL PRIVILEGES ON _._ TO 'user1'@'localhost' IDENTIFIED BY 'password1';
 
-then create a .env matching
-
-##Google Auth
-npm install google-auth-library
-
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=saves
-DB_USER=user1
-DB_PASSWORD=password1
+then create a .env matching:
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_DATABASE=
+DATABASE_URL =
+SESSION_SECRET =
+FIREBASE_API_KEY =
+FIREBASE_AUTH_DOMAIN =
+FIREBASE_PROJECT_ID =
+FIREBASE_STORAGE_BUCKET =
+FIREBASE_APP_ID =
+FIREBASE_MESSAGING_SENDER_ID =

@@ -1,4 +1,5 @@
 window.addEventListener("DOMContentLoaded", (event) => {
+  //this might be a security issue
   console.log("DOM fully loaded and parsed");
   const searchBar = document.getElementById("searchBar");
   let loginButton = document.getElementById("loginBtn");
