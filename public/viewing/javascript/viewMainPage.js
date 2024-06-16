@@ -12,7 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
   viewMainPage();
 });
 window.addEventListener("resize", function () {
-  placeMapMarkers();
+  console.log("resize");
+  let map1 = document.getElementById("map1");
+  let img1 = document.getElementById("map1Img");
+  placeMapMarkers(map1, img1);
 });
 
 function viewMainPage() {

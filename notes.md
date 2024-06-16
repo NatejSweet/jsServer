@@ -1,5 +1,5 @@
 TO-DO:
-the renaming button is in a wierd spot, should move it
+map slider usage moves dot
 add ads
 should try to impliment drag and drop edit page divs reorganization
 add logo to get rid of favicon error
@@ -7,10 +7,11 @@ updating images on main page forces second image too far down witout scroll
 limitations on # creations
 resizing screen messes up map markers, fixed with reload, not a huge issue, but will be annoying for mobile
 switch to JWT for user identification
-Later Plans(post production):
 allow world copying
 containerize
-change routing naming scheme
+Later Plans(post production):
+
+scan for vulnerabilities(github maybe)
 
 Khorvair Migrations:
 pip3 install mysql-connector-python

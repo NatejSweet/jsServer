@@ -1,6 +1,7 @@
 function editMapMarkers() {
   let mapDiv = document.getElementById("mapDiv");
   let img = document.getElementById("map1Img");
+  mapDiv.style.height = img.height + "px";
   let editButtonsDiv = document.getElementById("editButtonsDiv");
   while (editButtonsDiv.hasChildNodes()) {
     editButtonsDiv.removeChild(editButtonsDiv.firstChild);
@@ -135,6 +136,7 @@ function addMarker(button) {
     // If no button is active, toggle the clicked button on
     handleClickWrapper = function (event) {
       console.log("clicked");
+      console.log("mapDiv: ", mapDiv);
       handleClick(event, navItemDiv, navItem, mapDiv);
     };
 
@@ -145,14 +147,16 @@ function addMarker(button) {
 }
 
 function handleClick(event, navItemDiv, navItem, mapDiv) {
-  let rect = mapDiv.getBoundingClientRect();
   let img = mapDiv.firstChild;
-  let x = event.pageX - rect.left - window.scrollX;
-  let y = event.pageY - rect.top - window.scrollY;
+  let rect = img.getBoundingClientRect();
+  console.log("rect: ", rect.left, rect.top);
+  let x = event.clientX - rect.left;
+  let y = event.clientY - rect.top;
   let coords = [];
   console.log("Clicked location:", x, y);
   coords[0] = x / img.width;
   coords[1] = y / img.height;
+  console.log("Coords:", coords);
 
   // Create a slider in the navItemDiv
   let slider = document.createElement("input");
@@ -160,8 +164,10 @@ function handleClick(event, navItemDiv, navItem, mapDiv) {
   slider.setAttribute("min", "0");
   slider.setAttribute("max", "100");
   slider.setAttribute("value", "50");
-  coords[2] = slider.value / 2 / img.width;
+  coords[2] = slider.value / 2 / img.width; //radius as decimal percentage of image width
+  coords[3] = slider.value / 2 / img.height; //radius as decimal percentage of image height
   navItemDiv.appendChild(slider);
+  console.log("radiai: ", coords[2], coords[3]);
 
   // Create a remove button
   let removeButton = document.createElement("button");
@@ -173,22 +179,34 @@ function handleClick(event, navItemDiv, navItem, mapDiv) {
   dot.setAttribute("class", "dot");
   dot.setAttribute("id", navItem);
   dot.style.position = "absolute";
-  dot.style.left = coords[0] * img.width - coords[2] * img.width + "px"; // Adjust left position
-  dot.style.top = coords[1] * img.height - coords[2] * img.width + "px"; // Adjust top position
-  dot.style.width = coords[2] * 2 * img.width + "px";
-  dot.style.height = coords[2] * 2 * img.width + "px";
+  console.log(
+    "new cords:",
+    (coords[0] - coords[2]) * 100,
+    (coords[1] - coords[3]) * 100
+  );
+  dot.style.left = (coords[0] - coords[2]) * 100 + "%"; // Adjust left position
+  dot.style.top = (coords[1] - coords[3]) * 100 + "%"; // Adjust top position
+  dot.style.width = coords[2] * 2 * 100 + "%"; // Adjust width
+  dot.style.height = coords[3] * 2 * 100 + "%"; // Adjust height
   dot.style.borderRadius = "50%";
   dot.style.backgroundColor = "red";
   dot.style.zIndex = "999";
   dot.style.display = "block";
+  console.log(
+    "dot: ",
+    dot.style.left,
+    dot.style.top,
+    dot.style.width,
+    dot.style.height
+  );
   mapDiv.appendChild(dot);
 
   // Update the dot size and position based on the slider value
   slider.addEventListener("input", function () {
     dot.style.width = this.value + "px";
     dot.style.height = this.value + "px";
-    dot.style.left = coords[0] * img.width - this.value / 2 + "px"; // Adjust left position
-    dot.style.top = coords[1] * img.height - this.value / 2 + "px"; // Adjust top position
+    dot.style.left = coords[0] * 100 - this.value / 2 + "%"; // Adjust left position
+    dot.style.top = coords[1] * 100 - this.value / 2 + "%"; // Adjust top position
     coords[2] = this.value / 2 / img.width;
   });
 
@@ -200,17 +218,18 @@ function handleClick(event, navItemDiv, navItem, mapDiv) {
   });
 
   window.addEventListener("resize", function () {
-    let x = coords[0] * img.width;
-    let y = coords[1] * img.height;
-    let r = coords[2] * img.width;
-    dot.style.left = x - r + "px"; // Adjust left position
-    dot.style.top = y - r + "px"; // Adjust top position
-    dot.style.width = r * 2 + "px";
-    dot.style.height = r * 2 + "px";
+    let x = coords[0] * 100; // Convert to percentage
+    let y = coords[1] * 100; // Convert to percentage
+    let r = coords[2] * 100; // Convert to percentage
+    dot.style.left = x - r + "%"; // Adjust left position
+    dot.style.top = y - r + "%"; // Adjust top position
+    dot.style.width = r * 2 + "%";
+    dot.style.height = r * 2 + "%";
   });
 }
 function saveMapMarkers(mapDiv) {
   let img = mapDiv.firstChild;
+  mapDiv.style.height = "auto";
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
   mapMarkers = {};
@@ -218,15 +237,22 @@ function saveMapMarkers(mapDiv) {
   for (let i = 0; i < dotDivs.length; i++) {
     let dotDiv = dotDivs[i];
     let navItem = dotDiv.id;
-    let radius = parseInt(dotDiv.style.width) / 2 / img.width;
+    console.log("width: ", parseInt(dotDiv.style.width));
+    console.log("height: ", parseInt(dotDiv.style.height));
+    let radXPercent = parseInt(dotDiv.style.width);
+    let radiusX = (parseInt(dotDiv.style.width) / 2 / 100) * img.width;
+    let radiusY = (parseInt(dotDiv.style.height) / 2 / 100) * img.height;
     let dotRect = dotDiv.getBoundingClientRect();
     let mapRect = mapDiv.getBoundingClientRect();
-    let x = (dotRect.left - mapRect.left + radius * img.width) / img.width;
-    let y = (dotRect.top - mapRect.top + radius * img.width) / img.height;
+    console.log("dotRect: ", dotRect.left, dotRect.top);
+    console.log("mapRect: ", mapRect.left, mapRect.top);
+    let x = (dotRect.left - mapRect.left + radiusX * img.width) / img.width;
+    let y = (dotRect.top - mapRect.top + radiusY * img.height) / img.height;
+    console.log("x, y, radiusX:", x, y, radiusX);
     if (!mapMarkers[navItem]) {
       mapMarkers[navItem] = [];
     }
-    mapMarkers[navItem].push([x, y, radius]);
+    mapMarkers[navItem].push([x, y, radXPercent]);
   }
   fetch("/saveMapMarkers?id=" + encodeURIComponent(id), {
     method: "POST",

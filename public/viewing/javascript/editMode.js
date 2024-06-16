@@ -58,12 +58,12 @@ function enterEditMode(editButtonsDiv) {
   deleteWorldButton.setAttribute("onclick", "deleteWorldCheck()");
   deleteWorldButton.appendChild(document.createTextNode("Delete World"));
   // editButtonsDiv.appendChild(publicButton)
-  editButtonsDiv.appendChild(renameWorldButton);
   editButtonsDiv.appendChild(editPageButton);
   editButtonsDiv.appendChild(editNavBarButton);
   editButtonsDiv.appendChild(editNavItemsButton);
   editButtonsDiv.appendChild(editMapMarkersButton);
   editButtonsDiv.appendChild(publicButton);
+  editButtonsDiv.appendChild(renameWorldButton);
   editButtonsDiv.appendChild(deleteWorldButton);
   editButtonsDiv.appendChild(exitEditModeButton);
 }
