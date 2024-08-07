@@ -1,4 +1,4 @@
 #dependencies
-/node_modules
+/app/node_modules
 .env
-/serviceAccountKey.json
+/app/serviceAccountKey.json

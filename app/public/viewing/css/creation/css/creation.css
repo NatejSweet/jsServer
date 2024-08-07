@@ -1,0 +1,142 @@
+html {
+  height: auto;
+}
+main {
+  display: flex;
+  background-color: darkslategray;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 100vh;
+  flex-wrap: wrap;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+  display: inline;
+}
+
+nav ul li {
+  padding: 0;
+  margin-left: 1rem;
+  display: inline;
+}
+#mapsContainer {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 40%;
+  margin-top: 20px; /* Adjust this margin as needed to create space between header and maps */
+  height: auto;
+}
+
+#mainMap {
+  width: 100%; /* Set the width of the maps to 100% to fill the container */
+  margin: 0; /* Remove any margins */
+}
+
+#mainMapImg {
+  max-width: 100%;
+  object-fit: contain;
+  display: hidden;
+}
+
+.navColumns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.navColumns .column {
+  flex: 1 0 auto;
+  margin: 10px;
+}
+.column-div {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+label {
+  font-weight: bold;
+  color: beige;
+}
+
+button {
+  background-color: #541b0eab;
+  color: #ffffff;
+  font-size: 100%;
+  border: none;
+  margin-left: 3px;
+  margin-top: 3px;
+  margin-right: 3px;
+  padding: 3px 8px;
+}
+
+input {
+  background-color: #01443c;
+  color: beige;
+  margin-left: 3px;
+  margin-top: 3px;
+  margin-right: 3px;
+  padding: 3px 8px;
+}
+
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #01302b;
+  top: 0;
+}
+
+main div#mainContentDiv {
+  width: 55%;
+}
+
+div.titleDiv {
+  margin-left: 2%;
+  animation: fadeIn 1s ease-in-out;
+}
+div.subTitleDiv {
+  margin-left: 5%;
+  animation: fadeIn 1s ease-in-out;
+}
+div.textDiv {
+  margin-left: 8%;
+  animation: fadeIn 1s ease-in-out;
+}
+textarea {
+  resize: vertical;
+  width: 100%;
+  height: auto;
+  font-size: 100%;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  vertical-align: top;
+  background-color: #01302b;
+  margin-left: 0%;
+  margin-bottom: 2%;
+  color: beige; /* Add this line to set the text color to beige */
+}
+
+h2,
+h3,
+p,
+label,
+h1 {
+  position: relative;
+  width: auto;
+  color: beige;
+  word-wrap: break-word; /* Breaks long words if necessary to prevent overflow */
+  white-space: normal; /* Allows text to wrap onto the next line */
+  overflow-wrap: break-word;
+}

@@ -1,0 +1,179 @@
+body {
+  background-color: darkslategrey;
+  margin: 0;
+  padding: 0;
+}
+
+.login {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.createAccount {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#continueAsGuest {
+  display: block;
+  text-align: center;
+}
+
+main div.search input {
+  width: calc(100% - 5px);
+  font-size: 100%;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  vertical-align: top;
+  background-color: #01443c;
+  height: 20px;
+  color: beige;
+}
+
+h1 {
+  position: relative;
+  margin-top: 0%;
+  margin-left: 3px;
+  max-width: 70%;
+}
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #01302b;
+  top: 0;
+  border: 3px solid #01302b;
+}
+
+header button {
+  align-self: flex-start;
+  background-color: #541b0eab;
+  color: #ffffff;
+  font-size: 100%;
+  border: none;
+  margin-left: 3px;
+  margin-top: 3px;
+  margin-right: 3px;
+  padding: 3px 8px;
+}
+main div.search {
+  margin-top: 8px;
+  margin-left: 8px;
+  width: 30%;
+}
+
+main div div#searchResults {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 3px;
+  width: 100%;
+  border: none;
+  animation: fadeIn 1s ease-in-out;
+}
+
+main div div button {
+  align-self: flex-start;
+  background-color: #541b0eab;
+  width: 100%;
+  color: #ffffff;
+  font-size: 100%;
+  padding: 3px 8px;
+  margin-top: 3px;
+}
+
+main div div#searchResults button:hover {
+  background-color: #541b0e;
+}
+
+button:hover {
+  background-color: #541b0e;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+main div.login,
+div.createAccount {
+  display: hidden;
+  top: calc(50% - width / 2);
+  left: calc(50% - height / 2);
+  background-color: #01302b;
+  padding: 40px 15px;
+}
+
+main div.login input,
+div.createAccount input {
+  width: 100%;
+  font-size: 100%;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  background-color: #01443c;
+  height: 20px;
+  color: beige;
+  margin-top: 5px;
+}
+
+main div.login form,
+div.createAccount form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+main div.login button,
+div.createAccount button {
+  align-self: center;
+  background-color: #541b0eab;
+  width: auto;
+  color: #ffffff;
+  font-size: 100%;
+  padding: 3px 8px;
+  margin-top: 5px;
+}
+
+main div.login label,
+div.createAccount label {
+  margin-top: 5px;
+  color: beige;
+}
+
+main div.login a,
+div.createAccount a {
+  color: beige;
+  margin-top: 5px;
+}
+
+main div.login a:hover,
+div.createAccount a:hover {
+  color: #11927d;
+}
+
+main div.login button:hover,
+div.createAccount button:hover {
+  background-color: #541b0e;
+}
+
+div.credential_picker_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

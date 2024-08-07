@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: ./app
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: ${PORT}
+      MARIA_HOST: ${MARIA_HOST}
+      MARIA_PORT: ${MARIA_PORT}
+      MARIA_USER: ${MARIA_USER}
+      MARIA_PASSWORD: ${MARIA_PASSWORD}
+      MARIA_DATABASE: ${MARIA_DATABASE}
+      TOKEN_SECRET: ${TOKEN_SECRET}
+    depends_on:
+      - db
+    restart: on-failure
+    command: npm run start
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MARIA_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MARIA_DATABASE}
+      MYSQL_USER: ${MARIA_USER}
+      MYSQL_PASSWORD: ${MARIA_PASSWORD}
+    ports:
+      - "${MARIA_PORT}:${MARIA_PORT}"
+    volumes:
+      - ./app/mariadb/maria-init.sh:/docker-entrypoint-initdb.d/maria-init.sh

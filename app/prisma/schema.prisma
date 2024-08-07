@@ -8,18 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model images {
-  id      Int     @id @default(autoincrement())
-  src     String? @db.MediumText
-  ownerId String  @db.VarChar(80)
-}
-
-model save {
-  id      Int     @id @default(autoincrement())
-  user_id String  @db.VarChar(80)
-  content String? @db.VarChar(255)
-}
-
 model users {
   id          String @db.VarChar(80) @unique
   savedWorlds String? @db.LongText
