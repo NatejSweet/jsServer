@@ -19,6 +19,7 @@ sed "s/USERNAME_PLACEHOLDER/${DB_USER}/g; s/PASSWORD_PLACEHOLDER/${DB_PASS}/g" $
 
 # Execute the SQL script
 # Replace 'root' and 'your_root_password' with your actual root username and password
+mysql_upgrade -u root -p"${MYSQL_ROOT_PASSWORD}"
 mysql -u root --password="${DB_ROOT_PASS}" < $TEMP_SQL_SCRIPT
 
 # Optionally, remove the temporary SQL file after execution

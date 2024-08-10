@@ -1,24 +1,24 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 var mariadb = require("mariadb");
 const dotenv = require("dotenv");
 // const bcrypt = require("bcryptjs");
-dotenv.config({ path: "./.env" });
+dotenv.config({ path: "../.env" });
 const app = express();
 const path = require("path");
 const port = 3000;
 app.use(express.json({ limit: "20mb" }));
-const prisma = new PrismaClient();
+
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client("158223117090 - mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com");
 var admin = require("firebase-admin");
 
 var serviceAccount = require("./serviceAccountKey.json");
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-
+console.log(process.env.FIREBASE_STORAGE_BUCKET);
 const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
 
 const multer = require("multer");
@@ -47,21 +47,12 @@ var pool = mariadb.createPool({
   user: process.env.MARIA_USER,
   password: process.env.MARIA_PASSWORD,
   database: process.env.MARIA_DATABASE,
+  connectionLimit: 20, // Increase the limit
+  acquireTimeout: 30000, // Increase the timeout
 });
 module.exports = Object.freeze({
   pool: pool,
 });
-
-//database setup
-const createTables = require("./setup");
-createTables()
-  .then(() => {
-    console.log("Database setup complete");
-  })
-  .catch((err) => {
-    console.error("Error setting up database:", err);
-  });
-
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static("public"));
