@@ -1,14 +1,16 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-var mariadb = require("mariadb");
+console.log(prisma);
 const dotenv = require("dotenv");
 // const bcrypt = require("bcryptjs");
 dotenv.config({ path: "../.env" });
 const app = express();
 const path = require("path");
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.use(express.json({ limit: "20mb" }));
+const mysql = require("mysql");
+
 
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client("158223117090 - mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com");
@@ -41,7 +43,7 @@ const jwtMiddleware = () => {
   };
 };
 //db setup
-var pool = mariadb.createPool({
+var pool = mysql.createPool({
   host: process.env.MARIA_HOST,
   port: process.env.MARIA_PORT,
   user: process.env.MARIA_USER,
@@ -92,6 +94,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+  console.log("login"); 
+  // console.log(prisma);
   const { idToken } = req.body;
   try {
     const ticket = await client.verifyIdToken({
@@ -629,7 +633,7 @@ app.post("/image/:id", upload.fields([{ name: "image", maxCount: 1 }]), async (r
           altImgUrl: src,
         },
       });
-    } else {
+    }else {
       world.pages = JSON.parse(world.pages);
       world.pages[tag].imgId = src;
       world.pages = JSON.stringify(world.pages);

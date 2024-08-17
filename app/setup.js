@@ -1,6 +1,5 @@
 const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
-
 var mariadb = require("mariadb");
 var pool = mariadb.createPool({
   host: process.env.MARIA_HOST,
@@ -27,5 +26,7 @@ async function createTables() {
     if (conn) conn.end();
   }
 }
-
-module.exports = createTables;
+createTables().then(() => process.exit()).catch(err => {
+  console.error("Error in createTables:", err);
+  process.exit(1);
+});
