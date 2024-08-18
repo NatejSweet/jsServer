@@ -43,11 +43,11 @@ const jwtMiddleware = () => {
 };
 //db setup
 var pool = mysql.createPool({
-  host: process.env.MARIA_HOST,
-  port: process.env.MARIA_PORT,
-  user: process.env.MARIA_USER,
-  password: process.env.MARIA_PASSWORD,
-  database: process.env.MARIA_DATABASE,
+  host: process.env.MYSQL_HOST,
+  port: process.env.MYSQL_PORT,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
   connectionLimit: 20, // Increase the limit
   acquireTimeout: 30000, // Increase the timeout
 });
@@ -107,7 +107,8 @@ app.post("/login", async (req, res) => {
       //if there is no user id from google
       res.status(401).send("unauthorized");
     }
-    const user = await prisma.user.findUnique({
+    console.log(prisma);
+    const user = await prisma.users.findUnique({
       where: { id: userid },
     });
     if (!user) {

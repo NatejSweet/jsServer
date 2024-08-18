@@ -3,13 +3,13 @@ services:
     build: ./app
     entrypoint: /usr/src/app/entrypoint.sh
     environment:
-      - DATABASE_URL=mariadb://${MARIA_USER}:${MARIA_PASSWORD}@db:${MARIA_PORT}/${MARIA_DATABASE}
+      - DATABASE_URL=mariadb://${MYSQL_USER}:${MYSQL_PASSWORD}@db:${MYSQL_PORT}/${MYSQL_DATABASE}
       - FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
-      - MARIA_HOST=db
-      - MARIA_PORT=${MARIA_PORT}
-      - MARIA_USER=${MARIA_USER}
-      - MARIA_PASSWORD=${MARIA_PASSWORD}
-      - MARIA_DATABASE=${MARIA_DATABASE}
+      - MYSQL_HOST=db
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
       - DATABASE_URL=${DATABASE_URL}
     ports:
       - 3000:3000
@@ -17,15 +17,15 @@ services:
       - db
     networks:
       - app-network
-
+  
   db:
     image: mysql
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=${MARIA_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MARIA_DATABASE}
-      - MYSQL_USER=${MARIA_USER}
-      - MYSQL_PASSWORD=${MARIA_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - ./data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql

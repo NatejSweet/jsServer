@@ -12,4 +12,5 @@ echo "Setting up the database..."
 # node ./setup.js
 
 # Start the API service
+echo "Starting API server"
 exec npm start
