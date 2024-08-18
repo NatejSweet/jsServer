@@ -9,6 +9,8 @@ resizing screen messes up map markers, fixed with reload, not a huge issue, but 
 switch to JWT for user identification
 allow world copying
 containerize
+
+
 Later Plans(post production):
 
 scan for vulnerabilities(github maybe)

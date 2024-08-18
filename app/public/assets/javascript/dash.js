@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   dropdown("myWorldsMenu");
   dropdown("savedWorldsMenu");
   const searchBar = document.getElementById("searchBar");
+  console.log(localStorage.getItem("token"));
   searchBar.addEventListener("input", search);
   searchBar.addEventListener("keydown", (event) => {
     if (event.keyCode === 8) {
@@ -15,7 +16,10 @@ function dropdown(id) {
   var dropdown = document.getElementById(id); // Get the <select> element
   dropdown.classList.toggle("show");
   if (id == "myWorldsMenu") {
-    fetch("/myWorlds")
+    fetch("/myWorlds", {
+      method: "GET",
+      "Authentication": "Bearer " + localStorage.getItem("token"),
+    })
       .then((response) => {
         if (response.ok) {
           return response.json();

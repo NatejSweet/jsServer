@@ -31,10 +31,12 @@ const jwtMiddleware = () => {
     const token = req.headers.authorization;
     if (!token) {
       res.status(401).send("unauthorized");
+      return;
     }
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
         res.status(401).send("unauthorized");
+        return;
       }
       req.userId = decoded.id;
       next();
@@ -94,7 +96,6 @@ app.get("/", (req, res) => {
 
 app.post("/login", async (req, res) => {
   console.log("login"); 
-  // console.log(prisma);
   const { idToken } = req.body;
   try {
     const ticket = await client.verifyIdToken({
@@ -106,22 +107,23 @@ app.post("/login", async (req, res) => {
     if (!userid) {
       //if there is no user id from google
       res.status(401).send("unauthorized");
+      return; // Ensure no further code is executed
     }
-    console.log(prisma);
     const user = await prisma.users.findUnique({
       where: { id: userid },
     });
     if (!user) {
       //if there is no user in the database
-      await prisma.user.create({
+      await prisma.users.create({
         data: {
           id: userid,
-          savedWorlds: [],
+          savedWorlds: JSON.stringify([]),
         },
       });
     }
     const token = jwt.sign({ id: userid }, process.env.JWT_SECRET); //create a token
     res.send({ token });
+    return; // Ensure no further code is executed
   } catch (err) {
     console.log(err);
     res.status(500).send("login failed");
@@ -130,7 +132,7 @@ app.post("/login", async (req, res) => {
 
 app.get("/dashboard", jwtMiddleware(), async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: req.userId },
     });
     if (!user) {
@@ -144,9 +146,26 @@ app.get("/dashboard", jwtMiddleware(), async (req, res) => {
   }
 });
 
+app.get("/worlds", async (req, res) => {
+  try {
+    const items = await prisma.worlds.findMany({
+      where: {
+        public: true,
+      },
+      select: {
+        id: true,
+        worldName: true,
+      },
+    });
+    res.send(items);
+  } catch (error) {
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.get("/myWorlds", jwtMiddleware(), async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: req.userId },
     });
     if (!user) {
@@ -162,7 +181,7 @@ app.get("/myWorlds", jwtMiddleware(), async (req, res) => {
 
 app.get("/savedWorlds", jwtMiddleware(), async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: req.userId },
     });
     if (!user) {

@@ -1,3 +1,5 @@
+let worlds = {};
+
 window.addEventListener("DOMContentLoaded", (event) => {
   //this might be a security issue
   console.log("DOM fully loaded and parsed");
@@ -12,6 +14,18 @@ window.addEventListener("DOMContentLoaded", (event) => {
     });
     google.accounts.id.prompt();
   });
+  fetch("/worlds", {
+    method: "GET",
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+    })
+    .then((data) => {
+      console.log(data);
+      worlds = data;
+    });
   searchBar.addEventListener("input", search);
   searchBar.addEventListener("keydown", (event) => {
     if (event.keyCode === 8) {
@@ -27,6 +41,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 function handleCredentialResponse(response) {
+  console.log("heyyyy");
   if (response.error) {
     console.error(response.error);
     return;
@@ -45,9 +60,11 @@ function handleCredentialResponse(response) {
       })
       .then((data) => {
         console.log(data);
+        console.log(data.token);
         if (data) {
-          localStorage.setItem("savedWorlds", JSON.stringify(data.savedWorlds));
-          window.location.href = "/dash.html";
+          localStorage.setItem("token", data.token);
+          console.log(localStorage.getItem("token"));
+          // window.location.href = "/dash.html";
         }
       });
   }
@@ -56,29 +73,22 @@ function handleCredentialResponse(response) {
 function search(event) {
   const query = event.target.value;
   const searchResultsDiv = document.getElementById("searchResults");
-  fetch("/search?query=" + encodeURIComponent(query))
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-    })
-    .then((worlds) => {
-      console.log(worlds);
-      Array.from(searchResultsDiv.children).forEach((option) => {
-        option.remove();
-      });
-      console.log(worlds);
-      worlds.forEach((world) => {
-        var option = document.createElement("button");
-        option.appendChild(document.createTextNode(world.worldName));
-        option.onclick = function () {
-          window.location.href = "./viewing/viewMainPage.html?id=" + world.id;
-        };
-        console.log(option);
-        searchResultsDiv.appendChild(option); // Append the <option> to the <select>
-        console.log(searchResultsDiv);
-      });
-    });
+  searchResultsDiv.innerHTML = ""; // Empty the search results
+  if (query.length < 1) {
+    return;
+  }
+  const searchResults = [];
+  for (let world in worlds) {
+    if (world.toLowerCase().includes(query.toLowerCase())) {
+      searchResults.push(world);
+    }
+  }
+  searchResults.forEach((world) => {
+    const option = document.createElement("option");
+    option.value = worlds[world];
+    option.textContent = world;
+    searchResultsDiv.appendChild(option);
+  });
 }
 function loadWorld(option) {
   location.assign(option.value);

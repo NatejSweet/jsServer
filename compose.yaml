@@ -11,6 +11,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${TOKEN_SECRET}
     ports:
       - 3000:3000
     depends_on:
