@@ -28,7 +28,11 @@ const upload = multer();
 const jwt = require("jsonwebtoken");
 const jwtMiddleware = () => {
   return (req, res, next) => {
-    const token = req.headers.authorization;
+    let authorization = req.headers.authorization
+    let token;
+    if (authorization) {
+      token = authorization.split(" ")[1];
+    }
     if (!token) {
       res.status(401).send("unauthorized");
       return;
@@ -95,7 +99,6 @@ app.get("/", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  console.log("login"); 
   const { idToken } = req.body;
   try {
     const ticket = await client.verifyIdToken({
@@ -122,7 +125,7 @@ app.post("/login", async (req, res) => {
       });
     }
     const token = jwt.sign({ id: userid }, process.env.JWT_SECRET); //create a token
-    res.send({ token });
+    res.status(200).send({ token });
     return; // Ensure no further code is executed
   } catch (err) {
     console.log(err);
@@ -172,7 +175,17 @@ app.get("/myWorlds", jwtMiddleware(), async (req, res) => {
       //user not found
       res.redirect("/");
     }
-    res.sendFile(path.join(__dirname + "/public/myWorlds.html"));
+    const items = await prisma.worlds.findMany({
+      where: {
+        ownerId: req.userId,
+      },
+      select: {
+        id: true,
+        worldName: true,
+      },
+    });
+    res.send(items);
+
   } catch (err) {
     console.log(err);
     res.status(500).send("get myWorlds failed");
@@ -263,12 +276,11 @@ app.post(
       const world = JSON.parse(req.body.world);
       const name = world.name;
       var navItems = world.navItems;
-      const image = req.files.image[0]; //image file
+      
       var content = world.content;
       content = JSON.stringify(content);
       navItems = JSON.stringify(navItems);
-      let mainImageUrl = "images/" + name + "_" + worldId + "/mainImg";
-      let altImageUrl = "images/" + name + "_" + worldId + "/altImg";
+
       const worldResult = await prisma.worlds.create({
         data: {
           worldName: name,
@@ -277,11 +289,32 @@ app.post(
           navItems: navItems,
           mapMarkers: "{}",
           public: false,
+          mainImgUrl: "",
+          altImgUrl: "",
+        },
+      });
+      let worldId = worldResult.id;
+      if (worldId){
+      let mainImageUrl = "images/" + name + "_" + worldId + "/mainImg";
+      let altImageUrl = "images/" + name + "_" + worldId + "/altImg";
+      if (req.files.image){
+        const image = req.files.image[0]; //image file
+        mainImageUrl = await uploadImage(image, mainImageUrl); //upload image to
+      }
+      
+      const result = await prisma.worlds.update({
+        where: {
+          id: worldId,
+        },
+        data: {
           mainImgUrl: mainImageUrl,
           altImgUrl: altImageUrl,
         },
       });
-      let worldId = worldResult.id;
+        res.status(200).json({ worldId: worldId });
+      } else {
+        res.status(500).send("create world failed");
+      }
     } catch (err) {
       console.log(err);
       res.status(500).send("create world failed");
@@ -294,7 +327,7 @@ app.get("/fillNavs/:id", jwtMiddleware(), async (req, res) => {
   try {
     const navs = await prisma.worlds.findUnique({
       where: {
-        id: parseInt(worldId),
+        id: worldId,
         ownerId: req.userId,
       },
       select: {

@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const mysql = require("mysql");
+const mysql = require("mysql2/promise");
 dotenv.config({ path: "./.env" });
 
 const pool = mysql.createPool({
@@ -9,6 +9,7 @@ const pool = mysql.createPool({
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
 });
+
 const initDb = async () => {
   const sqlQueries = [
     "CREATE DATABASE IF NOT EXISTS lorekeeper",
@@ -18,25 +19,30 @@ const initDb = async () => {
       id INT AUTO_INCREMENT PRIMARY KEY, \
       worldName VARCHAR(50) NOT NULL, \
       ownerId VARCHAR(80) NOT NULL, \
-      img1Id INT, \
-      img2Id INT, \
+      mainImgUrl VARCHAR(255), \
+      altImgUrl VARCHAR(255), \
       mainPage JSON, \
       pages JSON, \
       navItems JSON, \
       mapMarkers JSON, \
       public BOOLEAN \
     );"
-  ]
-  for (let query of sqlQueries){
-    try{ await mysqlpool.query(query);
+  ];
+  for (let query of sqlQueries) {
+    try {
+      const [results, fields] = await pool.query(query);
+      // console.log("Executed: " + query);
+      // console.log(results);
     } catch (err) {
       console.error("Failed to execute: " + query);
       console.error(err);
-
     }
   }
-}
+};
 
-await initDb().then(() => {
+const runInitDb = async () => {
+  await initDb();
   process.exit();
-});
+};
+
+runInitDb();

@@ -18,7 +18,9 @@ function dropdown(id) {
   if (id == "myWorldsMenu") {
     fetch("/myWorlds", {
       method: "GET",
-      "Authentication": "Bearer " + localStorage.getItem("token"),
+      headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+      },
     })
       .then((response) => {
         if (response.ok) {
@@ -35,7 +37,12 @@ function dropdown(id) {
       });
   } else if (id == "savedWorldsMenu") {
     console.log("savedWorlds");
-    fetch("/savedWorlds")
+    fetch("/savedWorlds", {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
       .then((response) => {
         if (response.ok) {
           return response.json();

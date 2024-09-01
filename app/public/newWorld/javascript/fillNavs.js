@@ -1,16 +1,20 @@
 export { createFillNavsPage };
 
-function createFillNavsPage() {
+function createFillNavsPage(worldId) {
   let mainContentDiv = document.getElementById("mainContentDiv");
   mainContentDiv.style.display = "none";
   let navDiv = document.createElement("div");
   navDiv.setAttribute("class", "navColumns");
-  fetch("/fillNavs")
+  fetch("/fillNavs/"+worldId, {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+  })
     .then((response) => {
       if (response.ok) {
         return response.json().then((data) => {
           console.log(data);
-          console.log("hi");
           createHeader(data.worldName);
           let navItems = JSON.parse(data.navItems);
           console.log(typeof navItems);
@@ -101,6 +105,7 @@ function submitNavPage(event) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
     },
     body: JSON.stringify(navItemsJSON),
   }).then((response) => {

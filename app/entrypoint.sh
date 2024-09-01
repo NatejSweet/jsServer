@@ -9,7 +9,7 @@ done
 
 # Run the setup script
 echo "Setting up the database..."
-# node ./setup.js
+node ./setup.js
 
 # Start the API service
 echo "Starting API server"

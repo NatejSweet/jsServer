@@ -41,32 +41,33 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 function handleCredentialResponse(response) {
-  console.log("heyyyy");
+  console.log(response);
   if (response.error) {
     console.error(response.error);
     return;
   } else {
-    fetch("/login", {
-      method: "POST",
+    fetch('/login', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ idToken: response.credential }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
+      body: JSON.stringify({
+        idToken: response.credential
       })
-      .then((data) => {
-        console.log(data);
-        console.log(data.token);
-        if (data) {
-          localStorage.setItem("token", data.token);
-          console.log(localStorage.getItem("token"));
-          // window.location.href = "/dash.html";
-        }
-      });
+    })
+    .then(response => response.json())
+    .then((data) => {
+      console.log(data);
+      console.log(data.token);
+      if (data) {
+        localStorage.setItem("token", data.token);
+        console.log(localStorage.getItem("token"));
+        window.location.href = "/dashboard"; // Redirect to dashboard
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
   }
 }
 
@@ -92,26 +93,6 @@ function search(event) {
 }
 function loadWorld(option) {
   location.assign(option.value);
-}
-
-function login() {
-  let username = document.getElementById("username").value;
-  let password = document.getElementById("password").value;
-  fetch("/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ username, password }),
-  }).then((response) => {
-    console.log("response", response);
-    if (response.ok) {
-      localStorage.setItem("savedWorlds", JSON.stringify(response.savedWorlds));
-      console.log(localStorage.getItem("savedWorlds"));
-      window.location.href = "/dash.html";
-      return;
-    }
-  });
 }
 
 // function createAccount() {

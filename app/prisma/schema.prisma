@@ -16,13 +16,13 @@ model users {
 
 model worlds {
   id         Int     @id @default(autoincrement())
-  worldName  String   @db.VarChar(50)
+  worldName  String  @db.VarChar(50)
   ownerId    String
-  img1Id     Int?
-  img2Id     Int?
-  mainPage   String?  @db.LongText
-  pages      String?  @db.LongText
-  navItems   String?  @db.LongText
-  mapMarkers String?  @db.LongText
+  mainImgUrl String
+  altImgUrl  String
+  mainPage   String? @db.LongText
+  pages      String? @db.LongText
+  navItems   String? @db.LongText
+  mapMarkers String? @db.LongText
   public     Boolean?
 }

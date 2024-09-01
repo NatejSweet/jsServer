@@ -179,13 +179,18 @@ function submitMainPage(event) {
   formData.append("world", JSON.stringify(world));
   formData.append("image", mainImage); // Assuming `imageFile` is the File object for the image
 
-  fetch("/createworld", {
+  fetch("/world", {
     method: "POST",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
     body: formData,
   }).then((response) => {
     if (response.ok) {
-      console.log("ok");
-      return createFillNavsPage();
+      response.json().then((response) => {
+        let worldId = response.worldId;
+        return createFillNavsPage(worldId);
+      });
     }
   });
 }
@@ -220,7 +225,6 @@ function storeMainContent() {
 
 function storeMainImage() {
   let mainMap = document.getElementById("mainMap");
-  console.log(mainMap.files[0]);
   return mainMap.files[0];
 }
 
