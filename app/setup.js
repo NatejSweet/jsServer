@@ -19,14 +19,14 @@ const initDb = async () => {
       id INT AUTO_INCREMENT PRIMARY KEY, \
       worldName VARCHAR(50) NOT NULL, \
       ownerId VARCHAR(80) NOT NULL, \
-      mainImgUrl VARCHAR(255), \
-      altImgUrl VARCHAR(255), \
+      mainImgUrl VARCHAR(2048), \
+      altImgUrl VARCHAR(1024), \
       mainPage JSON, \
       pages JSON, \
       navItems JSON, \
       mapMarkers JSON, \
       public BOOLEAN \
-    );"
+    );",
   ];
   for (let query of sqlQueries) {
     try {

@@ -19,7 +19,7 @@ function dropdown(id) {
     fetch("/myWorlds", {
       method: "GET",
       headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     })
       .then((response) => {
@@ -31,7 +31,7 @@ function dropdown(id) {
         worlds.forEach((world) => {
           var option = document.createElement("option");
           option.appendChild(document.createTextNode(world.worldName));
-          option.value = "./viewing/viewMainPage.html?id=" + world.id;
+          option.value = "../world?id=" + world.id;
           dropdown.appendChild(option); // Append the <option> to the <select>
         });
       });
@@ -54,7 +54,7 @@ function dropdown(id) {
           console.log(world);
           var option = document.createElement("option");
           option.appendChild(document.createTextNode(worlds[world]));
-          option.value = "./viewing/viewMainPage.html?id=" + world;
+          option.value = "../world?id=" + world;
           dropdown.appendChild(option); // Append the <option> to the <select>
         });
       });
@@ -79,7 +79,7 @@ function search(event) {
         var option = document.createElement("button");
         option.appendChild(document.createTextNode(world.worldName));
         option.onclick = function () {
-          window.location.href = "./viewing/viewMainPage.html?id=" + world.id;
+          window.location.href = "../worlds?id=" + world.id;
         };
         console.log(option);
         searchResultsDiv.appendChild(option); // Append the <option> to the <select>

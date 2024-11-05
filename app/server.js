@@ -10,9 +10,10 @@ const port = process.env.PORT || 3000;
 app.use(express.json({ limit: "20mb" }));
 const mysql = require("mysql");
 
-
 const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client("158223117090 - mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com");
+const client = new OAuth2Client(
+  "158223117090 - mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com"
+);
 var admin = require("firebase-admin");
 
 var serviceAccount = require("./serviceAccountKey.json");
@@ -28,7 +29,7 @@ const upload = multer();
 const jwt = require("jsonwebtoken");
 const jwtMiddleware = () => {
   return (req, res, next) => {
-    let authorization = req.headers.authorization
+    let authorization = req.headers.authorization;
     let token;
     if (authorization) {
       token = authorization.split(" ")[1];
@@ -63,7 +64,9 @@ module.exports = Object.freeze({
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static("public"));
-app.listen(port, () => console.log("server listening at http://localhost:" + port));
+app.listen(port, () =>
+  console.log("server listening at http://localhost:" + port)
+);
 
 async function uploadImage(image, name) {
   const file = bucket.file(name);
@@ -103,7 +106,8 @@ app.post("/login", async (req, res) => {
   try {
     const ticket = await client.verifyIdToken({
       idToken,
-      audience: "158223117090-mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com",
+      audience:
+        "158223117090-mm2f708rmllg070nisolvu1nomefh5mb.apps.googleusercontent.com",
     });
     const payload = ticket.getPayload();
     const userid = payload["sub"];
@@ -185,7 +189,6 @@ app.get("/myWorlds", jwtMiddleware(), async (req, res) => {
       },
     });
     res.send(items);
-
   } catch (err) {
     console.log(err);
     res.status(500).send("get myWorlds failed");
@@ -276,7 +279,7 @@ app.post(
       const world = JSON.parse(req.body.world);
       const name = world.name;
       var navItems = world.navItems;
-      
+
       var content = world.content;
       content = JSON.stringify(content);
       navItems = JSON.stringify(navItems);
@@ -294,23 +297,23 @@ app.post(
         },
       });
       let worldId = worldResult.id;
-      if (worldId){
-      let mainImageUrl = "images/" + name + "_" + worldId + "/mainImg";
-      let altImageUrl = "images/" + name + "_" + worldId + "/altImg";
-      if (req.files.image){
-        const image = req.files.image[0]; //image file
-        mainImageUrl = await uploadImage(image, mainImageUrl); //upload image to
-      }
-      
-      const result = await prisma.worlds.update({
-        where: {
-          id: worldId,
-        },
-        data: {
-          mainImgUrl: mainImageUrl,
-          altImgUrl: altImageUrl,
-        },
-      });
+      if (worldId) {
+        let mainImageUrl = "images/" + name + "_" + worldId + "/mainImg";
+        let altImageUrl = "images/" + name + "_" + worldId + "/altImg";
+        if (req.files.image) {
+          const image = req.files.image[0]; //image file
+          mainImageUrl = await uploadImage(image, mainImageUrl); //upload image to
+        }
+
+        const result = await prisma.worlds.update({
+          where: {
+            id: worldId,
+          },
+          data: {
+            mainImgUrl: mainImageUrl,
+            altImgUrl: altImageUrl,
+          },
+        });
         res.status(200).json({ worldId: worldId });
       } else {
         res.status(500).send("create world failed");
@@ -393,7 +396,10 @@ app.get("/world/:id", jwtMiddleware(), async (req, res) => {
       //world not found
       res.status(404).send("world not found");
     }
-    if (mainPage != null && (mainPage.public || mainPage.ownerId == req.userId)) {
+    if (
+      mainPage != null &&
+      (mainPage.public || mainPage.ownerId == req.userId)
+    ) {
       const editAccess = mainPage.ownerId == req.userId;
       const mainPageJSON = mainPage.mainPage;
       const worldName = mainPage.worldName;
@@ -634,75 +640,79 @@ app.delete("/world/:id", jwtMiddleware(), async (req, res) => {
   }
 });
 
-app.post("/image/:id", upload.fields([{ name: "image", maxCount: 1 }]), async (req, res) => {
-  const worldId = parseInt(req.params.id);
-  let src;
-  let image = req.files.image[0];
-  let worldName = req.body.worldName;
-  let tag = req.body.imgTag;
-  let imageUrl = "images/" + worldName + "_" + worldId + "/" + tag;
-  let world;
-  try {
-    world = await prisma.worlds.findUnique({
-      //check that world exists and user has access
-      where: {
-        id: worldId,
-      },
-    });
-    if (!world) {
+app.post(
+  "/image/:id",
+  upload.fields([{ name: "image", maxCount: 1 }]),
+  async (req, res) => {
+    const worldId = parseInt(req.params.id);
+    let src;
+    let image = req.files.image[0];
+    let worldName = req.body.worldName;
+    let tag = req.body.imgTag;
+    let imageUrl = "images/" + worldName + "_" + worldId + "/" + tag;
+    let world;
+    try {
+      world = await prisma.worlds.findUnique({
+        //check that world exists and user has access
+        where: {
+          id: worldId,
+        },
+      });
+      if (!world) {
+        //world not found
+        res.status(404).send("world not found");
+        return;
+      }
+      if (world.ownerId != req.userId) {
+        //unauthorized
+        res.status(401).send("unauthorized");
+        return;
+      }
+      src = await uploadImage(image, imageUrl); //upload image to firebase
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("upload image failed");
+      return;
+    }
+    let result;
+    if (src) {
+      if (tag == "mainImg") {
+        result = await prisma.worlds.update({
+          where: {
+            id: worldId,
+          },
+          data: {
+            mainImgUrl: src,
+          },
+        });
+      } else if (tag == "altImg") {
+        result = await prisma.worlds.update({
+          where: {
+            id: worldId,
+          },
+          data: {
+            altImgUrl: src,
+          },
+        });
+      } else {
+        world.pages = JSON.parse(world.pages);
+        world.pages[tag].imgId = src;
+        world.pages = JSON.stringify(world.pages);
+        result = await prisma.worlds.update({
+          where: {
+            id: worldId,
+          },
+          data: {
+            pages: world.pages,
+          },
+        });
+      }
+    }
+    if (!result) {
       //world not found
-      res.status(404).send("world not found");
+      res.status(404).send("error updating image src in world");
       return;
     }
-    if (world.ownerId != req.userId) {
-      //unauthorized
-      res.status(401).send("unauthorized");
-      return;
-    }
-    src = await uploadImage(image, imageUrl); //upload image to firebase
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("upload image failed");
-    return;
+    res.send(src);
   }
-  let result;
-  if (src) {
-    if (tag == "mainImg") {
-      result = await prisma.worlds.update({
-        where: {
-          id: worldId,
-        },
-        data: {
-          mainImgUrl: src,
-        },
-      });
-    } else if (tag == "altImg") {
-      result = await prisma.worlds.update({
-        where: {
-          id: worldId,
-        },
-        data: {
-          altImgUrl: src,
-        },
-      });
-    }else {
-      world.pages = JSON.parse(world.pages);
-      world.pages[tag].imgId = src;
-      world.pages = JSON.stringify(world.pages);
-      result = await prisma.worlds.update({
-        where: {
-          id: worldId,
-        },
-        data: {
-          pages: world.pages,
-        },
-      });
-    }
-  }
-  if (!result) {
-    //world not found
-    res.status(404).send("error updating image src in world");
-    return;
-  }
-  res.send(src);
-});
+);

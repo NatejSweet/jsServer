@@ -1,0 +1,317 @@
+div#mapDiv {
+  flex: 1;
+  position: fixed;
+  height: 100%;
+  min-width: 30%;
+  max-width: 40%;
+  right: 0;
+  animation: fadeIn 1s ease-in-out;
+}
+
+div#mapDiv label {
+  text-align: right;
+  white-space: nowrap;
+  margin-right: 5px;
+}
+
+.imgControlButton {
+  float: right;
+}
+main div#mapDiv input {
+  float: right;
+}
+
+header nav {
+  position: relative;
+  display: inline-flex;
+  flex-direction: row;
+  /* width: 100%; */
+  max-width: 100%;
+  overflow: block;
+}
+
+header #homeButton img {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  right: 1%;
+  top: 1%;
+  filter: invert(100%);
+}
+
+body {
+  background-color: darkslategrey;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background-image: url("../../assets/images/foggyForest.jpg");
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 0px;
+  width: 100%;
+  border-bottom: 1px solid #000000;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+  z-index: 100;
+}
+
+header input#worldNameInput {
+  font-size: larger;
+  width: 100%;
+  height: 30px;
+  margin-top: 5px;
+  margin-left: 5px;
+}
+header h1 {
+  position: relative;
+  flex-grow: 1;
+  margin-top: 5px;
+  margin-left: 5px;
+  max-height: 1%;
+}
+header h1 a {
+  color: blanchedalmond;
+  text-decoration: none;
+  font-size: 120%;
+  padding: 0px 8px;
+  display: inline-block;
+  font-family: "Times New Roman", Times, serif;
+}
+header a:hover {
+  color: #258c4d;
+}
+header div#editButtonsDiv {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  bottom: 0;
+}
+header button {
+  color: blanchedalmond;
+  text-decoration: none;
+  font-size: 120%;
+  padding: 3px 3px;
+  display: inline-block;
+  font-family: "Times New Roman", Times, serif;
+  background-color: #01443c;
+  margin-left: 3px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  border: none;
+  animation: fadeIn 1s ease-in-out;
+  overflow: auto;
+}
+
+header div#editButtonsDiv button#editModeButton,
+header div#editButtonsDiv button#exitEditModeButton,
+header div#editButtonsDiv button#saveWorldButton,
+header div#editButtonsDiv button#unsaveWorldButton {
+  margin-left: auto;
+}
+
+header button:hover {
+  color: #258c4d;
+  background-color: #012622;
+}
+
+header nav ul {
+  list-style: none;
+  /* flex:1; */
+  display: flex;
+  flex-direction: row;
+  margin-top: 5px;
+  /* justify-content: space-between; */
+  flex-wrap: wrap;
+}
+
+header nav ul li {
+  margin-left: 8px;
+}
+
+header nav select {
+  flex: 1;
+  display: inline-block;
+  background-color: #01443c;
+  color: #ffffff;
+  animation: fadeIn 1s ease-in-out;
+  padding-right: 10px;
+  font-size: 120%;
+}
+select:hover {
+  background-color: #012622;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+main div button {
+  background-color: #541b0eab;
+  color: #ffffff;
+  align-self: center;
+  font-size: 100%;
+  border: none;
+  margin-left: 3px;
+}
+
+main div#mapDiv img {
+  position: sticky;
+  right: 0%;
+  margin-top: 5px;
+  z-index: 1;
+  float: right;
+  max-width: 100%;
+  height: auto;
+  min-width: 100%;
+  /* align-self: flex-end; */
+}
+
+main {
+  display: flex;
+  flex-direction: row;
+  margin-top: 3px;
+}
+textarea {
+  resize: vertical;
+  width: 95%;
+  height: auto;
+  font-size: 100%;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  vertical-align: top;
+  background-color: #01302b;
+  margin-left: 0%;
+  margin-bottom: 2%;
+  color: beige; /* Add this line to set the text color to beige */
+}
+
+main div#mainContentDiv input,
+header input {
+  max-width: 30%;
+  font-size: 100%;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  vertical-align: top;
+  background-color: #01302b;
+  margin-left: 0%;
+  margin-bottom: 0%;
+  height: 20px;
+  color: beige;
+}
+div.titleDiv {
+  margin-left: 2%;
+  animation: fadeIn 1s ease-in-out;
+}
+div.subTitleDiv {
+  margin-left: 5%;
+  animation: fadeIn 1s ease-in-out;
+}
+div.textDiv {
+  margin-left: 8%;
+  animation: fadeIn 1s ease-in-out;
+}
+
+main h2,
+h3,
+p,
+main div#mainContentDiv label,
+header label,
+h1 {
+  position: relative;
+  width: auto;
+  color: beige;
+  word-wrap: break-word; /* Breaks long words if necessary to prevent overflow */
+  white-space: normal; /* Allows text to wrap onto the next line */
+  overflow-wrap: break-word;
+}
+div {
+  max-width: 100%;
+}
+
+header div {
+  max-height: 12%;
+  width: 100%;
+}
+
+main div button:hover {
+  background-color: #541b0e;
+}
+
+main div#mainContentDiv {
+  width: 55%;
+  position: relative;
+  overflow: auto;
+}
+
+div#navOptionsDiv div {
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 2%;
+}
+div#navOptionsDiv button {
+  margin-right: 2%;
+}
+option {
+  background-color: #01302b;
+  color: #ffffff;
+  font-size: 100%;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  vertical-align: top;
+  margin-left: 0%;
+  margin-bottom: 0%;
+  height: 20px;
+}
+
+div#deleteWorldMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: darkslategrey;
+  color: beige;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  z-index: 10000;
+}
+
+div#deleteWorldMessage button {
+  background-color: #541b0e;
+  color: #ffffff;
+  font-size: 100%;
+  border: none;
+  margin-left: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  header button {
+    font-size: 100%;
+  }
+  header nav select {
+    font-size: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  header button {
+    font-size: 60%;
+  }
+  header nav select {
+    font-size: 80%;
+  }
+}

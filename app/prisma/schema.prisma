@@ -18,8 +18,8 @@ model worlds {
   id         Int     @id @default(autoincrement())
   worldName  String  @db.VarChar(50)
   ownerId    String
-  mainImgUrl String
-  altImgUrl  String
+  mainImgUrl String  @db.VarChar(1024)
+  altImgUrl  String  @db.VarChar(1024)
   mainPage   String? @db.LongText
   pages      String? @db.LongText
   navItems   String? @db.LongText

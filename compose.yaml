@@ -3,9 +3,8 @@ services:
     build: ./app
     entrypoint: /usr/src/app/entrypoint.sh
     environment:
-      - DATABASE_URL=mariadb://${MYSQL_USER}:${MYSQL_PASSWORD}@db:${MYSQL_PORT}/${MYSQL_DATABASE}
       - FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
-      - MYSQL_HOST=db
+      - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
@@ -18,7 +17,7 @@ services:
       - db
     networks:
       - app-network
-  
+
   db:
     image: mysql
     restart: always
@@ -28,7 +27,7 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - ./data:/var/lib/mysql
+      - db-data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - app-network
@@ -36,3 +35,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  db-data:

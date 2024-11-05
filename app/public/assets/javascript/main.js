@@ -46,28 +46,28 @@ function handleCredentialResponse(response) {
     console.error(response.error);
     return;
   } else {
-    fetch('/login', {
-      method: 'POST',
+    fetch("/login", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        idToken: response.credential
+        idToken: response.credential,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        console.log(data.token);
+        if (data) {
+          localStorage.setItem("token", data.token);
+          console.log(localStorage.getItem("token"));
+          window.location.href = "/dashboard"; // Redirect to dashboard
+        }
       })
-    })
-    .then(response => response.json())
-    .then((data) => {
-      console.log(data);
-      console.log(data.token);
-      if (data) {
-        localStorage.setItem("token", data.token);
-        console.log(localStorage.getItem("token"));
-        window.location.href = "/dashboard"; // Redirect to dashboard
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
 }
 

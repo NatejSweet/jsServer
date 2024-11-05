@@ -5,7 +5,7 @@ function createFillNavsPage(worldId) {
   mainContentDiv.style.display = "none";
   let navDiv = document.createElement("div");
   navDiv.setAttribute("class", "navColumns");
-  fetch("/fillNavs/"+worldId, {
+  fetch("/fillNavs/" + worldId, {
     method: "GET",
     headers: {
       Authorization: "Bearer " + localStorage.getItem("token"),
@@ -63,7 +63,7 @@ function createFillNavsPage(worldId) {
     "click",
     function (event) {
       event.preventDefault();
-      submitNavPage(event);
+      submitNavPage(event, worldId);
     },
     false
   );
@@ -85,7 +85,7 @@ function addItem(item) {
   li.appendChild(input);
   ul.appendChild(li);
 }
-function submitNavPage(event) {
+function submitNavPage(event, worldId) {
   event.preventDefault();
   let navNames = Array.from(
     document.getElementsByClassName("navColumns")[0].children
@@ -101,7 +101,7 @@ function submitNavPage(event) {
     });
     navItemsJSON[navNameString] = navItemsArray;
   });
-  fetch("/fillNavs", {
+  fetch("/fillNavs/" + worldId, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -112,7 +112,7 @@ function submitNavPage(event) {
     if (response.ok) {
       console.log("responded");
       console.log(response);
-      location.assign("../dash.html");
+      location.assign("../dashboard");
     }
   });
 }
