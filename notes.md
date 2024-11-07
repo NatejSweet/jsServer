@@ -9,7 +9,12 @@ resizing screen messes up map markers, fixed with reload, not a huge issue, but 
 switch to JWT for user identification
 allow world copying
 containerize
+search needs to get all then search locally
 
+api_rebase_to-do:
+guest search needs reworked
+dash search needs reworked
+dash saved worlds needs reworked
 
 Later Plans(post production):
 

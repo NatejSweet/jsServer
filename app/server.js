@@ -385,6 +385,7 @@ app.post("/fillNavs/:id", jwtMiddleware(), async (req, res) => {
 });
 
 app.get("/world/:id", jwtMiddleware(), async (req, res) => {
+  console.log("hit world");
   try {
     let worldId = parseInt(req.params.id);
     const world = await prisma.worlds.findUnique({
@@ -396,26 +397,23 @@ app.get("/world/:id", jwtMiddleware(), async (req, res) => {
       //world not found
       res.status(404).send("world not found");
     }
-    if (
-      mainPage != null &&
-      (mainPage.public || mainPage.ownerId == req.userId)
-    ) {
-      const editAccess = mainPage.ownerId == req.userId;
-      const mainPageJSON = mainPage.mainPage;
-      const worldName = mainPage.worldName;
-      const mainImgUrl = mainPage.mainImageUrl;
-      const altImgUrl = mainPage.altImageUrl;
-      const navItems = mainPage.navItems;
-      const pages = mainPage.pages;
-      const mapMarkers = mainPage.mapMarkers;
-      const public = mainPage.public;
+    if (world != null && (world.public || world.ownerId == req.userId)) {
+      const editAccess = world.ownerId == req.userId;
+      const mainPageJSON = world.mainPage;
+      const worldName = world.worldName;
+      const mainImgUrl = world.mainImageUrl;
+      const altImgUrl = world.altImageUrl;
+      const navItems = world.navItems;
+      const pagesJSON = world.pages;
+      const mapMarkers = world.mapMarkers;
+      const public = world.public;
       res.send({
         mainPageJSON,
         worldName,
         mainImgUrl,
         altImgUrl,
         navItems,
-        pages,
+        pagesJSON,
         mapMarkers,
         editAccess,
         public,

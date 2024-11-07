@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
   dropdown("myWorldsMenu");
   dropdown("savedWorldsMenu");
   const searchBar = document.getElementById("searchBar");
-  console.log(localStorage.getItem("token"));
   searchBar.addEventListener("input", search);
   searchBar.addEventListener("keydown", (event) => {
     if (event.keyCode === 8) {

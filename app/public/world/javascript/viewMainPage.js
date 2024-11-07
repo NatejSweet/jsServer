@@ -10,6 +10,7 @@ var savedWorlds = {};
 document.addEventListener("DOMContentLoaded", function () {
   print("DOMContentLoaded");
   savedWorlds = JSON.parse(localStorage.getItem("savedWorlds"));
+  token = localStorage.getItem("token");
   viewMainPage();
 });
 window.addEventListener("resize", function () {
@@ -25,7 +26,12 @@ function viewMainPage() {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
   console.log(id);
-  fetch("/world/=" + encodeURIComponent(id))
+  fetch("/world/" + encodeURIComponent(id), {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+  })
     .then((response) => {
       if (response.ok) {
         return response.json();
@@ -69,6 +75,9 @@ function viewMainPage() {
       fillMainContent(mainPageJSON);
       fillNavBar(navItems);
       fillMap(img1Id, img2Id);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
     });
 }
 
