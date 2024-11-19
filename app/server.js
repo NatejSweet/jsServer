@@ -385,7 +385,6 @@ app.post("/fillNavs/:id", jwtMiddleware(), async (req, res) => {
 });
 
 app.get("/world/:id", jwtMiddleware(), async (req, res) => {
-  console.log("hit world");
   try {
     let worldId = parseInt(req.params.id);
     const world = await prisma.worlds.findUnique({
@@ -401,8 +400,8 @@ app.get("/world/:id", jwtMiddleware(), async (req, res) => {
       const editAccess = world.ownerId == req.userId;
       const mainPageJSON = world.mainPage;
       const worldName = world.worldName;
-      const mainImgUrl = world.mainImageUrl;
-      const altImgUrl = world.altImageUrl;
+      const mainImgUrl = world.mainImgUrl;
+      const altImgUrl = world.altImgUrl;
       const navItems = world.navItems;
       const pagesJSON = world.pages;
       const mapMarkers = world.mapMarkers;
@@ -427,7 +426,7 @@ app.get("/world/:id", jwtMiddleware(), async (req, res) => {
     res.status(500).send("get world failed");
   }
 });
-app.patch("world/:id", jwtMiddleware(), async (req, res) => {
+app.patch("/world/:id", jwtMiddleware(), async (req, res) => {
   try {
     let worldId = parseInt(req.params.id);
     const world = await prisma.worlds.findUnique({
@@ -443,7 +442,7 @@ app.patch("world/:id", jwtMiddleware(), async (req, res) => {
       //unauthorized
       res.status(401).send("unauthorized");
     }
-    const worldData = JSON.parse(req.body);
+    const worldData = req.body;
     const result = await prisma.worlds.update({
       where: {
         id: worldId,

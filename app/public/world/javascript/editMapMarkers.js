@@ -240,30 +240,32 @@ function saveMapMarkers(mapDiv) {
     console.log("width: ", parseInt(dotDiv.style.width));
     console.log("height: ", parseInt(dotDiv.style.height));
     let radXPercent = parseInt(dotDiv.style.width);
-    let radiusX = (parseInt(dotDiv.style.width) / 2 / 100) * img.width;
-    let radiusY = (parseInt(dotDiv.style.height) / 2 / 100) * img.height;
+    let radiusX = (parseInt(dotDiv.style.width) / 2 / 100);
+    let radiusY = (parseInt(dotDiv.style.height) / 2 / 100);
     let dotRect = dotDiv.getBoundingClientRect();
     let mapRect = mapDiv.getBoundingClientRect();
     console.log("dotRect: ", dotRect.left, dotRect.top);
     console.log("mapRect: ", mapRect.left, mapRect.top);
-    let x = (dotRect.left - mapRect.left + radiusX * img.width) / img.width;
-    let y = (dotRect.top - mapRect.top + radiusY * img.height) / img.height;
-    console.log("x, y, radiusX:", x, y, radiusX);
+    let x = (dotRect.left - mapRect.left + radiusX) / img.width;
+    let y = (dotRect.top - mapRect.top + radiusY) / img.height;
+    console.log("x, y, radiusX:", x, y, radiusX, radiusY);
     if (!mapMarkers[navItem]) {
       mapMarkers[navItem] = [];
     }
-    mapMarkers[navItem].push([x, y, radXPercent]);
+    mapMarkers[navItem].push([x, y, radiusX]);
   }
-  fetch("/saveMapMarkers?id=" + encodeURIComponent(id), {
-    method: "POST",
+  fetch("/world/" + encodeURIComponent(id), {
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
     },
     body: JSON.stringify({
-      mapMarkers: mapMarkers,
+      "mapMarkers": JSON.stringify(mapMarkers),
     }),
   }).then((response) => {
     if (response.ok) {
+      console.log(response);
       reloadContents((editMode = true));
     } else {
       return Promise.reject("something went wrong!");

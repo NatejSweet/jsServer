@@ -83,13 +83,15 @@ function mainImageIsUpdated(imgId) {
 function updatePages() {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
-  fetch("/updatePage?id=" + encodeURIComponent(id), {
+  fetch("/world/" + encodeURIComponent(id), {
     //update page in db
-    method: "POST",
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
+
     },
-    body: JSON.stringify(pagesJSON),
+    body: JSON.stringify({"pages": JSON.stringify(pagesJSON) }),
   }).then((response) => {
     if (response.ok) {
       return reloadContents(((editMode = true), (editAccess = true)));
@@ -101,13 +103,15 @@ function updateMainPage(content) {
   mainPageJSON = content;
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
-  fetch("/updateMainPage?id=" + encodeURIComponent(id), {
+  fetch("/world/" + encodeURIComponent(id), {
     //update main page in db
-    method: "POST",
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
+
     },
-    body: JSON.stringify(content),
+    body: JSON.stringify({ mainPage: JSON.stringify(content) }),
   }).then((response) => {
     if (response.ok) {
       return reloadContents(((editMode = true), (editAccess = true)));

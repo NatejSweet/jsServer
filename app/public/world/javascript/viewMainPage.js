@@ -4,11 +4,10 @@ var pagesJSON = {};
 var mapMarkers = {};
 var mainPageJSON = {};
 var navItems = {};
-var img1Id = null;
-var img2Id = null;
+var mainImgUrl = "";
+var altImgUrl = "";
 var savedWorlds = {};
 document.addEventListener("DOMContentLoaded", function () {
-  print("DOMContentLoaded");
   savedWorlds = JSON.parse(localStorage.getItem("savedWorlds"));
   token = localStorage.getItem("token");
   viewMainPage();
@@ -35,46 +34,48 @@ function viewMainPage() {
     .then((response) => {
       if (response.ok) {
         return response.json();
+      } else {
+        throw new Error("Failed to fetch world data");
       }
     })
     .then((content) => {
       try {
-        // console.log(JSON.parse(content));
+        if (!content) {
+          throw new Error("Content is undefined");
+        }
+        console.log(content);
         mainPageJSON = JSON.parse(content.mainPageJSON);
-        pagesJSON = JSON.parse(content.pages);
+        console.log(mainPageJSON);
+        pagesJSON = JSON.parse(content.pagesJSON);
+        console.log(pagesJSON);
         mapMarkers = JSON.parse(content.mapMarkers);
+        console.log(mapMarkers);
         navItems = JSON.parse(content.navItems);
-        mapMarkers = JSON.parse(content.mapMarkers);
-        console.log(content.editAccess);
-      } catch (error) {
-        console.log(error);
-      }
-      worldName.innerHTML = content.worldName;
-      img1Id = parseInt(content.img1Id, 10);
-      img2Id = parseInt(content.img2Id, 10);
-      var public = content.public === "true";
-      if (
-        // !document.getElementById("editModeButton") &&
-        // !document.getElementById("editPageButton") &&
-        content.editAccess
-      ) {
-        if (document.getElementById("editModeButton")) {
+        mainImgUrl = content.mainImgUrl;
+        console.log(mainImgUrl);
+        altImgUrl = content.altImgUrl;
+
+        worldName.innerHTML = content.worldName;
+        const isPublic = content.public === "true";
+        if (content.editAccess) {
           if (document.getElementById("editModeButton")) {
             document.getElementById("editModeButton").remove();
           }
+          if (document.getElementById("editPageButton")) {
+            document.getElementById("editPageButton").remove();
+          }
+          createEditButton(isPublic);
+        } else {
+          console.log("no edit access");
+          createSaveWorldButton(id);
         }
-        if (document.getElementById("editPageButton")) {
-          document.getElementById("editPageButton").remove();
-        }
-        createEditButton(public);
-      } else {
-        console.log("no edit access");
-        console.log(savedWorlds);
-        createSaveWorldButton(id);
+        fillMainContent(mainPageJSON);
+        fillNavBar(navItems);
+        console.log("mainImgUrl:", mainImgUrl);
+        fillMap(mainImgUrl, altImgUrl);
+      } catch (error) {
+        console.log(error);
       }
-      fillMainContent(mainPageJSON);
-      fillNavBar(navItems);
-      fillMap(img1Id, img2Id);
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -239,7 +240,7 @@ function fillNavBar(navItems) {
   });
   nav.appendChild(list);
 }
-function fillMap(img1Id, img2Id) {
+function fillMap(mainImgUrl, altImgUrl) {
   let mapDiv = document.getElementById("mapDiv");
   mapDiv.innerHTML = "";
   let img1 = document.createElement("img");
@@ -273,31 +274,10 @@ function fillMap(img1Id, img2Id) {
       img1.style.display = "none";
     }
   });
-  let time = new Date().getTime();
-  fetch("/viewImage?imgId=" + encodeURIComponent(img1Id))
-    .then((response) => {
-      if (response.ok) {
-        console.log(response);
-        return response.json();
-      }
-    })
-    .then((content) => {
-      console.log("seting src: " + content.src);
-      img1.setAttribute("src", content.src + "&t=" + time);
-    });
-  if (img2Id != null) {
-    fetch("/viewImage?imgId=" + encodeURIComponent(img2Id))
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then((content) => {
-        img2.setAttribute("src", content.src + "&t=" + time);
-        console.log("HERE: " + content.src);
-        img2.style.display = "none";
-      });
-  }
+  img1.setAttribute("src", mainImgUrl);
+  img2.setAttribute("src", altImgUrl);
+  img1.style.display = "block";
+  img2.style.display = "none";
   mapDiv.appendChild(img2Button);
   mapDiv.appendChild(img1Button);
   mapDiv.appendChild(document.createElement("br"));
@@ -307,60 +287,36 @@ function fillMap(img1Id, img2Id) {
   placeMapMarkers(map1, img1);
 }
 
-function getAltImage(img2Id) {
-  let img1 = document.getElementById("map1Img");
-  let img2 = document.getElementById("map2Img");
-  let img2Button = document.getElementById("img2Button");
-  img2Button.addEventListener("click", () => {
-    if (img2.style.display == "block") {
-      return;
-    } else {
-      img2.style.display = "block";
-      img1.style.display = "none";
-    }
-  });
-  if (img2Id != null) {
-    fetch("/viewImage?imgId=" + encodeURIComponent(img2Id))
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then((content) => {
-        img2.setAttribute("src", content.src);
-        img2.style.display = "none";
-      });
-  } else {
-    img2.setAttribute("src", "#");
-    img2.style.display = "none";
-  }
-}
-
 function placeMapMarkers(map1, img1) {
-  img1.onload = function () {
-    Object.keys(mapMarkers).forEach((hub) => {
-      mapMarkers[hub].forEach((marker) => {
-        let x = marker[0] * img1.width;
-        let y = marker[1] * img1.height;
-        let r = marker[2] * img1.width;
-        let area = document.createElement("area");
-        area.setAttribute("shape", "circle");
-        area.setAttribute("coords", x + "," + y + "," + r);
-        area.setAttribute("href", "#");
-        area.setAttribute("title", hub);
-        area.setAttribute("class", "mapMarker");
-        area.addEventListener("click", function (event) {
-          event.preventDefault(); // Prevent the default action
-          loadHub(hub);
+  console.log(mapMarkers);
+  if (mapMarkers != {}) {
+    console.log("placing markers");
+    img1.onload = function () {
+      Object.keys(mapMarkers).forEach((hub) => {
+        console.log(hub);
+        mapMarkers[hub].forEach((marker) => {
+          let x = marker[0] * img1.width;
+          let y = marker[1] * img1.height;
+          let r = marker[2] * img1.width;
+          let area = document.createElement("area");
+          area.setAttribute("shape", "circle");
+          area.setAttribute("coords", x + "," + y + "," + r);
+          area.setAttribute("href", "#");
+          area.setAttribute("title", hub);
+          area.setAttribute("class", "mapMarker");
+          area.addEventListener("click", function (event) {
+            event.preventDefault(); // Prevent the default action
+            loadHub(hub);
+          });
+          map1.appendChild(area);
         });
-        map1.appendChild(area);
       });
-    });
-  };
+    }
+    };
 }
 
 function loadHub(hubName) {
-  console.log(pagesJSON);
+  console.log(pagesJSON)
   let hub = pagesJSON[hubName];
   fillMainContent(hub.content, hubName);
   getAltImage(hub.imgId);

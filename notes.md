@@ -10,7 +10,10 @@ switch to JWT for user identification
 allow world copying
 containerize
 search needs to get all then search locally
-
+change maps to have one global and allow a page to have a locla map
+uploading a replacement image may not work due to cacheing
+need to rout / if have token to dash
+might need a full mapmarkers rework, the logic is too complex, start with pseudo
 api_rebase_to-do:
 guest search needs reworked
 dash search needs reworked
